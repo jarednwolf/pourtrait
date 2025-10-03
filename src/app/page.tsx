@@ -1,33 +1,11 @@
-'use client'
-
-import React from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Icon } from '@/components/ui/Icon'
-import { Badge } from '@/components/ui/Badge'
-import { InteractiveDemo } from '@/components/demo/InteractiveDemo'
-import { DemoTasteProfileQuiz } from '@/components/demo/DemoTasteProfileQuiz'
-import { DemoRecommendations } from '@/components/demo/DemoRecommendations'
-
-type DemoState = 'landing' | 'interactive' | 'quiz' | 'results'
-
 export default function Home() {
-  const router = useRouter()
-  const [demoState, setDemoState] = React.useState<DemoState>('landing')
-  const [quizResult, setQuizResult] = React.useState<any>(null)
-
-  const handleStartInteractiveDemo = () => {
-    setDemoState('interactive')
-  }
-
-  const handleStartQuiz = () => {
-    setDemoState('quiz')
-  }
-
-  const handleQuizComplete = (result: any) => {
-    setQuizResult(result)
-    setDemoState('results')
+  return (
+    <div>
+      <h1>Pourtrait - AI Wine Sommelier</h1>
+      <p>Welcome to your personal AI-powered wine cellar and sommelier!</p>
+      <p>This is a simplified version to test deployment.</p>
+    </div>
+  )
   }
 
   const handleSignUp = () => {
