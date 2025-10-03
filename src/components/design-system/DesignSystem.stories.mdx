@@ -1,0 +1,149 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Design System/Overview" />
+
+# Pourtrait Design System
+
+A professional, wine-inspired design system built for the Pourtrait AI sommelier application.
+
+## Core Principles
+
+### 1. Professional Excellence
+- **No Emojis Policy**: Strict prohibition on emoji usage throughout the application
+- **Sommelier-Appropriate Language**: All content maintains professional wine industry standards
+- **Visual Sophistication**: Clean, elegant design that conveys expertise and trustworthiness
+
+### 2. Mobile-First Responsive Design
+- **Progressive Enhancement**: Starts with mobile experience and enhances for larger screens
+- **Touch-Friendly Interactions**: Optimized for one-handed mobile use
+- **Consistent Breakpoints**: Standardized responsive behavior across components
+
+### 3. Accessibility & Inclusivity
+- **WCAG Compliance**: Meets accessibility standards for inclusive design
+- **Semantic HTML**: Proper markup for screen readers and assistive technologies
+- **Color Contrast**: Sufficient contrast ratios for readability
+
+## Color Palette
+
+### Wine-Inspired Colors
+Our color palette draws inspiration from the wine world while maintaining professional sophistication:
+
+- **Burgundy**: Primary brand color representing deep, rich wines
+- **Wine**: Accent color for highlights and interactive elements  
+- **Gold**: Complementary color for premium features and success states
+- **Neutral Grays**: Professional foundation colors for text and backgrounds
+
+### Usage Guidelines
+- Use burgundy for primary actions and brand elements
+- Apply wine colors sparingly for accents and highlights
+- Gold should be reserved for premium features and positive feedback
+- Maintain high contrast ratios for accessibility
+
+## Typography
+
+### Font Families
+- **Primary**: Inter - Clean, modern sans-serif for body text and UI elements
+- **Display**: Playfair Display - Elegant serif for headings and wine names
+
+### Scale & Hierarchy
+- Consistent type scale from 12px to 48px
+- Clear hierarchy with appropriate line heights
+- Professional tone without excessive styling
+
+## Iconography
+
+### Heroicons Integration
+- **Consistent Style**: All icons from Heroicons library for visual consistency
+- **Professional Appearance**: No custom emojis or casual graphics
+- **Semantic Usage**: Icons support content meaning, never decorative only
+- **Size System**: Standardized sizing (xs, sm, md, lg, xl) for consistency
+
+### Available Icon Categories
+- Navigation (home, user, settings, search)
+- Actions (plus, x, heart, star)
+- Status (info, warning, success, error)
+- Wine-specific (camera, photo, calendar, clock)
+
+## Component Architecture
+
+### Design Tokens
+- Consistent spacing scale (4px base unit)
+- Standardized border radius values
+- Professional shadow system
+- Responsive breakpoint tokens
+
+### Variant System
+Components use class-variance-authority for:
+- Consistent prop-based styling
+- Type-safe variant definitions
+- Maintainable style combinations
+- Predictable component behavior
+
+## Testing & Quality Assurance
+
+### Automated Validation
+- **Emoji Detection**: Automated tests prevent emoji usage
+- **Professional Tone**: Content validation for appropriate language
+- **Visual Regression**: Storybook visual testing for consistency
+- **Accessibility**: Automated a11y testing in component tests
+
+### Component Testing
+- React Testing Library for user-focused testing
+- Comprehensive prop validation
+- Interaction testing for all interactive elements
+- Professional design guideline enforcement
+
+## Development Guidelines
+
+### Code Standards
+- TypeScript for type safety
+- Consistent naming conventions
+- Comprehensive documentation
+- Professional code comments
+
+### Performance Optimization
+- Tree-shakeable component exports
+- Optimized bundle sizes
+- Efficient re-rendering patterns
+- Mobile-first performance considerations
+
+## Getting Started
+
+### Installation
+```bash
+npm install @heroicons/react class-variance-authority
+```
+
+### Basic Usage
+```tsx
+import { Button, Card, Icon } from '@/components/ui'
+
+function WineCard() {
+  return (
+    <Card>
+      <Button variant="primary">
+        <Icon name="plus" size="sm" />
+        Add to Collection
+      </Button>
+    </Card>
+  )
+}
+```
+
+### Design System Utilities
+```tsx
+import { cn, designSystem } from '@/lib/design-system'
+
+// Validate professional content
+const isValid = designSystem.validateNoEmojis(content)
+
+// Merge classes efficiently
+const className = cn('base-class', conditionalClass && 'active')
+```
+
+## Resources
+
+- [Component Documentation](/?path=/docs/ui-button--docs)
+- [Layout System](/?path=/docs/layout-container--docs)
+- [Icon Library](/?path=/docs/ui-icon--docs)
+- [Professional Guidelines](/?path=/docs/design-system-guidelines--docs)

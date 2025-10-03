@@ -1,0 +1,61 @@
+{
+  "crons": [
+    {
+      "path": "/api/notifications/process",
+      "schedule": "*/15 * * * *"
+    }
+  ],
+  "functions": {
+    "src/app/api/notifications/process/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/ai/chat/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/ai/recommendations/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/image/recognize-wine/route.ts": {
+      "maxDuration": 45
+    },
+    "src/app/api/image/ocr/route.ts": {
+      "maxDuration": 45
+    }
+  },
+  "env": {
+    "CRON_SECRET": "@cron-secret"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "/api/health"
+    }
+  ]
+}

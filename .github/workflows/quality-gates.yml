@@ -1,0 +1,361 @@
+name: Quality Gates
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Dependency vulnerability check
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for known vulnerabilities
+        run: npm audit --audit-level=moderate
+
+      - name: Check for outdated dependencies
+        run: npm outdated || true
+
+      - name: Generate dependency report
+        run: |
+          npm list --depth=0 > dependency-report.txt
+          echo "## Dependency Report" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          cat dependency-report.txt >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+  # Code quality analysis
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for SonarCloud
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test -- --coverage
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        if: env.SONAR_TOKEN != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  # Performance testing
+  performance-test:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          configPath: './lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  # Bundle size analysis
+  bundle-analysis:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and analyze bundle
+        run: |
+          npm run build
+          npx @next/bundle-analyzer
+
+      - name: Check bundle size
+        uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Accessibility testing
+  accessibility-test:
+    name: Accessibility Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run accessibility tests
+        run: npm run test -- --testNamePattern="accessibility"
+
+      - name: Pa11y accessibility check
+        run: |
+          npm install -g pa11y-ci
+          # This would run against a deployed preview
+          echo "Accessibility check would run against preview deployment"
+
+  # Database migration validation
+  migration-validation:
+    name: Database Migration Validation
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'supabase/migrations/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+
+      - name: Start Supabase local
+        run: supabase start
+
+      - name: Run migration tests
+        run: |
+          # Test migrations can be applied
+          supabase db reset
+          
+          # Test migration rollback (if applicable)
+          echo "Migration validation completed"
+
+      - name: Stop Supabase local
+        run: supabase stop
+
+  # API contract testing
+  api-contract-test:
+    name: API Contract Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run API contract tests
+        run: |
+          # Test API route handlers
+          npm run test -- --testPathPattern="api.*test"
+
+      - name: Validate OpenAPI spec (if exists)
+        run: |
+          if [ -f "openapi.yaml" ]; then
+            npx swagger-parser validate openapi.yaml
+          fi
+
+  # Security scanning
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run Semgrep security scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+
+  # Environment validation
+  env-validation:
+    name: Environment Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate environment variables
+        run: |
+          # Check that all required environment variables are documented
+          echo "Validating environment configuration..."
+          
+          # Check .env.local.example exists and is up to date
+          if [ ! -f ".env.local.example" ]; then
+            echo "❌ .env.local.example file is missing"
+            exit 1
+          fi
+          
+          # Validate Vercel configuration
+          if [ ! -f "vercel.json" ]; then
+            echo "❌ vercel.json file is missing"
+            exit 1
+          fi
+          
+          echo "✅ Environment configuration validated"
+
+      - name: Check documentation
+        run: |
+          # Ensure deployment documentation exists
+          if [ ! -f "docs/05-operations/deployment.md" ]; then
+            echo "❌ Deployment documentation is missing"
+            exit 1
+          fi
+          
+          echo "✅ Documentation validated"
+
+  # Quality gate summary
+  quality-gate-summary:
+    name: Quality Gate Summary
+    runs-on: ubuntu-latest
+    needs: [
+      dependency-check,
+      code-quality,
+      performance-test,
+      bundle-analysis,
+      accessibility-test,
+      api-contract-test,
+      security-scan,
+      env-validation
+    ]
+    if: always()
+    steps:
+      - name: Generate quality report
+        run: |
+          echo "# Quality Gate Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check each job status
+          if [[ "${{ needs.dependency-check.result }}" == "success" ]]; then
+            echo "✅ Dependency Check: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Dependency Check: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.code-quality.result }}" == "success" ]]; then
+            echo "✅ Code Quality: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Code Quality: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.performance-test.result }}" == "success" ]]; then
+            echo "✅ Performance Test: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Performance Test: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.bundle-analysis.result }}" == "success" ]]; then
+            echo "✅ Bundle Analysis: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Bundle Analysis: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.accessibility-test.result }}" == "success" ]]; then
+            echo "✅ Accessibility Test: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Accessibility Test: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.api-contract-test.result }}" == "success" ]]; then
+            echo "✅ API Contract Test: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ API Contract Test: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.security-scan.result }}" == "success" ]]; then
+            echo "✅ Security Scan: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Security Scan: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.env-validation.result }}" == "success" ]]; then
+            echo "✅ Environment Validation: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Environment Validation: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check overall quality gate
+        run: |
+          # Fail if any critical checks failed
+          if [[ "${{ needs.security-scan.result }}" != "success" || 
+                "${{ needs.code-quality.result }}" != "success" || 
+                "${{ needs.env-validation.result }}" != "success" ]]; then
+            echo "❌ Quality gate failed - critical checks did not pass"
+            exit 1
+          fi
+          
+          echo "✅ Quality gate passed - ready for deployment"

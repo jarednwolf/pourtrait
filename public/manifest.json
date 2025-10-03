@@ -1,0 +1,117 @@
+{
+  "name": "Pourtrait - AI Wine Sommelier",
+  "short_name": "Pourtrait",
+  "description": "AI-powered personal wine cellar and sommelier for wine lovers of all experience levels",
+  "theme_color": "#7c2d12",
+  "background_color": "#fef7f0",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "categories": ["food", "lifestyle", "productivity"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Wine",
+      "short_name": "Add Wine",
+      "description": "Quickly add a new wine to your inventory",
+      "url": "/inventory?action=add",
+      "icons": [
+        {
+          "src": "/icons/shortcut-add-wine.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Wine Recommendations",
+      "short_name": "Recommendations",
+      "description": "Get AI-powered wine recommendations",
+      "url": "/chat?context=recommendations",
+      "icons": [
+        {
+          "src": "/icons/shortcut-recommendations.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Scan Wine Label",
+      "short_name": "Scan Label",
+      "description": "Scan a wine label to add to inventory",
+      "url": "/inventory?action=scan",
+      "icons": [
+        {
+          "src": "/icons/shortcut-scan.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Pourtrait home screen on desktop"
+    },
+    {
+      "src": "/screenshots/mobile-inventory.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Wine inventory on mobile"
+    }
+  ]
+}
