@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseClient } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { dataExportService } from '@/lib/services/data-export'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createSupabaseClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -69,7 +68,6 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createSupabaseClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

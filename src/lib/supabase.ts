@@ -22,24 +22,16 @@ export const createSupabaseClient = () => {
   })
 }
 
-// Lazy client creation for backwards compatibility
-let _supabase: ReturnType<typeof createClient<Database>> | null = null
-
-export const supabase = {
-  get client() {
-    if (!_supabase) {
-      _supabase = createSupabaseClient()
-    }
-    return _supabase
-  }
-}
+// Default client instance for backwards compatibility
+export const supabase = createSupabaseClient()
 
 // Server-side client for admin operations
 export const createServerClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
   
-  if (!serviceRoleKey) {
-    throw new Error('Missing Supabase service role key')
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase environment variables')
   }
   
   return createClient<Database>(supabaseUrl, serviceRoleKey, {

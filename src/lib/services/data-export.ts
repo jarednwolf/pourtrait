@@ -1,5 +1,5 @@
 import { Wine, User, TasteProfile, ConsumptionRecord } from '@/types'
-import { createSupabaseClient } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import type { Database } from '@/lib/database.types'
 
 export interface ExportOptions {
@@ -20,9 +20,6 @@ export interface UserDataExport {
 }
 
 export class DataExportService {
-  private getSupabase() {
-    return createSupabaseClient()
-  }
 
   /**
    * Export user's complete wine inventory and data
@@ -30,14 +27,14 @@ export class DataExportService {
   async exportUserData(userId: string, options: ExportOptions): Promise<UserDataExport> {
     try {
       // Get user data
-      const { data: user } = await this.getSupabase()
+      const { data: user } = await supabase
         .from('users')
         .select('id, email, name, created_at, experience_level')
         .eq('id', userId)
         .single()
 
       // Get wine inventory
-      const { data: wines } = await this.getSupabase()
+      const { data: wines } = await supabase
         .from('wines')
         .select('*')
         .eq('user_id', userId)
@@ -52,7 +49,7 @@ export class DataExportService {
 
       // Include taste profile if requested
       if (options.includeTasteProfile) {
-        const { data: tasteProfile } = await this.getSupabase()
+        const { data: tasteProfile } = await supabase
           .from('taste_profiles')
           .select('*')
           .eq('user_id', userId)
@@ -65,7 +62,7 @@ export class DataExportService {
 
       // Include consumption history if requested
       if (options.includeConsumptionHistory) {
-        const { data: consumptionHistory } = await this.getSupabase()
+        const { data: consumptionHistory } = await supabase
           .from('consumption_history')
           .select('*')
           .eq('user_id', userId)
