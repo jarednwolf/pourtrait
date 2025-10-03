@@ -68,7 +68,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@esbuild/darwin-arm64": "^0.25.10",
     "@storybook/addon-docs": "^9.1.10",
     "@storybook/addon-onboarding": "^9.1.10",
     "@storybook/nextjs": "^9.1.10",
