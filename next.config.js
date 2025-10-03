@@ -97,7 +97,6 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   // Optimize for Vercel deployment
-  output: 'standalone',
   // Enable PWA capabilities
   headers: async () => [
     {
