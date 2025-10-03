@@ -55,10 +55,12 @@ export interface MealContext {
 }
 
 export class RestaurantWineAnalysisService {
-  private supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  private getSupabase() {
+    return createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+  }
 
   /**
    * Analyze restaurant wine list and provide personalized recommendations
@@ -185,7 +187,7 @@ export class RestaurantWineAnalysisService {
   ): Promise<RestaurantWineMatch> {
     try {
       // Search for similar wines in the database
-      const { data: wines, error } = await this.supabase
+      const { data: wines, error } = await this.getSupabase()
         .from('wines')
         .select('*')
         .or(`name.ilike.%${extractedWine.name}%,producer.ilike.%${extractedWine.producer || ''}%`)
@@ -798,7 +800,7 @@ export class RestaurantWineAnalysisService {
    */
   private async getUserTasteProfile(userId: string): Promise<TasteProfile | null> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.getSupabase()
         .from('taste_profiles')
         .select('*')
         .eq('user_id', userId)
@@ -817,7 +819,7 @@ export class RestaurantWineAnalysisService {
    */
   private async getUserInventory(userId: string): Promise<Wine[]> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.getSupabase()
         .from('wines')
         .select('*')
         .eq('user_id', userId)

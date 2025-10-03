@@ -1,5 +1,5 @@
 import { Wine, User, TasteProfile, ConsumptionRecord } from '@/types'
-import { createClient } from '@supabase/supabase-js'
+import { createSupabaseClient } from '@/lib/supabase'
 import type { Database } from '@/lib/database.types'
 
 export interface ExportOptions {
@@ -20,7 +20,9 @@ export interface UserDataExport {
 }
 
 export class DataExportService {
-  private supabase = createClient()
+  private getSupabase() {
+    return createSupabaseClient()
+  }
 
   /**
    * Export user's complete wine inventory and data
@@ -28,14 +30,14 @@ export class DataExportService {
   async exportUserData(userId: string, options: ExportOptions): Promise<UserDataExport> {
     try {
       // Get user data
-      const { data: user } = await this.supabase
+      const { data: user } = await this.getSupabase()
         .from('users')
         .select('id, email, name, created_at, experience_level')
         .eq('id', userId)
         .single()
 
       // Get wine inventory
-      const { data: wines } = await this.supabase
+      const { data: wines } = await this.getSupabase()
         .from('wines')
         .select('*')
         .eq('user_id', userId)
@@ -50,7 +52,7 @@ export class DataExportService {
 
       // Include taste profile if requested
       if (options.includeTasteProfile) {
-        const { data: tasteProfile } = await this.supabase
+        const { data: tasteProfile } = await this.getSupabase()
           .from('taste_profiles')
           .select('*')
           .eq('user_id', userId)
@@ -63,7 +65,7 @@ export class DataExportService {
 
       // Include consumption history if requested
       if (options.includeConsumptionHistory) {
-        const { data: consumptionHistory } = await this.supabase
+        const { data: consumptionHistory } = await this.getSupabase()
           .from('consumption_history')
           .select('*')
           .eq('user_id', userId)
@@ -170,7 +172,7 @@ export class DataExportService {
       }
 
       // Start transaction-like operations
-      const { error: deleteWinesError } = await this.supabase
+      const { error: deleteWinesError } = await this.getSupabase()
         .from('wines')
         .delete()
         .eq('user_id', userId)
@@ -187,7 +189,7 @@ export class DataExportService {
           id: undefined // Let database generate new IDs
         }))
 
-        const { error: insertWinesError } = await this.supabase
+        const { error: insertWinesError } = await this.getSupabase()
           .from('wines')
           .insert(winesWithUserId)
 
@@ -198,7 +200,7 @@ export class DataExportService {
 
       // Restore taste profile if included
       if (backupData.tasteProfile) {
-        const { error: upsertProfileError } = await this.supabase
+        const { error: upsertProfileError } = await this.getSupabase()
           .from('taste_profiles')
           .upsert({
             ...backupData.tasteProfile,
@@ -212,7 +214,7 @@ export class DataExportService {
 
       // Restore consumption history if included
       if (backupData.consumptionHistory && backupData.consumptionHistory.length > 0) {
-        const { error: deleteHistoryError } = await this.supabase
+        const { error: deleteHistoryError } = await this.getSupabase()
           .from('consumption_history')
           .delete()
           .eq('user_id', userId)
@@ -224,7 +226,7 @@ export class DataExportService {
             id: undefined
           }))
 
-          const { error: insertHistoryError } = await this.supabase
+          const { error: insertHistoryError } = await this.getSupabase()
             .from('consumption_history')
             .insert(historyWithUserId)
 
@@ -245,16 +247,17 @@ export class DataExportService {
   async deleteAllUserData(userId: string): Promise<void> {
     try {
       // Delete in order to respect foreign key constraints
+      const supabase = this.getSupabase()
       await Promise.all([
-        this.supabase.from('consumption_history').delete().eq('user_id', userId),
-        this.supabase.from('recommendations').delete().eq('user_id', userId),
-        this.supabase.from('notifications').delete().eq('user_id', userId),
-        this.supabase.from('taste_profiles').delete().eq('user_id', userId),
-        this.supabase.from('wines').delete().eq('user_id', userId)
+        supabase.from('consumption_history').delete().eq('user_id', userId),
+        supabase.from('recommendations').delete().eq('user_id', userId),
+        supabase.from('notifications').delete().eq('user_id', userId),
+        supabase.from('taste_profiles').delete().eq('user_id', userId),
+        supabase.from('wines').delete().eq('user_id', userId)
       ])
 
       // Finally delete user profile (handled by Supabase Auth)
-      const { error } = await this.supabase.auth.admin.deleteUser(userId)
+      const { error } = await this.getSupabase().auth.admin.deleteUser(userId)
       
       if (error) {
         console.error('Error deleting user account:', error)
@@ -277,11 +280,12 @@ export class DataExportService {
     lastActivity: string
   }> {
     try {
+      const supabase = this.getSupabase()
       const [winesResult, historyResult, profileResult, userResult] = await Promise.all([
-        this.supabase.from('wines').select('id').eq('user_id', userId),
-        this.supabase.from('consumption_history').select('id').eq('user_id', userId),
-        this.supabase.from('taste_profiles').select('id').eq('user_id', userId).single(),
-        this.supabase.from('users').select('created_at, updated_at').eq('id', userId).single()
+        supabase.from('wines').select('id').eq('user_id', userId),
+        supabase.from('consumption_history').select('id').eq('user_id', userId),
+        supabase.from('taste_profiles').select('id').eq('user_id', userId).single(),
+        supabase.from('users').select('created_at, updated_at').eq('id', userId).single()
       ])
 
       return {
