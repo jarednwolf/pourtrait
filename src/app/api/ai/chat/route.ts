@@ -2,6 +2,9 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { OpenAI } from 'openai'
+
+// Configure function timeout for Vercel
+export const maxDuration = 30
 import { createClient } from '@supabase/supabase-js'
 import { ResponseValidator } from '@/lib/ai/validation'
 import { buildPromptTemplate } from '@/lib/ai/config'

@@ -6,6 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+
+// Configure function timeout for Vercel
+export const maxDuration = 60
 import { NotificationScheduler } from '@/lib/services/notification-scheduler'
 import { NotificationService } from '@/lib/services/notification-service'
 
