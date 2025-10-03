@@ -12,25 +12,6 @@ import { withRetry, retryConditions } from '../utils/retry'
 import { ImageProcessingFallbacks } from '../utils/fallback'
 import { imageLogger } from '../utils/logger'
 import { performanceMonitor } from '../monitoring/performance'
-import { text } from 'stream/consumers'
-import { string } from 'zod'
-import { text } from 'stream/consumers'
-import { text } from 'stream/consumers'
-import { text } from 'stream/consumers'
-import { text } from 'stream/consumers'
-import { text } from 'stream/consumers'
-import { text } from 'stream/consumers'
-import { string } from 'zod'
-import { text } from 'stream/consumers'
-import { url } from 'inspector'
-import { url } from 'inspector'
-import { url } from 'inspector'
-import { format } from 'path'
-import { format } from 'path'
-import { format } from 'path'
-import { text } from 'stream/consumers'
-import { text } from 'stream/consumers'
-import { url } from 'inspector'
 
 /**
  * Image Processing Service
@@ -104,9 +85,22 @@ export class ImageProcessingService {
       }
       
       // Fallback if no API key available
-      return this.fallbackTextExtraction(imageBuffer)
+      return this.fallbackTextExtraction(imageBuffer);
+    } catch (error) {
+      return {
+        success: false,
+        extractedText: '',
+        confidence: 0,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
       }
+    }
+  }
 
+  /**
+   * Legacy Google Vision API method (kept for reference)
+   */
+  private async extractTextWithGoogleVision(imageBuffer: Buffer): Promise<OCRResult> {
+    try {
       const [result] = await this.visionClient.textDetection({
         image: { content: imageBuffer }
       })

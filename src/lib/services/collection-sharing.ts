@@ -1,5 +1,6 @@
 import { Wine } from '@/types'
-import { createClient } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/database.types'
 
 export interface SharedCollection {
   id: string
@@ -23,7 +24,16 @@ export interface ShareOptions {
 }
 
 export class CollectionSharingService {
-  private supabase = createClient()
+  private getSupabaseClient() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Missing Supabase environment variables')
+    }
+    
+    return createClient<Database>(supabaseUrl, supabaseAnonKey)
+  }
 
   /**
    * Create a shareable collection
@@ -34,7 +44,8 @@ export class CollectionSharingService {
       const shareToken = this.generateShareToken()
 
       // Get wines to share
-      let winesQuery = this.supabase
+      const supabase = this.getSupabaseClient()
+      let winesQuery = supabase
         .from('wines')
         .select('*')
         .eq('user_id', userId)
@@ -59,7 +70,7 @@ export class CollectionSharingService {
       })) || []
 
       // Create shared collection record
-      const { data: sharedCollection, error: createError } = await this.supabase
+      const { data: sharedCollection, error: createError } = await supabase
         .from('shared_collections')
         .insert({
           user_id: userId,
@@ -90,7 +101,8 @@ export class CollectionSharingService {
    */
   async getSharedCollection(shareToken: string): Promise<SharedCollection | null> {
     try {
-      const { data: collection, error } = await this.supabase
+      const supabase = this.getSupabaseClient()
+      const { data: collection, error } = await supabase
         .from('shared_collections')
         .select('*')
         .eq('share_token', shareToken)
@@ -101,7 +113,7 @@ export class CollectionSharingService {
       }
 
       // Increment view count
-      await this.supabase
+      await supabase
         .from('shared_collections')
         .update({ view_count: collection.view_count + 1 })
         .eq('id', collection.id)

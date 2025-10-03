@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * React Error Boundary component for graceful error handling
  */

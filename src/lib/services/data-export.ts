@@ -1,5 +1,6 @@
 import { Wine, User, TasteProfile, ConsumptionRecord } from '@/types'
-import { createClient } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/database.types'
 
 export interface ExportOptions {
   format: 'csv' | 'json' | 'pdf'

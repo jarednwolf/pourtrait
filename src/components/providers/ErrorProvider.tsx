@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Global error provider for handling application-wide errors
  */
