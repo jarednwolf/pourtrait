@@ -7,7 +7,6 @@
 import { supabase } from '@/lib/supabase'
 import { NotificationService, DrinkingWindowAlert } from './notification-service'
 import { pushNotificationService, wineNotificationTemplates } from './push-notifications'
-import { sendPushNotification } from '@/app/api/push/send/route'
 
 export interface ScheduledNotification {
   id: string
@@ -169,7 +168,20 @@ export class NotificationScheduler {
       // Send push notification if enabled
       if (preferences.pushEnabled !== false) {
         try {
-          const pushResult = await sendPushNotification(notification.user_id, payload)
+          // Send push notification via API endpoint
+          const pushResponse = await fetch('/api/push/send', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.PUSH_API_KEY || ''
+            },
+            body: JSON.stringify({
+              userId: notification.user_id,
+              payload
+            })
+          })
+          
+          const pushResult = await pushResponse.json()
           deliveryResults.push({ type: 'push', success: pushResult.success })
           if (pushResult.success && pushResult.sent > 0) {
             deliverySuccess = true

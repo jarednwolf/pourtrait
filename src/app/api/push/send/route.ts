@@ -10,12 +10,24 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import webpush from 'web-push'
 
-// Configure web-push with VAPID keys
-if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+// Function to configure web-push with VAPID keys
+function configureWebPush() {
+  const vapidPublicKey = process.env.VAPID_PUBLIC_KEY
+  const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY
+  
+  if (!vapidPublicKey || !vapidPrivateKey) {
+    throw new Error('VAPID keys not configured')
+  }
+  
+  // Validate VAPID public key format (URL-safe base64 without padding)
+  if (vapidPublicKey.includes('=') || vapidPublicKey.includes('+') || vapidPublicKey.includes('/')) {
+    throw new Error('VAPID public key must be URL-safe base64 without padding')
+  }
+  
   webpush.setVapidDetails(
     'mailto:your-email@example.com', // Replace with your email
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
+    vapidPublicKey,
+    vapidPrivateKey
   )
 }
 
@@ -43,6 +55,9 @@ interface SendNotificationRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Configure VAPID keys
+    configureWebPush()
+    
     const supabase = createRouteHandlerClient({ cookies })
     const body: SendNotificationRequest = await request.json()
 
