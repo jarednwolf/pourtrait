@@ -31,12 +31,15 @@ class PushNotificationService {
 
   constructor() {
     this.vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || null
-    this.initializeServiceWorker()
+    // Only initialize service worker on client side
+    if (typeof window !== 'undefined') {
+      this.initializeServiceWorker()
+    }
   }
 
   private async initializeServiceWorker(): Promise<void> {
-    if (!('serviceWorker' in navigator)) {
-      console.warn('Service Worker not supported')
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      console.warn('Service Worker not supported or running on server')
       return
     }
 
@@ -51,6 +54,7 @@ class PushNotificationService {
   // Check if push notifications are supported
   isSupported(): boolean {
     return (
+      typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&
       'PushManager' in window &&
       'Notification' in window
@@ -59,13 +63,13 @@ class PushNotificationService {
 
   // Get current notification permission status
   getPermissionStatus(): NotificationPermission {
-    if (!('Notification' in window)) return 'denied'
+    if (typeof window === 'undefined' || !('Notification' in window)) return 'denied'
     return Notification.permission
   }
 
   // Request notification permission
   async requestPermission(): Promise<NotificationPermission> {
-    if (!('Notification' in window)) {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
       console.warn('Notifications not supported')
       return 'denied'
     }
