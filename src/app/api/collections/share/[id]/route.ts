@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createSupabaseClient } from '@/lib/supabase'
 import { collectionSharingService } from '@/lib/services/collection-sharing'
 
 export async function PUT(
@@ -7,7 +7,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient()
+    const supabase = createSupabaseClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -56,7 +56,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient()
+    const supabase = createSupabaseClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

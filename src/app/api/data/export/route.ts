@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createSupabaseClient } from '@/lib/supabase'
 import { dataExportService, ExportOptions } from '@/lib/services/data-export'
 import { pdfExportService } from '@/lib/services/pdf-export'
-import type { Database } from '@/lib/database.types'
 
 export async function POST(request: NextRequest) {
   try {
@@ -91,7 +90,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = createSupabaseClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

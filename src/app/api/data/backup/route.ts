@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createSupabaseClient } from '@/lib/supabase'
 import { dataExportService } from '@/lib/services/data-export'
-import type { Database } from '@/lib/database.types'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      )
-    }
-    
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+    const supabase = createSupabaseClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -80,7 +69,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = createSupabaseClient()
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
