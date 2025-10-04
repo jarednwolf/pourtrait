@@ -29,10 +29,14 @@ const mockIDBTransaction = {
   objectStore: vi.fn().mockReturnValue(mockIDBObjectStore),
 }
 
-const mockIDBRequest = {
-  onsuccess: null as any,
-  onerror: null as any,
-  result: null as any,
+const mockIDBRequest: {
+  onsuccess: (() => void) | null
+  onerror: (() => void) | null
+  result: unknown
+} = {
+  onsuccess: null,
+  onerror: null,
+  result: null,
 }
 
 const mockIndexedDB = {
@@ -46,7 +50,10 @@ Object.defineProperty(global, 'indexedDB', {
 })
 
 Object.defineProperty(global, 'IDBOpenDBRequest', {
-  value: function() {},
+  value: function IDBOpenDBRequest() {
+    // Non-empty body to satisfy no-empty-function rule in tests
+    return undefined
+  },
   writable: true,
 })
 
@@ -83,7 +90,9 @@ describe('OfflineCacheService', () => {
       const request = { ...mockIDBRequest }
       setTimeout(() => {
         request.result = mockIDBDatabase
-        if (request.onsuccess) request.onsuccess()
+        if (request.onsuccess) {
+          request.onsuccess()
+        }
       }, 0)
       return request
     })
@@ -101,7 +110,9 @@ describe('OfflineCacheService', () => {
       mockIndexedDB.open.mockImplementation(() => {
         const request = { ...mockIDBRequest }
         setTimeout(() => {
-          if (request.onerror) request.onerror()
+          if (request.onerror) {
+            request.onerror()
+          }
         }, 0)
         return request
       })
@@ -118,10 +129,12 @@ describe('OfflineCacheService', () => {
     it('should cache wines for a user', async () => {
       const wines = [mockWine]
       
-      mockIDBObjectStore.put.mockImplementation((data) => {
+      mockIDBObjectStore.put.mockImplementation((_data) => {
         const request = { ...mockIDBRequest }
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {
+            request.onsuccess()
+          }
         }, 0)
         return request
       })
@@ -142,7 +155,9 @@ describe('OfflineCacheService', () => {
         const request = { ...mockIDBRequest }
         request.result = cachedData
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {
+            request.onsuccess()
+          }
         }, 0)
         return request
       })
@@ -177,7 +192,9 @@ describe('OfflineCacheService', () => {
       mockIDBObjectStore.put.mockImplementation(() => {
         const request = { ...mockIDBRequest }
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {
+            request.onsuccess()
+          }
         }, 0)
         return request
       })
@@ -198,7 +215,9 @@ describe('OfflineCacheService', () => {
         const request = { ...mockIDBRequest }
         request.result = cachedData
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {
+            request.onsuccess()
+          }
         }, 0)
         return request
       })
@@ -243,7 +262,9 @@ describe('OfflineCacheService', () => {
         const request = { ...mockIDBRequest }
         request.result = { key: 'syncQueue', data: [] }
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {
+            request.onsuccess()
+          }
         }, 0)
         return request
       })
@@ -314,7 +335,9 @@ describe('OfflineCacheService', () => {
       mockIDBObjectStore.clear.mockImplementation(() => {
         const request = { ...mockIDBRequest }
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {
+            request.onsuccess()
+          }
         }, 0)
         return request
       })
@@ -328,7 +351,9 @@ describe('OfflineCacheService', () => {
         const request = { ...mockIDBRequest }
         request.result = 5
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {
+            request.onsuccess()
+          }
         }, 0)
         return request
       })
