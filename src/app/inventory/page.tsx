@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { WineService } from '@/lib/services/wine-service'
 import { useEnhancedWineService } from '@/lib/services/wine-service-enhanced'
@@ -22,6 +23,7 @@ type ListViewMode = 'grid' | 'list'
 export default function InventoryPage() {
   const { user } = useAuth()
   const enhancedWineService = useEnhancedWineService(user?.id || '')
+  const search = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search)
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard')
   const [listViewMode, setListViewMode] = useState<ListViewMode>('grid')
   const [allWines, setAllWines] = useState<Wine[]>([])
@@ -39,6 +41,67 @@ export default function InventoryPage() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Client-only listener for adding a sample wine without server calls
+  useEffect(() => {
+    const handler = () => {
+      // Minimal demo sample wine compatible with Wine type
+      const sample = {
+        id: `sample-${Date.now()}`,
+        userId: user?.id || 'demo',
+        name: 'Pinot Noir',
+        producer: 'Willamette Estates',
+        vintage: 2021,
+        region: 'Willamette Valley',
+        country: 'USA',
+        varietal: ['Pinot Noir'],
+        type: 'red' as const,
+        quantity: 1,
+        purchasePrice: 24.99,
+        purchaseDate: undefined,
+        drinkingWindow: {
+          earliestDate: new Date(),
+          peakStartDate: new Date(),
+          peakEndDate: new Date(),
+          latestDate: new Date(),
+          currentStatus: 'ready' as const
+        },
+        personalRating: 8,
+        personalNotes: 'Sample added for demo',
+        imageUrl: undefined,
+        externalData: {},
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+
+      // Track event
+      try {
+        const { track } = require('@/lib/utils/track')
+        track('sample_wine_added', { source: 'inventory_empty_state' })
+      } catch {}
+
+      setAllWines(prev => [sample, ...prev])
+      setFilteredWines(prev => [sample, ...prev])
+      setCurrentView('list')
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('sample_wine_add_request', handler as EventListener)
+      return () => window.removeEventListener('sample_wine_add_request', handler as EventListener)
+    }
+  }, [user])
+
+  // Support cross-page trigger via query param: ?addSample=1
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('addSample') === '1') {
+      window.dispatchEvent(new CustomEvent('sample_wine_add_request'))
+      params.delete('addSample')
+      const nextUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`
+      window.history.replaceState({}, '', nextUrl)
+    }
+  }, [])
 
   // Load initial data
   useEffect(() => {

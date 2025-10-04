@@ -9,6 +9,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert'
 import { LoadingState } from '@/components/ui/LoadingState'
 import { useAsyncOperation } from '@/hooks/useAsyncOperation'
 import { AppError } from '@/lib/errors'
+import { track } from '@/lib/utils/track'
 
 // ============================================================================
 // Types
@@ -17,6 +18,7 @@ import { AppError } from '@/lib/errors'
 interface ChatInterfaceProps {
   className?: string
   initialMessage?: string
+  autoSend?: boolean
   showSuggestions?: boolean
   maxHeight?: string
 }
@@ -30,6 +32,7 @@ interface ChatInterfaceProps {
 export function ChatInterface({
   className = '',
   initialMessage,
+  autoSend = false,
   showSuggestions = true,
   maxHeight = '600px'
 }: ChatInterfaceProps) {
@@ -37,6 +40,7 @@ export function ChatInterface({
   const [isExpanded, setIsExpanded] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const hasAutoSentRef = useRef(false)
 
   const {
     messages,
@@ -59,6 +63,23 @@ export function ChatInterface({
     }
   }, [isExpanded])
 
+  // Auto-send prefilled prompt once on mount if requested
+  useEffect(() => {
+    if (autoSend && initialMessage && !hasAutoSentRef.current && messages.length === 0) {
+      hasAutoSentRef.current = true
+      ;(async () => {
+        try {
+          track('chat_prompt_sent', { source: 'prefill_auto' })
+          await sendMessage(initialMessage)
+          setInputMessage('')
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error('Auto-send failed', err)
+        }
+      })()
+    }
+  }, [autoSend, initialMessage, messages.length, sendMessage])
+
   // Handle message submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,6 +92,7 @@ export function ChatInterface({
     setInputMessage('')
     
     try {
+      track('chat_prompt_sent', { source: 'input' })
       await sendMessage(message)
     } catch (error) {
       console.error('Failed to send message:', error)
@@ -81,6 +103,7 @@ export function ChatInterface({
   const handleSuggestionSelect = async (suggestion: string) => {
     setInputMessage(suggestion)
     // Always send the message when a suggestion is selected
+    track('chat_prompt_sent', { source: 'suggestion' })
     await sendMessage(suggestion)
   }
 

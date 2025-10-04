@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { Wine } from '@/lib/supabase'
 import type { InventoryFilters } from '@/types'
 
@@ -359,23 +360,34 @@ export function WineInventoryList({
 
       {/* Wine Grid/List */}
       {wines.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Icon name="wine" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No wines found</h3>
-            <p className="text-gray-600 mb-4">
-              {hasActiveFilters() 
-                ? 'Try adjusting your filters to see more results.'
-                : 'Start building your wine collection by adding your first bottle.'
+        <EmptyState
+          icon="wine"
+          title="No wines found"
+          description={hasActiveFilters() ? 'Try adjusting your filters to see more results.' : 'Start building your wine collection by adding your first bottle.'}
+          aria-label="Inventory empty state"
+        >
+          {hasActiveFilters() && (
+            <Button variant="outline" onClick={clearFilters} aria-label="Clear filters">
+              Clear Filters
+            </Button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              // Client-only sample add
+              if (typeof window !== 'undefined') {
+                try {
+                  const event = new CustomEvent('sample_wine_add_request')
+                  window.dispatchEvent(event)
+                } catch {}
               }
-            </p>
-            {hasActiveFilters() && (
-              <Button variant="outline" onClick={clearFilters}>
-                Clear Filters
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+            }}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            aria-label="Add sample wine"
+          >
+            Add sample
+          </button>
+        </EmptyState>
       ) : (
         <div className={
           viewMode === 'grid' 

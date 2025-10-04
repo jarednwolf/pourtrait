@@ -1,15 +1,27 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { ChatInterface } from '@/components/ai/ChatInterface'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
+import { track } from '@/lib/utils/track'
 
 // ============================================================================
 // Chat Page Component
 // ============================================================================
 
 export default function ChatPage() {
+  const search = useSearchParams()
+  const initialMessage = useMemo(() => search?.get('q') || '', [search])
+  const shouldAutoSend = useMemo(() => search?.get('send') === '1', [search])
+
+  useEffect(() => {
+    if (initialMessage) {
+      track('chat_prompt_sent', { source: 'prefill', autoSend: shouldAutoSend ? 1 : 0 })
+    }
+  }, [initialMessage, shouldAutoSend])
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -39,6 +51,8 @@ export default function ChatPage() {
                 className="flex-1"
                 maxHeight="600px"
                 showSuggestions={true}
+                initialMessage={initialMessage}
+                autoSend={shouldAutoSend}
               />
             </Card>
           </div>

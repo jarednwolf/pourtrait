@@ -84,15 +84,31 @@ export function TonightRecommendations({
 
   if (!recommendations || recommendations.recommendations.length === 0) {
     return (
-      <Card className="p-6 text-center">
+      <Card className="p-6 text-center" aria-label="Recommendations empty state">
         <Icon name="wine" className="w-12 h-12 mx-auto mb-4 text-gray-400" />
         <h3 className="text-lg font-semibold mb-2">No Recommendations Available</h3>
         <p className="text-gray-600 mb-4">
           {recommendations?.reasoning || "We couldn't find any wines to recommend right now."}
         </p>
-        <Button onClick={handleRefresh} variant="outline">
-          Refresh
-        </Button>
+        <div className="flex flex-wrap gap-2 justify-center">
+          <Button onClick={handleRefresh} variant="outline" aria-label="Refresh recommendations">
+            Refresh
+          </Button>
+          <a
+            href="/chat?q=What%20should%20I%20drink%20tonight%3F&send=1"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            aria-label="Ask the Sommelier"
+          >
+            Ask the Sommelier
+          </a>
+          <a
+            href="/import"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            aria-label="Open CSV import helper"
+          >
+            CSV import helper
+          </a>
+        </div>
       </Card>
     )
   }

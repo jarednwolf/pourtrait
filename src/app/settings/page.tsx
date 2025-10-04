@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DataExportPanel } from '@/components/settings/DataExportPanel'
 import { Card } from '@/components/ui/Card'
 
@@ -8,6 +8,15 @@ type SettingsTab = 'profile' | 'notifications' | 'data' | 'privacy'
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('data')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab') as SettingsTab | null
+    if (tab && ['profile', 'notifications', 'data', 'privacy'].includes(tab)) {
+      setActiveTab(tab)
+    }
+  }, [])
 
   const tabs = [
     { id: 'profile' as const, label: 'Profile', description: 'Manage your account and preferences' },

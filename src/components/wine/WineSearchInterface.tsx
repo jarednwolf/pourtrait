@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { Badge } from '@/components/ui/Badge'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { WineCard } from './WineCard'
 import { useWineSearch } from '@/hooks/useWineSearch'
 import type { SearchFilters, QuickFilter, SavedSearch } from '@/types'
@@ -643,23 +644,39 @@ export function WineSearchInterface({
           )}
         </>
       ) : results && results.items.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Icon name="search" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No wines found</h3>
-            <p className="text-gray-600 mb-4">
-              {hasActiveFilters 
-                ? 'Try adjusting your search criteria or filters.'
-                : 'Start by searching for wines in your collection.'
+        <EmptyState
+          icon="search"
+          title="No wines found"
+          description={hasActiveFilters ? 'Try adjusting your search criteria or filters.' : 'Start by searching for wines in your collection.'}
+          aria-label="Search empty state"
+        >
+          {hasActiveFilters && (
+            <Button variant="outline" onClick={clearFilters} aria-label="Clear filters">
+              Clear All Filters
+            </Button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                try {
+                  window.dispatchEvent(new CustomEvent('sample_wine_add_request'))
+                } catch {}
               }
-            </p>
-            {hasActiveFilters && (
-              <Button variant="outline" onClick={clearFilters}>
-                Clear All Filters
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+            }}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            aria-label="Add sample wine"
+          >
+            Add sample
+          </button>
+          <a
+            href="/import"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            aria-label="Open CSV import helper"
+          >
+            CSV import helper
+          </a>
+        </EmptyState>
       ) : null}
     </div>
   )

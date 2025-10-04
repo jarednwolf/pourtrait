@@ -1,0 +1,33 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/app/**/*.ts",
+    "src/app/**/*.tsx",
+    "src/components/**/*.ts",
+    "src/components/**/*.tsx",
+    "src/hooks/**/*.ts",
+    "src/hooks/**/*.tsx",
+    "src/types/**/*.ts",
+    "src/lib/utils/track.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/lib/monitoring/**",
+    "src/lib/services/**/__tests__/**",
+    "src/lib/services/**/__tests__/**",
+    "src/lib/services/**/test/**",
+    "src/lib/services/notification-*.ts",
+    "src/lib/services/wine-service-enhanced.ts",
+    "src/lib/services/wine-search.ts",
+    "src/lib/services/wine-knowledge-base.ts",
+    "src/lib/services/pdf-export.ts",
+    "src/lib/services/personalized-recommendations.ts",
+    "src/lib/services/push-notifications.ts"
+  ]
+}
+
+

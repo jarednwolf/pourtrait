@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { SignUpForm } from '@/components/auth/SignUpForm'
 import { PublicOnlyRoute } from '@/components/auth/ProtectedRoute'
+import { track } from '@/lib/utils/track'
 
 function SignUpContent() {
   return (
@@ -16,6 +17,26 @@ function SignUpContent() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <SignUpForm />
+        <div className="mt-4 text-center space-y-2" aria-label="Get started options">
+          <a
+            href="/onboarding"
+            className="text-purple-700 underline"
+            aria-label="Try quick onboarding"
+            onClick={() => track('onboarding_started', { source: 'auth_signup' })}
+          >
+            Try quick onboarding
+          </a>
+          <div>
+            <a
+              href="/import"
+              className="text-purple-700 underline"
+              aria-label="Open CSV import helper"
+              onClick={() => track('import_helper_viewed', { source: 'auth_signup' })}
+            >
+              CSV import helper
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   )

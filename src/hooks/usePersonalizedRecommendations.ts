@@ -27,6 +27,8 @@ export function usePersonalizedRecommendations() {
     error: null
   })
 
+  const serverEnabled = typeof window !== 'undefined' ? (window as any).NEXT_PUBLIC_ENABLE_SERVER_RECS === 'true' : (process.env.NEXT_PUBLIC_ENABLE_SERVER_RECS === 'true')
+
   /**
    * Get "What to drink tonight" recommendations
    */
@@ -41,6 +43,19 @@ export function usePersonalizedRecommendations() {
     setState(prev => ({ ...prev, loading: true, error: null }))
 
     try {
+      if (!serverEnabled) {
+        // Demo fallback client-side with simple reasoning
+        const demo: PersonalizedRecommendationResponse = {
+          recommendations: [],
+          reasoning: 'Server recommendations disabled. Add wines to your cellar or enable server recs.',
+          confidence: 0,
+          alternativeOptions: [],
+          educationalNotes: undefined,
+          followUpQuestions: ['Would you like to ask the AI Sommelier instead?']
+        }
+        setState(prev => ({ ...prev, recommendations: demo, loading: false }))
+        return demo
+      }
       const token = await getAccessToken()
       if (!token) {
         throw new Error('Failed to get access token')
