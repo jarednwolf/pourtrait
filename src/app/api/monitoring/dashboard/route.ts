@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
       getErrorMetrics(supabase, timeRange),
       getBusinessMetrics(supabase, timeRange),
       getAlertMetrics(supabase),
-      getUptimeMetrics(supabase, timeRange)
+      getUptimeMetrics(supabase)
     ])
 
     const dashboardData: DashboardMetrics = {
@@ -479,7 +479,7 @@ async function getAlertMetrics(supabase: any): Promise<AlertMetrics> {
   }
 }
 
-async function getUptimeMetrics(supabase: any, _timeRange: string): Promise<UptimeMetrics> {
+async function getUptimeMetrics(supabase: any): Promise<UptimeMetrics> {
   try {
     // Get system health records
     const { data: healthRecords } = await supabase

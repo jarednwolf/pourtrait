@@ -10,32 +10,40 @@ import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useAuth } from '@/hooks/useAuth'
 
 export function NotificationBell() {
+  // All hooks must be called unconditionally before any returns
   const { user } = useAuth()
   const { notifications } = useDrinkingWindowNotifications(user?.id || '')
   const { isSubscribed, subscribe, canSubscribe } = usePushNotifications()
   const [showCenter, setShowCenter] = useState(false)
   const [showPushPrompt, setShowPushPrompt] = useState(false)
 
-  // Early return after all hooks
-  if (!notifications) {
+  // Show push notification prompt if user can subscribe but hasn't
+  useEffect(() => {
+    if (canSubscribe && !isSubscribed && user && notifications) {
+      const timer = setTimeout(() => {
+        setShowPushPrompt(true)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+    return
+  }, [canSubscribe, isSubscribed, user, notifications])
+
+  // Don't show push prompt if dismissed in this session
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem('pushPromptDismissed')
+    if (dismissed) {
+      setShowPushPrompt(false)
+    }
+    return
+  }, [])
+
+  // Early returns after all hooks
+  if (!notifications || !user) {
     return null
   }
 
   // Count unread notifications
   const unreadCount = notifications.filter(n => !n.read).length
-
-  // Show push notification prompt if user can subscribe but hasn't
-  useEffect(() => {
-    if (canSubscribe && !isSubscribed && user) {
-      // Show prompt after a delay to not be intrusive
-      const timer = setTimeout(() => {
-        setShowPushPrompt(true)
-      }, 5000) // 5 seconds after component mounts
-
-      return () => clearTimeout(timer)
-    }
-    return
-  }, [canSubscribe, isSubscribed, user])
 
   const handleBellClick = () => {
     setShowCenter(true)
@@ -50,21 +58,7 @@ export function NotificationBell() {
 
   const handleDismissPushPrompt = () => {
     setShowPushPrompt(false)
-    // Don't show again for this session
     sessionStorage.setItem('pushPromptDismissed', 'true')
-  }
-
-  // Don't show push prompt if dismissed in this session
-  useEffect(() => {
-    const dismissed = sessionStorage.getItem('pushPromptDismissed')
-    if (dismissed) {
-      setShowPushPrompt(false)
-    }
-    return
-  }, [])
-
-  if (!user) {
-    return null
   }
 
   return (
