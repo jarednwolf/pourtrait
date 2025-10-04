@@ -31,7 +31,7 @@ export class DrinkingWindowRecommendationService {
       .sort((a, b) => {
         // First priority: wines in peak or ready status
         const statusPriority = this.getStatusPriority(a.status) - this.getStatusPriority(b.status)
-        if (statusPriority !== 0) return statusPriority
+        if (statusPriority !== 0) {return statusPriority}
         
         // Second priority: urgency score
         return b.urgencyScore - a.urgencyScore

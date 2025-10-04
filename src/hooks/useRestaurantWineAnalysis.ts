@@ -140,7 +140,7 @@ export function getTopRecommendations(
   result: RestaurantAnalysisResult | null, 
   count: number = 5
 ): RestaurantRecommendation[] {
-  if (!result) return []
+  if (!result) {return []}
   return result.recommendations.slice(0, count)
 }
 
@@ -148,7 +148,7 @@ export function getRecommendationsByScore(
   result: RestaurantAnalysisResult | null,
   minScore: number = 0.5
 ): RestaurantRecommendation[] {
-  if (!result) return []
+  if (!result) {return []}
   return result.recommendations.filter(rec => rec.score >= minScore)
 }
 
@@ -156,7 +156,7 @@ export function getWinesByMatchType(
   result: RestaurantAnalysisResult | null,
   matchType: 'exact' | 'partial' | 'similar' | 'none'
 ): RestaurantWineMatch[] {
-  if (!result) return []
+  if (!result) {return []}
   return result.processedWines.filter(wine => wine.matchType === matchType)
 }
 
@@ -165,9 +165,9 @@ export function formatRecommendationScore(score: number): string {
 }
 
 export function formatMatchConfidence(confidence: number): string {
-  if (confidence >= 0.9) return 'Excellent match'
-  if (confidence >= 0.7) return 'Good match'
-  if (confidence >= 0.5) return 'Possible match'
+  if (confidence >= 0.9) {return 'Excellent match'}
+  if (confidence >= 0.7) {return 'Good match'}
+  if (confidence >= 0.5) {return 'Possible match'}
   return 'Low confidence'
 }
 
@@ -176,14 +176,14 @@ export function getRecommendationsByPriceRange(
   minPrice: number,
   maxPrice: number
 ): RestaurantRecommendation[] {
-  if (!result) return []
+  if (!result) {return []}
   
   return result.recommendations.filter(rec => {
     const priceStr = rec.wine.extractedWine.price
-    if (!priceStr) return true // Include wines without price info
+    if (!priceStr) {return true} // Include wines without price info
     
     const priceMatch = priceStr.match(/[\d.,]+/)
-    if (!priceMatch) return true
+    if (!priceMatch) {return true}
     
     const price = parseFloat(priceMatch[0].replace(',', ''))
     return price >= minPrice && price <= maxPrice
@@ -194,7 +194,7 @@ export function getRecommendationsByWineType(
   result: RestaurantAnalysisResult | null,
   wineType: 'red' | 'white' | 'sparkling' | 'rosé' | 'dessert' | 'fortified'
 ): RestaurantRecommendation[] {
-  if (!result) return []
+  if (!result) {return []}
   
   return result.recommendations.filter(rec => 
     rec.wine.matchedWine?.type === wineType

@@ -209,9 +209,9 @@ export class ContextAnalyzer {
 
   private static getCurrentSeason(): 'spring' | 'summer' | 'fall' | 'winter' {
     const month = new Date().getMonth()
-    if (month >= 2 && month <= 4) return 'spring'
-    if (month >= 5 && month <= 7) return 'summer'
-    if (month >= 8 && month <= 10) return 'fall'
+    if (month >= 2 && month <= 4) {return 'spring'}
+    if (month >= 5 && month <= 7) {return 'summer'}
+    if (month >= 8 && month <= 10) {return 'fall'}
     return 'winter'
   }
 
@@ -219,12 +219,12 @@ export class ContextAnalyzer {
     const considerations: string[] = []
     const lowerQuery = query.toLowerCase()
 
-    if (lowerQuery.includes('anniversary')) considerations.push('anniversary')
-    if (lowerQuery.includes('birthday')) considerations.push('birthday')
-    if (lowerQuery.includes('first time')) considerations.push('first_time_guest')
-    if (lowerQuery.includes('impress')) considerations.push('impressive_selection')
-    if (lowerQuery.includes('budget')) considerations.push('budget_conscious')
-    if (lowerQuery.includes('special')) considerations.push('special_occasion')
+    if (lowerQuery.includes('anniversary')) {considerations.push('anniversary')}
+    if (lowerQuery.includes('birthday')) {considerations.push('birthday')}
+    if (lowerQuery.includes('first time')) {considerations.push('first_time_guest')}
+    if (lowerQuery.includes('impress')) {considerations.push('impressive_selection')}
+    if (lowerQuery.includes('budget')) {considerations.push('budget_conscious')}
+    if (lowerQuery.includes('special')) {considerations.push('special_occasion')}
 
     return considerations
   }

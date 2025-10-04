@@ -134,7 +134,7 @@ export class DataExportService {
    * Convert wine data to CSV format
    */
   exportToCSV(wines: Wine[]): string {
-    if (!wines.length) return ''
+    if (!wines.length) {return ''}
 
     const headers = [
       'Name',

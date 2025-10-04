@@ -595,10 +595,10 @@ export class WineKnowledgeBaseService {
     let confidence = 0.5 // Base confidence
 
     // Increase confidence based on available data
-    if (regionalProfile) confidence += 0.2
-    if (varietalProfiles && varietalProfiles.length > 0) confidence += 0.2
-    if (wine.external_data.professionalRatings && wine.external_data.professionalRatings.length > 0) confidence += 0.1
-    if (wine.external_data.tastingNotes) confidence += 0.1
+    if (regionalProfile) {confidence += 0.2}
+    if (varietalProfiles && varietalProfiles.length > 0) {confidence += 0.2}
+    if (wine.external_data.professionalRatings && wine.external_data.professionalRatings.length > 0) {confidence += 0.1}
+    if (wine.external_data.tastingNotes) {confidence += 0.1}
     if (wine.external_data.lastUpdated) {
       const freshness = ExternalWineDataService.getDataFreshness(wine.external_data.lastUpdated)
       confidence += freshness * 0.1

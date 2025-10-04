@@ -44,7 +44,7 @@ export function usePWA(): PWAState & PWAActions {
 
   // Check if app is running in standalone mode
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') {return}
 
     const checkStandalone = () => {
       const isStandalone = 
@@ -65,7 +65,7 @@ export function usePWA(): PWAState & PWAActions {
 
   // Handle install prompt
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') {return}
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
@@ -100,7 +100,7 @@ export function usePWA(): PWAState & PWAActions {
 
   // Handle online/offline status
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') {return}
 
     const handleOnline = () => setState(prev => ({ ...prev, isOnline: true }))
     const handleOffline = () => setState(prev => ({ ...prev, isOnline: false }))
@@ -116,7 +116,7 @@ export function usePWA(): PWAState & PWAActions {
 
   // Prompt user to install the app
   const promptInstall = useCallback(async (): Promise<boolean> => {
-    if (!state.installPrompt) return false
+    if (!state.installPrompt) {return false}
 
     try {
       await state.installPrompt.prompt()

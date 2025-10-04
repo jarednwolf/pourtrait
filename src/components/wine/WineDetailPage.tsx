@@ -79,7 +79,7 @@ export function WineDetailPage({
   }
 
   const renderRating = (rating: number | null) => {
-    if (!rating) return null
+    if (!rating) {return null}
     
     return (
       <div className="flex items-center gap-2">
@@ -102,12 +102,12 @@ export function WineDetailPage({
   }
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Not specified'
+    if (!dateString) {return 'Not specified'}
     return new Date(dateString).toLocaleDateString()
   }
 
   const formatPrice = (price: number | null) => {
-    if (!price) return 'Not specified'
+    if (!price) {return 'Not specified'}
     return `$${price.toFixed(2)}`
   }
 

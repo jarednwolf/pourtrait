@@ -86,7 +86,7 @@ export function useWineSearch(options: UseWineSearchOptions = {}): UseWineSearch
 
   // Debounced search effect
   useEffect(() => {
-    if (!autoSearch || !user) return
+    if (!autoSearch || !user) {return}
 
     const timer = setTimeout(() => {
       if (filters.query || hasActiveFilters) {
@@ -132,7 +132,7 @@ export function useWineSearch(options: UseWineSearchOptions = {}): UseWineSearch
 
   // Search function
   const search = useCallback(async (newFilters?: SearchFilters) => {
-    if (!user) return
+    if (!user) {return}
 
     try {
       setIsLoading(true)
@@ -168,7 +168,7 @@ export function useWineSearch(options: UseWineSearchOptions = {}): UseWineSearch
 
   // Load more results
   const loadMore = useCallback(async () => {
-    if (!user || !results || !canLoadMore) return
+    if (!user || !results || !canLoadMore) {return}
 
     try {
       setIsLoading(true)
@@ -196,7 +196,7 @@ export function useWineSearch(options: UseWineSearchOptions = {}): UseWineSearch
 
   // Load facets
   const loadFacets = useCallback(async (searchFilters: SearchFilters) => {
-    if (!user) return
+    if (!user) {return}
 
     try {
       setIsLoadingFacets(true)
@@ -258,7 +258,7 @@ export function useWineSearch(options: UseWineSearchOptions = {}): UseWineSearch
 
   // Saved searches
   const loadSavedSearches = useCallback(async () => {
-    if (!user) return
+    if (!user) {return}
 
     try {
       const searches = await WineSearchService.getSavedSearches(user.id)
@@ -269,7 +269,7 @@ export function useWineSearch(options: UseWineSearchOptions = {}): UseWineSearch
   }, [user])
 
   const saveCurrentSearch = useCallback(async (name: string, isDefault: boolean = false) => {
-    if (!user) return
+    if (!user) {return}
 
     try {
       const savedSearch = await WineSearchService.saveSearch(user.id, name, filters, isDefault)

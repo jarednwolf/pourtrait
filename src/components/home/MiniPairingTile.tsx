@@ -17,7 +17,7 @@ type MiniSuggestion = {
 
 function getMiniPairing(dish: string): MiniSuggestion[] {
   const text = dish.toLowerCase()
-  if (!text || text.length < 2) return []
+  if (!text || text.length < 2) {return []}
 
   if (/(steak|beef|lamb|burger)/.test(text)) {
     return [

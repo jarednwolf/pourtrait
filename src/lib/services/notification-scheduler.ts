@@ -272,7 +272,7 @@ export class NotificationScheduler {
    * Check if current time is within quiet hours
    */
   private static isInQuietHours(quietHours?: NotificationPreferences['quietHours']): boolean {
-    if (!quietHours?.enabled) return false
+    if (!quietHours?.enabled) {return false}
 
     const now = new Date()
     const currentTime = now.getHours() * 60 + now.getMinutes()
@@ -296,7 +296,7 @@ export class NotificationScheduler {
    * Get next delivery time after quiet hours
    */
   private static getNextDeliveryTime(quietHours: NotificationPreferences['quietHours']): Date {
-    if (!quietHours?.enabled) return new Date()
+    if (!quietHours?.enabled) {return new Date()}
 
     const now = new Date()
     const [endHour, endMin] = quietHours.end.split(':').map(Number)
@@ -391,7 +391,7 @@ export class NotificationScheduler {
     wines: any[],
     preferences: NotificationPreferences
   ): Promise<void> {
-    if (!preferences.drinkingWindowAlerts) return
+    if (!preferences.drinkingWindowAlerts) {return}
 
     const alerts = await NotificationService.generateDrinkingWindowAlerts(
       userId,

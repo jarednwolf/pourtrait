@@ -127,7 +127,7 @@ class RateLimiter {
 
   canMakeRequest(sourceId: string): boolean {
     const source = WINE_DATA_SOURCES.find(s => s.id === sourceId)
-    if (!source) return false
+    if (!source) {return false}
 
     const now = Date.now()
     const requests = this.requests.get(sourceId) || []
@@ -511,7 +511,7 @@ export class ExternalWineDataService {
    * Calculate overall confidence score from multiple results
    */
   private static calculateConfidence(results: WineDataResult[]): number {
-    if (results.length === 0) return 0
+    if (results.length === 0) {return 0}
 
     // Weight by source reliability and data quality
     let totalWeight = 0
@@ -595,15 +595,15 @@ export class ExternalWineDataService {
    * Get data freshness score based on last update
    */
   static getDataFreshness(lastUpdated?: Date): number {
-    if (!lastUpdated) return 0
+    if (!lastUpdated) {return 0}
 
     const now = new Date()
     const daysSinceUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24)
 
-    if (daysSinceUpdate <= 7) return 1.0      // Fresh (within a week)
-    if (daysSinceUpdate <= 30) return 0.8     // Good (within a month)
-    if (daysSinceUpdate <= 90) return 0.6     // Acceptable (within 3 months)
-    if (daysSinceUpdate <= 365) return 0.4    // Stale (within a year)
+    if (daysSinceUpdate <= 7) {return 1.0}      // Fresh (within a week)
+    if (daysSinceUpdate <= 30) {return 0.8}     // Good (within a month)
+    if (daysSinceUpdate <= 90) {return 0.6}     // Acceptable (within 3 months)
+    if (daysSinceUpdate <= 365) {return 0.4}    // Stale (within a year)
     
     return 0.2 // Very stale (over a year)
   }

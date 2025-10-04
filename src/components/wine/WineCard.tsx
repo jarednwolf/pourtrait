@@ -45,7 +45,7 @@ export function WineCard({
   }
 
   const renderRating = (rating: number | null) => {
-    if (!rating) return null
+    if (!rating) {return null}
     
     return (
       <div className="flex items-center gap-1">
@@ -56,7 +56,7 @@ export function WineCard({
   }
 
   const renderPrice = (price: number | null) => {
-    if (!price) return null
+    if (!price) {return null}
     
     return (
       <span className="text-sm text-gray-600">

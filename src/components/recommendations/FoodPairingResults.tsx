@@ -160,8 +160,8 @@ function PairingCard({ pairing, rank, onSelect, isPrimary }: PairingCardProps) {
   }
 
   const getConfidenceIcon = (confidence: number) => {
-    if (confidence > 0.8) return 'star'
-    if (confidence > 0.6) return 'check-circle'
+    if (confidence > 0.8) {return 'star'}
+    if (confidence > 0.6) {return 'check-circle'}
     return 'help-circle'
   }
 

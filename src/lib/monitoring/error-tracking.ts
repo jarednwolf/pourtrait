@@ -553,20 +553,20 @@ export class ErrorTracker {
   }
 
   private getHttpErrorSeverity(statusCode: number): ErrorSeverity {
-    if (statusCode >= 500) return 'high'
-    if (statusCode === 429) return 'medium' // Rate limiting
-    if (statusCode === 401 || statusCode === 403) return 'medium' // Auth issues
+    if (statusCode >= 500) {return 'high'}
+    if (statusCode === 429) {return 'medium'} // Rate limiting
+    if (statusCode === 401 || statusCode === 403) {return 'medium'} // Auth issues
     return 'low' // Client errors
   }
 
   private extractQueryType(query: string): string {
     const lowerQuery = query.toLowerCase().trim()
-    if (lowerQuery.startsWith('select')) return 'SELECT'
-    if (lowerQuery.startsWith('insert')) return 'INSERT'
-    if (lowerQuery.startsWith('update')) return 'UPDATE'
-    if (lowerQuery.startsWith('delete')) return 'DELETE'
-    if (lowerQuery.startsWith('create')) return 'CREATE'
-    if (lowerQuery.startsWith('alter')) return 'ALTER'
+    if (lowerQuery.startsWith('select')) {return 'SELECT'}
+    if (lowerQuery.startsWith('insert')) {return 'INSERT'}
+    if (lowerQuery.startsWith('update')) {return 'UPDATE'}
+    if (lowerQuery.startsWith('delete')) {return 'DELETE'}
+    if (lowerQuery.startsWith('create')) {return 'CREATE'}
+    if (lowerQuery.startsWith('alter')) {return 'ALTER'}
     return 'OTHER'
   }
 

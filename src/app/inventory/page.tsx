@@ -91,13 +91,13 @@ export default function InventoryPage() {
       cleanup = () => window.removeEventListener('sample_wine_add_request', handler as EventListener)
     }
     return () => {
-      if (cleanup) cleanup()
+      if (cleanup) {cleanup()}
     }
   }, [user])
 
   // Support cross-page trigger via query param: ?addSample=1
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') {return}
     const params = new URLSearchParams(window.location.search)
     if (params.get('addSample') === '1') {
       window.dispatchEvent(new CustomEvent('sample_wine_add_request'))
@@ -115,7 +115,7 @@ export default function InventoryPage() {
   }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadInventoryData = async () => {
-    if (!user) return
+    if (!user) {return}
 
     try {
       setIsLoading(true)

@@ -10,7 +10,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('data')
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') {return}
     const params = new URLSearchParams(window.location.search)
     const tab = params.get('tab') as SettingsTab | null
     if (tab && ['profile', 'notifications', 'data', 'privacy'].includes(tab)) {

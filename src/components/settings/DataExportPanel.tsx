@@ -71,7 +71,7 @@ export function DataExportPanel() {
 
   const handleBackupRestore = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (!file) return
+    if (!file) {return}
 
     try {
       await restoreBackup(file)

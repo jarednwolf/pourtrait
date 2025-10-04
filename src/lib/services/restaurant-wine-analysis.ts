@@ -250,14 +250,14 @@ export class RestaurantWineAnalysisService {
     maxScore += 40
     const nameMatch = this.calculateStringMatch(extractedWine.name, wine.name)
     score += nameMatch * 40
-    if (nameMatch > 0.7) matchedFields.push('name')
+    if (nameMatch > 0.7) {matchedFields.push('name')}
 
     // Producer matching
     if (extractedWine.producer && wine.producer) {
       maxScore += 30
       const producerMatch = this.calculateStringMatch(extractedWine.producer, wine.producer)
       score += producerMatch * 30
-      if (producerMatch > 0.7) matchedFields.push('producer')
+      if (producerMatch > 0.7) {matchedFields.push('producer')}
     }
 
     // Vintage matching
@@ -282,10 +282,10 @@ export class RestaurantWineAnalysisService {
     const confidence = maxScore > 0 ? score / maxScore : 0
 
     let matchType: 'exact' | 'partial' | 'similar' | 'none'
-    if (confidence > 0.9) matchType = 'exact'
-    else if (confidence > 0.7) matchType = 'partial'
-    else if (confidence > 0.4) matchType = 'similar'
-    else matchType = 'none'
+    if (confidence > 0.9) {matchType = 'exact'}
+    else if (confidence > 0.7) {matchType = 'partial'}
+    else if (confidence > 0.4) {matchType = 'similar'}
+    else {matchType = 'none'}
 
     return { confidence, matchType, matchedFields }
   }
@@ -297,10 +297,10 @@ export class RestaurantWineAnalysisService {
     const s1 = str1.toLowerCase().trim()
     const s2 = str2.toLowerCase().trim()
 
-    if (s1 === s2) return 1
+    if (s1 === s2) {return 1}
 
     const maxLength = Math.max(s1.length, s2.length)
-    if (maxLength === 0) return 1
+    if (maxLength === 0) {return 1}
 
     const distance = this.levenshteinDistance(s1, s2)
     return 1 - distance / maxLength
@@ -312,8 +312,8 @@ export class RestaurantWineAnalysisService {
   private levenshteinDistance(str1: string, str2: string): number {
     const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null))
 
-    for (let i = 0; i <= str1.length; i++) matrix[0][i] = i
-    for (let j = 0; j <= str2.length; j++) matrix[j][0] = j
+    for (let i = 0; i <= str1.length; i++) {matrix[0][i] = i}
+    for (let j = 0; j <= str2.length; j++) {matrix[j][0] = j}
 
     for (let j = 1; j <= str2.length; j++) {
       for (let i = 1; i <= str1.length; i++) {
@@ -341,7 +341,7 @@ export class RestaurantWineAnalysisService {
 
     for (const pattern of regionPatterns) {
       const match = description.match(pattern)
-      if (match) return match[0]
+      if (match) {return match[0]}
     }
 
     return null
@@ -661,12 +661,12 @@ export class RestaurantWineAnalysisService {
     // detailed wine characteristics in the database
     switch (wine.type) {
       case 'red':
-        if (wine.varietal.some(v => ['Pinot Noir', 'Gamay'].includes(v))) return 'light'
-        if (wine.varietal.some(v => ['Cabernet Sauvignon', 'Syrah', 'Malbec'].includes(v))) return 'rich'
+        if (wine.varietal.some(v => ['Pinot Noir', 'Gamay'].includes(v))) {return 'light'}
+        if (wine.varietal.some(v => ['Cabernet Sauvignon', 'Syrah', 'Malbec'].includes(v))) {return 'rich'}
         return 'medium'
       case 'white':
-        if (wine.varietal.some(v => ['Sauvignon Blanc', 'Pinot Grigio'].includes(v))) return 'light'
-        if (wine.varietal.some(v => ['Chardonnay', 'Viognier'].includes(v))) return 'medium'
+        if (wine.varietal.some(v => ['Sauvignon Blanc', 'Pinot Grigio'].includes(v))) {return 'light'}
+        if (wine.varietal.some(v => ['Chardonnay', 'Viognier'].includes(v))) {return 'medium'}
         return 'light'
       case 'sparkling':
         return 'light'
@@ -681,7 +681,7 @@ export class RestaurantWineAnalysisService {
   private calculatePriceScore(winePrice: string, priceRange: { min: number; max: number }): number {
     // Extract numeric price from string
     const priceMatch = winePrice.match(/[\d.,]+/)
-    if (!priceMatch) return 0.5 // Neutral score if price can't be parsed
+    if (!priceMatch) {return 0.5} // Neutral score if price can't be parsed
 
     const price = parseFloat(priceMatch[0].replace(',', ''))
     
@@ -806,7 +806,7 @@ export class RestaurantWineAnalysisService {
         .eq('user_id', userId)
         .single()
 
-      if (error || !data) return null
+      if (error || !data) {return null}
       return data as TasteProfile
     } catch (error) {
       console.error('Failed to fetch taste profile:', error)
@@ -824,7 +824,7 @@ export class RestaurantWineAnalysisService {
         .select('*')
         .eq('user_id', userId)
 
-      if (error || !data) return []
+      if (error || !data) {return []}
       return data as Wine[]
     } catch (error) {
       console.error('Failed to fetch user inventory:', error)
@@ -836,7 +836,7 @@ export class RestaurantWineAnalysisService {
    * Calculate matching accuracy across all wine matches
    */
   private calculateMatchingAccuracy(matches: RestaurantWineMatch[]): number {
-    if (matches.length === 0) return 0
+    if (matches.length === 0) {return 0}
 
     const totalConfidence = matches.reduce((sum, match) => sum + match.confidence, 0)
     return totalConfidence / matches.length
@@ -846,7 +846,7 @@ export class RestaurantWineAnalysisService {
    * Calculate overall recommendation confidence
    */
   private calculateRecommendationConfidence(recommendations: RestaurantRecommendation[]): number {
-    if (recommendations.length === 0) return 0
+    if (recommendations.length === 0) {return 0}
 
     const totalScore = recommendations.reduce((sum, rec) => sum + rec.score, 0)
     return totalScore / recommendations.length

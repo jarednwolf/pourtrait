@@ -368,18 +368,18 @@ export class AIRecommendationEngine {
   // ============================================================================
 
   private determineRecommendationType(request: AIRecommendationRequest): 'inventory' | 'purchase' | 'pairing' | 'restaurant' {
-    if (request.context.foodPairing) return 'pairing'
-    if (request.inventory && request.inventory.length > 0) return 'inventory'
+    if (request.context.foodPairing) {return 'pairing'}
+    if (request.inventory && request.inventory.length > 0) {return 'inventory'}
     return 'purchase'
   }
 
   private formatFlavorProfile(profile: any): string {
-    if (!profile) return 'No preferences specified'
+    if (!profile) {return 'No preferences specified'}
     return `Body: ${profile.body || 'unspecified'}, Fruitiness: ${profile.fruitiness || 0}/10, Earthiness: ${profile.earthiness || 0}/10`
   }
 
   private formatGeneralPreferences(preferences: any): string {
-    if (!preferences || !preferences.priceRange) return 'No price preferences specified'
+    if (!preferences || !preferences.priceRange) {return 'No price preferences specified'}
     return `Price Range: $${preferences.priceRange?.min || 0}-${preferences.priceRange?.max || 0}`
   }
 
@@ -396,7 +396,7 @@ export class AIRecommendationEngine {
   }
 
   private extractEducationalNotes(response: string, experienceLevel: string): string | undefined {
-    if (experienceLevel !== 'beginner') return undefined
+    if (experienceLevel !== 'beginner') {return undefined}
     
     // Extract educational content for beginners
     const educationalSentences = response.split('.').filter(sentence =>
@@ -468,13 +468,13 @@ export class AIRecommendationEngine {
     const whiteVarietals = ['chardonnay', 'sauvignon blanc', 'riesling', 'pinot grigio']
     
     const lowerVarietal = varietal.toLowerCase()
-    if (redVarietals.some(v => lowerVarietal.includes(v))) return 'red'
-    if (whiteVarietals.some(v => lowerVarietal.includes(v))) return 'white'
+    if (redVarietals.some(v => lowerVarietal.includes(v))) {return 'red'}
+    if (whiteVarietals.some(v => lowerVarietal.includes(v))) {return 'white'}
     return 'red' // Default
   }
 
   private calculateOverallConfidence(recommendations: AIRecommendation[], validationScore: number): number {
-    if (recommendations.length === 0) return 0
+    if (recommendations.length === 0) {return 0}
     
     const avgRecommendationConfidence = recommendations.reduce((sum, rec) => sum + rec.confidence, 0) / recommendations.length
     return Math.round((avgRecommendationConfidence * 0.7 + validationScore * 0.003) * 100) / 100

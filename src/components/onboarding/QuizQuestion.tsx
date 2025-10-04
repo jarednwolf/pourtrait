@@ -119,7 +119,7 @@ function SingleChoiceQuestion({
   value?: any
   onChange: (value: any) => void
 }) {
-  if (!question.options) return null
+  if (!question.options) {return null}
 
   return (
     <div className="space-y-3">
@@ -148,7 +148,7 @@ function MultipleChoiceQuestion({
   value: any[]
   onChange: (value: any[]) => void
 }) {
-  if (!question.options) return null
+  if (!question.options) {return null}
 
   const handleOptionToggle = (optionValue: any) => {
     const newValue = value.includes(optionValue)
@@ -184,7 +184,7 @@ function ScaleQuestion({
   value?: number
   onChange: (value: number) => void
 }) {
-  if (!question.scaleConfig) return null
+  if (!question.scaleConfig) {return null}
 
   const { min, max, minLabel, maxLabel, step = 1 } = question.scaleConfig
   const scaleValues = []

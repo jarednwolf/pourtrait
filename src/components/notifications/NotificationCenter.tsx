@@ -31,7 +31,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   }, [isOpen, user?.id])
 
   const loadNotificationHistory = async () => {
-    if (!user?.id) return
+    if (!user?.id) {return}
     
     try {
       const { notifications: history } = await NotificationScheduler.getNotificationHistory(user.id, 20)
@@ -42,7 +42,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   }
 
   const loadDeliveryStats = async () => {
-    if (!user?.id) return
+    if (!user?.id) {return}
     
     try {
       const stats = await NotificationScheduler.getDeliveryStats(user.id)
@@ -100,7 +100,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
     }
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {return null}
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -311,7 +311,7 @@ function NotificationSettings() {
   }
 
   const savePreferences = async () => {
-    if (!user?.id) return
+    if (!user?.id) {return}
     
     setLoading(true)
     try {

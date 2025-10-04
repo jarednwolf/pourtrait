@@ -309,7 +309,7 @@ export class WineSearchService {
       `)
       .limit(50)
 
-    if (!wines) return suggestions
+    if (!wines) {return suggestions}
 
     // Collect unique suggestions
     const uniqueNames = new Set<string>()
@@ -495,23 +495,23 @@ export class WineSearchService {
     let score = 0
     
     // Exact matches get highest score
-    if (wine.name.toLowerCase() === query) score += 100
-    if (wine.producer.toLowerCase() === query) score += 80
+    if (wine.name.toLowerCase() === query) {score += 100}
+    if (wine.producer.toLowerCase() === query) {score += 80}
     
     // Starts with matches
-    if (wine.name.toLowerCase().startsWith(query)) score += 50
-    if (wine.producer.toLowerCase().startsWith(query)) score += 40
+    if (wine.name.toLowerCase().startsWith(query)) {score += 50}
+    if (wine.producer.toLowerCase().startsWith(query)) {score += 40}
     
     // Contains matches with field weights
-    if (wine.name.toLowerCase().includes(query)) score += 30
-    if (wine.producer.toLowerCase().includes(query)) score += 25
-    if (wine.region.toLowerCase().includes(query)) score += 15
-    if (wine.country.toLowerCase().includes(query)) score += 8
-    if (wine.personalNotes?.toLowerCase().includes(query)) score += 10
+    if (wine.name.toLowerCase().includes(query)) {score += 30}
+    if (wine.producer.toLowerCase().includes(query)) {score += 25}
+    if (wine.region.toLowerCase().includes(query)) {score += 15}
+    if (wine.country.toLowerCase().includes(query)) {score += 8}
+    if (wine.personalNotes?.toLowerCase().includes(query)) {score += 10}
     
     // Varietal matches
     wine.varietal?.forEach(v => {
-      if (v.toLowerCase().includes(query)) score += 20
+      if (v.toLowerCase().includes(query)) {score += 20}
     })
     
     return score
@@ -599,7 +599,7 @@ export class WineSearchService {
     return ranges.map(range => {
       const count = wines.filter(wine => {
         const price = wine.purchasePrice
-        if (!price) return false
+        if (!price) {return false}
         
         if (range.max === Infinity) {
           return price >= range.min

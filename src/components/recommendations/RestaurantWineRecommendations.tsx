@@ -97,7 +97,7 @@ export function RestaurantWineRecommendations({
   }, [])
 
   const getFilteredRecommendations = useCallback(() => {
-    if (!analysisResult) return []
+    if (!analysisResult) {return []}
 
     let filtered = analysisResult.recommendations.filter(rec => rec.score >= filters.minScore)
 
@@ -114,10 +114,10 @@ export function RestaurantWineRecommendations({
     if (filters.priceRange) {
       filtered = filtered.filter(rec => {
         const priceStr = rec.wine.extractedWine.price
-        if (!priceStr) return true
+        if (!priceStr) {return true}
         
         const priceMatch = priceStr.match(/[\d.,]+/)
-        if (!priceMatch) return true
+        if (!priceMatch) {return true}
         
         const price = parseFloat(priceMatch[0].replace(',', ''))
         return price >= filters.priceRange!.min && price <= filters.priceRange!.max

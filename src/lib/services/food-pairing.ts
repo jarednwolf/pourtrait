@@ -379,11 +379,11 @@ export class FoodPairingService {
   private analyzeCookingMethod(method: string | undefined, food: string): CookingImpact {
     if (!method) {
       // Infer from food description
-      if (food.includes('grilled') || food.includes('bbq')) method = 'grilled'
-      else if (food.includes('roasted') || food.includes('baked')) method = 'roasted'
-      else if (food.includes('fried')) method = 'fried'
-      else if (food.includes('steamed')) method = 'steamed'
-      else method = 'unknown'
+      if (food.includes('grilled') || food.includes('bbq')) {method = 'grilled'}
+      else if (food.includes('roasted') || food.includes('baked')) {method = 'roasted'}
+      else if (food.includes('fried')) {method = 'fried'}
+      else if (food.includes('steamed')) {method = 'steamed'}
+      else {method = 'unknown'}
     }
 
     const impacts = {
@@ -418,11 +418,11 @@ export class FoodPairingService {
     intensity += richnessImpact[richness as keyof typeof richnessImpact] || 1
 
     // Food-specific adjustments
-    if (food.includes('truffle') || food.includes('foie gras')) intensity += 2
-    if (food.includes('delicate') || food.includes('light')) intensity -= 1
+    if (food.includes('truffle') || food.includes('foie gras')) {intensity += 2}
+    if (food.includes('delicate') || food.includes('light')) {intensity -= 1}
 
-    if (intensity <= 2) return 'light'
-    if (intensity <= 4) return 'medium'
+    if (intensity <= 2) {return 'light'}
+    if (intensity <= 4) {return 'medium'}
     return 'intense'
   }
 
@@ -521,7 +521,7 @@ export class FoodPairingService {
     wines: Wine[],
     tasteProfile: TasteProfile
   ): Promise<FoodPairingRecommendation[]> {
-    if (wines.length === 0) return []
+    if (wines.length === 0) {return []}
 
     const aiRequest: AIRecommendationRequest = {
       userId: request.userId,
@@ -598,7 +598,7 @@ export class FoodPairingService {
     // Price range filter
     if (filters.priceRange) {
       filtered = filtered.filter(wine => {
-        if (!wine.purchasePrice) return true
+        if (!wine.purchasePrice) {return true}
         return wine.purchasePrice >= filters.priceRange!.min && 
                wine.purchasePrice <= filters.priceRange!.max
       })
@@ -730,8 +730,8 @@ export class FoodPairingService {
 
     // Perfect match gets 1.0, adjacent levels get 0.7, distant levels get 0.3
     const difference = Math.abs(wineLvl - foodLvl)
-    if (difference === 0) return 1.0
-    if (difference === 1) return 0.7
+    if (difference === 0) {return 1.0}
+    if (difference === 1) {return 0.7}
     return 0.3
   }
 
@@ -739,15 +739,15 @@ export class FoodPairingService {
     // Simple heuristic based on wine type and region
     if (wine.type === 'red') {
       const boldRegions = ['Napa Valley', 'Barossa Valley', 'Mendoza', 'Tuscany']
-      if (boldRegions.some(region => wine.region.includes(region))) return 'intense'
+      if (boldRegions.some(region => wine.region.includes(region))) {return 'intense'}
       
       const boldVarietals = ['Cabernet Sauvignon', 'Syrah', 'Malbec', 'Nebbiolo']
-      if (wine.varietal.some(v => boldVarietals.includes(v))) return 'intense'
+      if (wine.varietal.some(v => boldVarietals.includes(v))) {return 'intense'}
       
       return 'medium'
     } else if (wine.type === 'white') {
       const boldVarietals = ['Chardonnay', 'Viognier', 'Gewürztraminer']
-      if (wine.varietal.some(v => boldVarietals.includes(v))) return 'medium'
+      if (wine.varietal.some(v => boldVarietals.includes(v))) {return 'medium'}
       
       return 'light'
     }
@@ -794,7 +794,7 @@ export class FoodPairingService {
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
-    if (error) throw error
+    if (error) {throw error}
     return data || []
   }
 
@@ -805,7 +805,7 @@ export class FoodPairingService {
       .eq('user_id', userId)
       .single()
 
-    if (error) throw error
+    if (error) {throw error}
     return data
   }
 
@@ -944,7 +944,7 @@ export class FoodPairingService {
     pairings: FoodPairingRecommendation[],
     _tasteProfile: TasteProfile
   ): string {
-    if (pairings.length === 0) return "No suitable pairings found in your inventory."
+    if (pairings.length === 0) {return "No suitable pairings found in your inventory."}
 
     const topPairing = pairings[0]
     let notes = `Food and wine pairing works on the principle of complementing or contrasting flavors. `
@@ -1028,7 +1028,7 @@ export class FoodPairingService {
   }
 
   private calculateOverallConfidence(pairings: FoodPairingRecommendation[]): number {
-    if (pairings.length === 0) return 0
+    if (pairings.length === 0) {return 0}
     
     const avgConfidence = pairings.reduce((sum, p) => sum + p.confidence, 0) / pairings.length
     return Math.round(avgConfidence * 100) / 100
@@ -1038,7 +1038,7 @@ export class FoodPairingService {
     filters: ContextualFilter,
     pairings: FoodPairingRecommendation[]
   ): string {
-    if (pairings.length === 0) return "No wines match your current criteria."
+    if (pairings.length === 0) {return "No wines match your current criteria."}
 
     let education = "When selecting wines for specific contexts, consider: "
     

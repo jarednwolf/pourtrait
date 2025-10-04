@@ -443,7 +443,7 @@ function PurchaseRecommendationCard({
 
   const wine = recommendation.suggestedWine
 
-  if (!wine) return null
+  if (!wine) {return null}
 
   return (
     <Card className={`p-4 ${isPrimary ? 'ring-2 ring-green-500 bg-green-50' : ''}`}>

@@ -115,7 +115,7 @@ export default function ImportHelperPage() {
         const nextMap = { ...prev }
         EXPECTED_FIELDS.forEach(f => {
           const match = parsed.headers.find(h => h.toLowerCase() === f.replace('_', ' ').toLowerCase())
-          if (match) nextMap[f] = match
+          if (match) {nextMap[f] = match}
         })
         return nextMap
       })
@@ -124,13 +124,13 @@ export default function ImportHelperPage() {
   }
 
   const mappedRecords = useMemo(() => {
-    if (headers.length === 0 || rows.length === 0) return []
+    if (headers.length === 0 || rows.length === 0) {return []}
     const headerIndex: Record<string, number> = {}
     headers.forEach((h, i) => { headerIndex[h] = i })
     return rows.map((r) => {
       const get = (field: SchemaField) => {
         const source = mapping[field]
-        if (!source) return ''
+        if (!source) {return ''}
         const idx = headerIndex[source]
         return idx >= 0 ? (r[idx] || '').trim() : ''
       }
@@ -186,8 +186,8 @@ export default function ImportHelperPage() {
 
   function handleImport() {
     // Feature-gated write; for now log to console
-    if (!validated) runValidation()
-    if (validationErrors.length > 0) return
+    if (!validated) {runValidation()}
+    if (validationErrors.length > 0) {return}
     if (!enableWrite) {
       // eslint-disable-next-line no-console
       console.log('[import] write disabled by flag, preview only', { rows: mappedRecords.length })
@@ -229,7 +229,7 @@ export default function ImportHelperPage() {
                   aria-label="Choose CSV file"
                   onChange={(e) => {
                     const f = e.target.files?.[0]
-                    if (f) onFileSelected(f)
+                    if (f) {onFileSelected(f)}
                   }}
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />

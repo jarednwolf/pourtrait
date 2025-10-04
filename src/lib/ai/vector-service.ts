@@ -293,10 +293,10 @@ export class VectorService {
    * Get price range category
    */
   private getPriceRange(price?: number): string {
-    if (!price) return 'unknown'
-    if (price < 20) return 'budget'
-    if (price < 50) return 'mid-range'
-    if (price < 100) return 'premium'
+    if (!price) {return 'unknown'}
+    if (price < 20) {return 'budget'}
+    if (price < 50) {return 'mid-range'}
+    if (price < 100) {return 'premium'}
     return 'luxury'
   }
 
@@ -304,7 +304,7 @@ export class VectorService {
    * Get average professional rating
    */
   private getAverageRating(ratings?: Array<{ score: number; maxScore: number }>): number | undefined {
-    if (!ratings || ratings.length === 0) return undefined
+    if (!ratings || ratings.length === 0) {return undefined}
 
     const normalizedRatings = ratings.map(rating => (rating.score / rating.maxScore) * 100)
     return normalizedRatings.reduce((sum, rating) => sum + rating, 0) / normalizedRatings.length

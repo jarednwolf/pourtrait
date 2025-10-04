@@ -73,8 +73,8 @@ export function useFoodPairing(userId: string): UseFoodPairingReturn {
       })
 
       // Add optional parameters
-      if (filters.occasion) searchParams.append('occasion', filters.occasion)
-      if (filters.urgency) searchParams.append('urgency', filters.urgency)
+      if (filters.occasion) {searchParams.append('occasion', filters.occasion)}
+      if (filters.urgency) {searchParams.append('urgency', filters.urgency)}
       if (filters.priceRange) {
         searchParams.append('priceMin', filters.priceRange.min.toString())
         searchParams.append('priceMax', filters.priceRange.max.toString())

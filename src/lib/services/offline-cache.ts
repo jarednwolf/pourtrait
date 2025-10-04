@@ -78,7 +78,7 @@ class OfflineCacheService {
 
   // Wine inventory caching
   async cacheWines(userId: string, wines: Wine[]): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {throw new Error('Database not initialized')}
 
     const transaction = this.db.transaction(['wines'], 'readwrite')
     const store = transaction.objectStore('wines')
@@ -98,7 +98,7 @@ class OfflineCacheService {
   }
 
   async getCachedWines(userId: string): Promise<Wine[] | null> {
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {throw new Error('Database not initialized')}
 
     const transaction = this.db.transaction(['wines'], 'readonly')
     const store = transaction.objectStore('wines')
@@ -127,7 +127,7 @@ class OfflineCacheService {
 
   // Individual wine caching for quick access
   async cacheWine(wine: Wine): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {throw new Error('Database not initialized')}
 
     const transaction = this.db.transaction(['wines'], 'readwrite')
     const store = transaction.objectStore('wines')
@@ -147,7 +147,7 @@ class OfflineCacheService {
   }
 
   async getCachedWine(wineId: string): Promise<Wine | null> {
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {throw new Error('Database not initialized')}
 
     const transaction = this.db.transaction(['wines'], 'readonly')
     const store = transaction.objectStore('wines')
@@ -187,7 +187,7 @@ class OfflineCacheService {
   }
 
   async processSyncQueue(): Promise<void> {
-    if (!navigator.onLine || this.syncQueue.length === 0) return
+    if (!navigator.onLine || this.syncQueue.length === 0) {return}
 
     const itemsToProcess = [...this.syncQueue]
     this.syncQueue = []
@@ -225,7 +225,7 @@ class OfflineCacheService {
   }
 
   private async saveSyncQueue(): Promise<void> {
-    if (!this.db) return
+    if (!this.db) {return}
 
     const transaction = this.db.transaction(['metadata'], 'readwrite')
     const store = transaction.objectStore('metadata')
@@ -238,7 +238,7 @@ class OfflineCacheService {
   }
 
   private async loadSyncQueue(): Promise<void> {
-    if (!this.db) return
+    if (!this.db) {return}
 
     const transaction = this.db.transaction(['metadata'], 'readonly')
     const store = transaction.objectStore('metadata')
@@ -257,7 +257,7 @@ class OfflineCacheService {
   }
 
   private async clearExpiredCache(storeName: string, key: string): Promise<void> {
-    if (!this.db) return
+    if (!this.db) {return}
 
     const transaction = this.db.transaction([storeName], 'readwrite')
     const store = transaction.objectStore(storeName)
@@ -288,7 +288,7 @@ class OfflineCacheService {
 
   // Cache management
   async clearAllCache(): Promise<void> {
-    if (!this.db) return
+    if (!this.db) {return}
 
     const storeNames = ['wines', 'preferences', 'recommendations']
     const transaction = this.db.transaction(storeNames, 'readwrite')
@@ -300,7 +300,7 @@ class OfflineCacheService {
   }
 
   async getCacheSize(): Promise<number> {
-    if (!this.db) return 0
+    if (!this.db) {return 0}
 
     let totalSize = 0
     const storeNames = ['wines', 'preferences', 'recommendations', 'syncQueue']

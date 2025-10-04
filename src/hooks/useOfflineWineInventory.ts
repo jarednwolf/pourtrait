@@ -240,7 +240,7 @@ export function useOfflineWineInventory(userId: string): OfflineWineInventorySta
   }, [loadWineInventory])
 
   const syncPendingChanges = useCallback(async () => {
-    if (!isOnline) return
+    if (!isOnline) {return}
 
     try {
       await offlineCacheService.processSyncQueue()

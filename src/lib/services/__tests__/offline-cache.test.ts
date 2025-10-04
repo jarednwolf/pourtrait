@@ -179,7 +179,7 @@ describe('OfflineCacheService', () => {
         const request = { ...mockIDBRequest }
         request.result = expiredData
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {request.onsuccess()}
         }, 0)
         return request
       })
@@ -236,7 +236,7 @@ describe('OfflineCacheService', () => {
       mockIDBObjectStore.put.mockImplementation(() => {
         const request = { ...mockIDBRequest }
         setTimeout(() => {
-          if (request.onsuccess) request.onsuccess()
+          if (request.onsuccess) {request.onsuccess()}
         }, 0)
         return request
       })

@@ -69,7 +69,7 @@ class PushNotificationService {
 
   // Get current notification permission status
   getPermissionStatus(): NotificationPermission {
-    if (typeof window === 'undefined' || !('Notification' in window)) return 'denied'
+    if (typeof window === 'undefined' || !('Notification' in window)) {return 'denied'}
     return Notification.permission
   }
 

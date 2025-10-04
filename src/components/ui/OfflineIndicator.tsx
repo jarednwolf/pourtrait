@@ -50,7 +50,7 @@ export function OfflineIndicator({
     return () => clearInterval(interval)
   }, [])
 
-  if (isOnline && !hasPendingSync) return null
+  if (isOnline && !hasPendingSync) {return null}
 
   return (
     <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-40 ${className}`}>

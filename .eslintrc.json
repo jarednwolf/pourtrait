@@ -17,8 +17,28 @@
     "no-var": "error",
     "no-console": "warn",
     "eqeqeq": "error",
-    "curly": "error"
+    "curly": "warn",
+    "react/no-unescaped-entities": "warn",
+    "storybook/no-renderer-packages": "warn"
   },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "warn",
+        "curly": "warn"
+      }
+    },
+    {
+      "files": ["**/*.stories.tsx", "**/*.stories.ts"],
+      "rules": {
+        "storybook/no-renderer-packages": "off",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "react/no-unescaped-entities": "warn",
+        "curly": "warn"
+      }
+    }
+  ],
   "parserOptions": {
     "ecmaVersion": 2021,
     "sourceType": "module",

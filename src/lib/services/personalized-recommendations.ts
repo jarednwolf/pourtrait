@@ -286,7 +286,7 @@ export class PersonalizedRecommendationService {
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
-    if (error) throw error
+    if (error) {throw error}
     return data || []
   }
 
@@ -297,7 +297,7 @@ export class PersonalizedRecommendationService {
       .eq('user_id', userId)
       .single()
 
-    if (error) throw error
+    if (error) {throw error}
     return data
   }
 
@@ -309,7 +309,7 @@ export class PersonalizedRecommendationService {
       .order('consumed_at', { ascending: false })
       .limit(50)
 
-    if (error) throw error
+    if (error) {throw error}
     return data || []
   }
 
@@ -516,7 +516,7 @@ export class PersonalizedRecommendationService {
   }
 
   private generatePairingNotes(wine: Wine, context?: RecommendationContext): string | undefined {
-    if (!context?.foodPairing) return undefined
+    if (!context?.foodPairing) {return undefined}
 
     // Basic pairing logic - in production, this would be more sophisticated
     const food = context.foodPairing.toLowerCase()
@@ -620,7 +620,7 @@ export class PersonalizedRecommendationService {
     // Filter by price range if specified
     if (context.priceRange) {
       filtered = filtered.filter(wine => {
-        if (!wine.purchasePrice) return true // Include wines without price data
+        if (!wine.purchasePrice) {return true} // Include wines without price data
         return wine.purchasePrice >= context.priceRange!.min && 
                wine.purchasePrice <= context.priceRange!.max
       })
@@ -743,7 +743,7 @@ export class PersonalizedRecommendationService {
   }
 
   private calculateOverallConfidence(recommendations: EnhancedRecommendation[]): number {
-    if (recommendations.length === 0) return 0
+    if (recommendations.length === 0) {return 0}
 
     const avgConfidence = recommendations.reduce((sum, rec) => sum + rec.confidence, 0) / recommendations.length
     return Math.round(avgConfidence * 100) / 100
@@ -872,7 +872,7 @@ export class RecommendationFeedbackService {
 
       const { data, error } = await query
 
-      if (error) throw error
+      if (error) {throw error}
       return data || []
 
     } catch (error) {
@@ -891,7 +891,7 @@ export class RecommendationFeedbackService {
         .select('*')
         .eq('user_id', userId)
 
-      if (error) throw error
+      if (error) {throw error}
 
       const total = recommendations.length
       const accepted = recommendations.filter((r: any) => r.user_feedback === 'accepted').length

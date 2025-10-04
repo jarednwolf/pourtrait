@@ -245,7 +245,7 @@ class ErrorHandler {
    * Calculate retry delay based on error type
    */
   private getRetryDelay(error: AppError): number | undefined {
-    if (!error.retryable) return undefined;
+    if (!error.retryable) {return undefined;}
 
     switch (error.type) {
       case ErrorType.AI_RATE_LIMIT:

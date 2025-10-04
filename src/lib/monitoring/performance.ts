@@ -133,10 +133,10 @@ class PerformanceMonitor {
   }
 
   private getResourceType(url: string): string {
-    if (url.includes('.js')) return 'script';
-    if (url.includes('.css')) return 'stylesheet';
-    if (url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) return 'image';
-    if (url.includes('/api/')) return 'api';
+    if (url.includes('.js')) {return 'script';}
+    if (url.includes('.css')) {return 'stylesheet';}
+    if (url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) {return 'image';}
+    if (url.includes('/api/')) {return 'api';}
     return 'other';
   }
 

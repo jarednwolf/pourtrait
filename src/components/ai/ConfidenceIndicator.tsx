@@ -32,8 +32,8 @@ export function ConfidenceIndicator({
 
   // Determine confidence level and styling
   const getConfidenceLevel = (conf: number) => {
-    if (conf >= 0.8) return { level: 'high' as const }
-    if (conf >= 0.6) return { level: 'medium' as const }
+    if (conf >= 0.8) {return { level: 'high' as const }}
+    if (conf >= 0.6) {return { level: 'medium' as const }}
     return { level: 'low' as const }
   }
 
@@ -145,8 +145,8 @@ export function DetailedConfidenceIndicator({
 }) {
   const { level } = (() => {
     const _c = Math.max(0, Math.min(1, confidence))
-    if (_c >= 0.8) return { level: 'high' as const }
-    if (_c >= 0.6) return { level: 'medium' as const }
+    if (_c >= 0.8) {return { level: 'high' as const }}
+    if (_c >= 0.6) {return { level: 'medium' as const }}
     return { level: 'low' as const }
   })()
 

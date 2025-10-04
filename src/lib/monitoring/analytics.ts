@@ -78,7 +78,7 @@ export class AnalyticsService {
    */
   async trackPerformance(metric: PerformanceMetric): Promise<void> {
     try {
-      if (!this.isProduction) return
+      if (!this.isProduction) {return}
 
       // Store performance metrics in database
       const supabase = createServerClient()
@@ -149,7 +149,7 @@ export class AnalyticsService {
     userRegistrations?: number
   }): Promise<void> {
     try {
-      if (!this.isProduction) return
+      if (!this.isProduction) {return}
 
       const supabase = createServerClient()
       

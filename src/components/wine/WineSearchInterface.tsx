@@ -128,7 +128,7 @@ export function WineSearchInterface({
   }
 
   const handleSaveSearch = async () => {
-    if (!saveSearchName.trim()) return
+    if (!saveSearchName.trim()) {return}
     
     try {
       await saveCurrentSearch(saveSearchName.trim())

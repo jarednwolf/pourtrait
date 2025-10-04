@@ -357,7 +357,7 @@ export class PDFExportService {
   }
 
   private formatDrinkingStatus(status?: string): string {
-    if (!status) return 'Unknown'
+    if (!status) {return 'Unknown'}
     
     const statusMap: Record<string, string> = {
       'too_young': 'Too Young',

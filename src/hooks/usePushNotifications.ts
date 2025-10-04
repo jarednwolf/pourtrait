@@ -200,7 +200,7 @@ export function usePushNotifications() {
 
   // Check if notifications are enabled in user preferences
   const checkNotificationPreferences = useCallback(async (): Promise<boolean> => {
-    if (!user) return false
+    if (!user) {return false}
 
     try {
       // This would check the user's notification preferences from their profile
@@ -286,7 +286,7 @@ export function useNotificationPreferences() {
   // Load preferences from user profile
   useEffect(() => {
     const loadPreferences = async () => {
-      if (!user?.id) return
+      if (!user?.id) {return}
 
       try {
         setLoading(true)
@@ -312,7 +312,7 @@ export function useNotificationPreferences() {
 
   // Save preferences to user profile
   const savePreferences = useCallback(async (newPreferences: typeof preferences): Promise<boolean> => {
-    if (!user?.id) return false
+    if (!user?.id) {return false}
 
     try {
       setLoading(true)

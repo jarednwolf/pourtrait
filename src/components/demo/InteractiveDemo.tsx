@@ -80,7 +80,7 @@ export function InteractiveDemo({
   }
 
   const handleGetRecommendation = async () => {
-    if (!customQuery.trim()) return
+    if (!customQuery.trim()) {return}
 
     setIsLoading(true)
     // Simulate AI processing time
@@ -90,7 +90,7 @@ export function InteractiveDemo({
   }
 
   const generateSampleResponse = () => {
-    if (!selectedScenario && !customQuery) return null
+    if (!selectedScenario && !customQuery) {return null}
 
     const scenario = selectedScenario || { id: 'custom', context: 'Custom query' }
     

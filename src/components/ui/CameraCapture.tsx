@@ -53,13 +53,13 @@ export function CameraCapture({ onCapture, onCancel, className = '' }: CameraCap
   }, [stream])
 
   const capturePhoto = useCallback(() => {
-    if (!videoRef.current || !canvasRef.current) return
+    if (!videoRef.current || !canvasRef.current) {return}
 
     const video = videoRef.current
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
 
-    if (!context) return
+    if (!context) {return}
 
     // Set canvas dimensions to match video
     canvas.width = video.videoWidth
@@ -79,7 +79,7 @@ export function CameraCapture({ onCapture, onCancel, className = '' }: CameraCap
   }, [stopCamera])
 
   const confirmCapture = useCallback(() => {
-    if (!capturedImage || !canvasRef.current) return
+    if (!capturedImage || !canvasRef.current) {return}
 
     canvasRef.current.toBlob((blob) => {
       if (blob) {

@@ -112,7 +112,7 @@ export function useAuth(): UseAuthReturn {
       async (event: AuthChangeEvent, session: Session | null) => {
         console.log('Auth state changed:', event, session?.user?.id)
 
-        if (!mounted) return
+        if (!mounted) {return}
 
         setState(prev => ({ ...prev, loading: true }))
 

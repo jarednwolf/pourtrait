@@ -411,7 +411,7 @@ export class WineEnrichmentService {
    * Check if wine was recently enriched
    */
   private static isRecentlyEnriched(externalData: ExternalWineData): boolean {
-    if (!externalData || !externalData.lastUpdated) return false
+    if (!externalData || !externalData.lastUpdated) {return false}
 
     const daysSinceUpdate = (Date.now() - new Date(externalData.lastUpdated).getTime()) / (1000 * 60 * 60 * 24)
     return daysSinceUpdate < 7 // Consider recent if updated within a week

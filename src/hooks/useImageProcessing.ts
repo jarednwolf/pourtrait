@@ -123,10 +123,10 @@ export function useImageProcessing(): UseImageProcessingReturn {
     const formData = new FormData()
     formData.append('image', file)
     
-    if (options.maxWidth) formData.append('maxWidth', options.maxWidth.toString())
-    if (options.maxHeight) formData.append('maxHeight', options.maxHeight.toString())
-    if (options.quality) formData.append('quality', options.quality.toString())
-    if (options.format) formData.append('format', options.format)
+    if (options.maxWidth) {formData.append('maxWidth', options.maxWidth.toString())}
+    if (options.maxHeight) {formData.append('maxHeight', options.maxHeight.toString())}
+    if (options.quality) {formData.append('quality', options.quality.toString())}
+    if (options.format) {formData.append('format', options.format)}
 
     return handleApiCall<ImageUploadResult>(
       () => fetch('/api/image/upload', {

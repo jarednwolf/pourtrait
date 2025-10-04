@@ -252,11 +252,11 @@ export function useAIChat(options: UseAIChatOptions = {}) {
    * Submit feedback for a message
    */
   const submitFeedback = useCallback(async (messageId: string, feedback: 'helpful' | 'not_helpful' | 'inappropriate' | 'inaccurate', details?: string) => {
-    if (!user) return
+    if (!user) {return}
 
     try {
       const token = await getAccessToken()
-      if (!token) return
+      if (!token) {return}
 
       await fetch('/api/ai/chat/feedback', {
         method: 'POST',
@@ -400,11 +400,11 @@ export function useAIMetrics() {
     metricValue?: number,
     metadata?: Record<string, any>
   ) => {
-    if (!user) return
+    if (!user) {return}
 
     try {
       const token = await getAccessToken()
-      if (!token) return
+      if (!token) {return}
 
       await fetch('/api/ai/metrics', {
         method: 'POST',

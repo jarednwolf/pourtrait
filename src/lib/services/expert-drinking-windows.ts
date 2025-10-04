@@ -177,7 +177,7 @@ export class ExpertDrinkingWindowService {
       data.region.toLowerCase() === wine.region.toLowerCase()
     )
     
-    if (match) return match
+    if (match) {return match}
     
     // Try region + varietal match
     if (wine.varietal && wine.varietal.length > 0) {
@@ -191,7 +191,7 @@ export class ExpertDrinkingWindowService {
         )
       )
       
-      if (match) return match
+      if (match) {return match}
     }
     
     // Try region-only match
@@ -219,7 +219,7 @@ export class ExpertDrinkingWindowService {
    * Get varietal aging pattern
    */
   static getVarietalPattern(varietals: string[]) {
-    if (!varietals || varietals.length === 0) return null
+    if (!varietals || varietals.length === 0) {return null}
     
     // Find the primary varietal (usually the first one)
     const primaryVarietal = varietals[0]

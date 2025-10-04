@@ -77,12 +77,12 @@ export function InventoryDashboard({
   )
 
   const formatRating = (rating: number) => {
-    if (rating === 0) return 'No ratings yet'
+    if (rating === 0) {return 'No ratings yet'}
     return `${rating.toFixed(1)}/10`
   }
 
   const calculateRatingPercentage = () => {
-    if (stats.totalWines === 0) return 0
+    if (stats.totalWines === 0) {return 0}
     return Math.round((stats.ratedWines / stats.totalWines) * 100)
   }
 
