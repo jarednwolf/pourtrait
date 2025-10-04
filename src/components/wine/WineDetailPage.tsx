@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import type { Wine } from '@/lib/supabase'
+import type { Wine } from '@/types'
 import type { ConsumptionRecord } from '@/types'
 
 interface WineDetailPageProps {
@@ -67,7 +67,7 @@ export function WineDetailPage({
 }: WineDetailPageProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-  const drinkingWindowStatus = wine.drinking_window as any
+  const drinkingWindowStatus = wine.drinkingWindow as any
   const currentStatus = drinkingWindowStatus?.currentStatus || 'ready'
   const statusInfo = DRINKING_WINDOW_STATUS[currentStatus as keyof typeof DRINKING_WINDOW_STATUS]
 
@@ -175,12 +175,12 @@ export function WineDetailPage({
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Wine Image */}
-          {wine.image_url && (
+          {wine.imageUrl && (
             <Card>
               <CardContent className="p-6">
                 <div className="relative w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
                   <Image
-                    src={wine.image_url}
+                    src={wine.imageUrl}
                     alt={`${wine.name} bottle`}
                     fill
                     className="object-contain"
@@ -240,10 +240,10 @@ export function WineDetailPage({
                 </div>
               )}
 
-              {wine.personal_notes && (
+              {wine.personalNotes && (
                 <div>
                   <label className="text-sm font-medium text-gray-600">Personal Notes</label>
-                  <p className="text-gray-900 mt-1">{wine.personal_notes}</p>
+                  <p className="text-gray-900 mt-1">{wine.personalNotes}</p>
                 </div>
               )}
             </CardContent>
@@ -344,27 +344,27 @@ export function WineDetailPage({
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Purchase Price:</span>
-                <span className="text-sm font-medium">{formatPrice(wine.purchase_price)}</span>
+                <span className="text-sm font-medium">{formatPrice(wine.purchasePrice || null)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Purchase Date:</span>
-                <span className="text-sm font-medium">{formatDate(wine.purchase_date)}</span>
+                <span className="text-sm font-medium">{formatDate(wine.purchaseDate ? wine.purchaseDate.toISOString() : null)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Added to Cellar:</span>
-                <span className="text-sm font-medium">{formatDate(wine.created_at)}</span>
+                <span className="text-sm font-medium">{formatDate(wine.createdAt.toISOString())}</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Personal Rating */}
-          {wine.personal_rating && (
+          {wine.personalRating && (
             <Card>
               <CardHeader>
                 <CardTitle>Personal Rating</CardTitle>
               </CardHeader>
               <CardContent>
-                {renderRating(wine.personal_rating)}
+                {renderRating(wine.personalRating)}
               </CardContent>
             </Card>
           )}

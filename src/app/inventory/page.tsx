@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+// import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { WineService } from '@/lib/services/wine-service'
 import { useEnhancedWineService } from '@/lib/services/wine-service-enhanced'
@@ -23,7 +23,7 @@ type ListViewMode = 'grid' | 'list'
 export default function InventoryPage() {
   const { user } = useAuth()
   const enhancedWineService = useEnhancedWineService(user?.id || '')
-  const search = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search)
+  // const search = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search)
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard')
   const [listViewMode, setListViewMode] = useState<ListViewMode>('grid')
   const [allWines, setAllWines] = useState<Wine[]>([])
@@ -85,9 +85,13 @@ export default function InventoryPage() {
       setCurrentView('list')
     }
 
+    let cleanup: (() => void) | undefined
     if (typeof window !== 'undefined') {
       window.addEventListener('sample_wine_add_request', handler as EventListener)
-      return () => window.removeEventListener('sample_wine_add_request', handler as EventListener)
+      cleanup = () => window.removeEventListener('sample_wine_add_request', handler as EventListener)
+    }
+    return () => {
+      if (cleanup) cleanup()
     }
   }, [user])
 
@@ -128,6 +132,7 @@ export default function InventoryPage() {
     } finally {
       setIsLoading(false)
     }
+    return
   }
 
   const handleFiltersChange = async (filters: InventoryFilters) => {

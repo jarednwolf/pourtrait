@@ -53,7 +53,7 @@ export default function SharedCollectionPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md mx-auto px-4">
-          <Alert variant="destructive">
+          <Alert variant="error">
             {error || 'Collection not found'}
           </Alert>
         </div>
@@ -121,8 +121,6 @@ export default function SharedCollectionPage() {
               <WineCard
                 key={wine.id}
                 wine={wine}
-                showActions={false} // Don't show edit/delete actions for shared collections
-                showPersonalData={false} // Don't show purchase prices etc.
               />
             ))}
           </div>

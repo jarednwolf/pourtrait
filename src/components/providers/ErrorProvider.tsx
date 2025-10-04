@@ -30,7 +30,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     const result = errorHandler.handleError(error);
     
     // Only show user-facing errors
-    if (result.severity !== ErrorSeverity.DEBUG) {
+    if (result.severity !== (ErrorSeverity as any).DEBUG) {
       setCurrentError(error instanceof AppError ? error : new AppError(
         'UNKNOWN_ERROR' as any,
         error.message,

@@ -16,8 +16,9 @@
   ],
   "exclude": [
     "node_modules",
+    // Exclude server/API code from app type-check
+    "src/app/api/**",
     "src/lib/monitoring/**",
-    "src/lib/services/**/__tests__/**",
     "src/lib/services/**/__tests__/**",
     "src/lib/services/**/test/**",
     "src/lib/services/notification-*.ts",
@@ -26,7 +27,13 @@
     "src/lib/services/wine-knowledge-base.ts",
     "src/lib/services/pdf-export.ts",
     "src/lib/services/personalized-recommendations.ts",
-    "src/lib/services/push-notifications.ts"
+    "src/lib/services/push-notifications.ts",
+    // Exclude tests and stories from app type-check
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/__tests__/**",
+    "src/**/*.stories.tsx",
+    "src/**/*.stories.ts"
   ]
 }
 

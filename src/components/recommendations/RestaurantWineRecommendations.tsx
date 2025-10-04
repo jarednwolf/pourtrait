@@ -2,8 +2,6 @@
 
 import React, { useState, useCallback } from 'react'
 import { 
-  StarIcon, 
-  CheckCircleIcon, 
   ExclamationTriangleIcon,
   InformationCircleIcon,
   AdjustmentsHorizontalIcon,
@@ -16,7 +14,6 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { 
   useRestaurantWineAnalysis,
-  RestaurantAnalysisResult,
   RestaurantRecommendation,
   MealContext,
   formatRecommendationScore,

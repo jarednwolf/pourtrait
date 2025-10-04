@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { track } from '@/lib/utils/track'
@@ -37,7 +36,7 @@ export default function ImportHelperPage() {
   ]
 
   const [fileName, setFileName] = useState<string>('')
-  const [rawCsv, setRawCsv] = useState<string>('')
+  // Raw CSV is parsed immediately; no need to persist the string
   const [headers, setHeaders] = useState<string[]>([])
   const [rows, setRows] = useState<string[][]>([])
   const [mapping, setMapping] = useState<Record<SchemaField, string | ''>>({
@@ -108,7 +107,6 @@ export default function ImportHelperPage() {
     const reader = new FileReader()
     reader.onload = () => {
       const text = String(reader.result || '')
-      setRawCsv(text)
       const parsed = parseCSV(text)
       setHeaders(parsed.headers)
       setRows(parsed.rows)

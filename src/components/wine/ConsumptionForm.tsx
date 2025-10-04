@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
-import type { Wine } from '@/lib/supabase'
+import type { Wine } from '@/types'
 
 interface ConsumptionFormProps {
   wine: Wine

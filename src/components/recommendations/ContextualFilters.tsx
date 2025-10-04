@@ -326,7 +326,6 @@ export function ContextualFilters({ onApplyFilters, loading = false, className =
           <Button
             onClick={handleApplyFilters}
             disabled={loading}
-            loading={loading}
             className="min-w-[120px]"
           >
             {loading ? 'Filtering...' : 'Apply Filters'}

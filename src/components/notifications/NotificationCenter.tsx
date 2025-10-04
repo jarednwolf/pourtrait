@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Bell, Settings, History, X, Check, Clock, AlertTriangle } from 'lucide-react'
+import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { useDrinkingWindowNotifications } from '@/lib/services/notification-service'
+import { useDrinkingWindowNotifications } from '@/hooks/useDrinkingWindowNotifications'
 import { NotificationScheduler } from '@/lib/services/notification-scheduler'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -67,13 +67,13 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'drinking_window':
-        return <AlertTriangle className="h-4 w-4 text-amber-500" />
+        return <Icon name="exclamation-triangle" className="h-4 w-4 text-amber-500" />
       case 'recommendation':
-        return <Bell className="h-4 w-4 text-blue-500" />
+        return <Icon name="bell" className="h-4 w-4 text-blue-500" />
       case 'system':
-        return <Settings className="h-4 w-4 text-gray-500" />
+        return <Icon name="settings" className="h-4 w-4 text-gray-500" />
       default:
-        return <Bell className="h-4 w-4 text-gray-500" />
+        return <Icon name="bell" className="h-4 w-4 text-gray-500" />
     }
   }
 
@@ -115,11 +115,11 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
       <Card className="w-full max-w-2xl max-h-[80vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center space-x-2">
-            <Bell className="h-5 w-5" />
+            <Icon name="bell" className="h-5 w-5" />
             <h2 className="text-lg font-semibold">Notification Center</h2>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
+            <Icon name="x" className="h-4 w-4" />
           </Button>
         </div>
 
@@ -165,7 +165,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                 <div className="text-center py-8 text-gray-500">Loading notifications...</div>
               ) : notifications.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  <Bell className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <Icon name="bell" className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>No new notifications</p>
                 </div>
               ) : (
@@ -184,7 +184,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                             <h4 className="font-medium text-gray-900">{notification.title}</h4>
                             <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                             <p className="text-xs text-gray-400 mt-2">
-                              {formatDate(notification.created_at)}
+                              {formatDate((notification as any).created_at || (notification as any).createdAt)}
                             </p>
                           </div>
                         </div>
@@ -194,7 +194,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                             size="sm"
                             onClick={() => handleMarkAsRead(notification.id)}
                           >
-                            <Check className="h-4 w-4" />
+                            <Icon name="check" className="h-4 w-4" />
                           </Button>
                         )}
                       </div>
@@ -238,7 +238,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
 
               {notificationHistory.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  <History className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <Icon name="clock" className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>No notification history</p>
                 </div>
               ) : (

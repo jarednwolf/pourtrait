@@ -103,7 +103,7 @@ export function DataExportPanel() {
   return (
     <div className="space-y-6">
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="error">
           {error}
         </Alert>
       )}
@@ -229,7 +229,6 @@ export function DataExportPanel() {
             <Button
               onClick={handleBackupCreate}
               disabled={isExporting}
-              variant="default"
             >
               {isExporting ? <LoadingSpinner size="sm" /> : 'Create Full Backup'}
             </Button>
@@ -276,7 +275,7 @@ export function DataExportPanel() {
           </Button>
         ) : (
           <div className="space-y-4">
-            <Alert variant="destructive">
+            <Alert variant="error">
               <strong>Warning:</strong> This will permanently delete all your wines, taste profile, 
               consumption history, and account data. This action cannot be undone.
             </Alert>

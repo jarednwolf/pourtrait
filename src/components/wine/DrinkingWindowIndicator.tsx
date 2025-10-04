@@ -1,7 +1,7 @@
 'use client'
 
 import { DrinkingWindow, Wine } from '@/types'
-import { DrinkingWindowUtils, DrinkingWindowService } from '@/lib/services/drinking-window'
+import { DrinkingWindowUtils } from '@/lib/services/drinking-window'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 
@@ -25,7 +25,7 @@ export function DrinkingWindowIndicator({
   const statusText = DrinkingWindowUtils.getStatusText(drinkingWindow.currentStatus)
   const statusColor = DrinkingWindowUtils.getStatusColor(drinkingWindow.currentStatus)
   const statusChange = DrinkingWindowUtils.getDaysUntilStatusChange(drinkingWindow)
-  const dataSource = wine ? DrinkingWindowService.getDrinkingWindowDataSource(wine) : null
+  const dataSource = wine ? DrinkingWindowUtils.getDrinkingWindowDataSource(wine) : null
   
   const getStatusIcon = (status: DrinkingWindow['currentStatus']) => {
     switch (status) {
@@ -58,7 +58,7 @@ export function DrinkingWindowIndicator({
       >
         <Icon 
           name={getStatusIcon(drinkingWindow.currentStatus)} 
-          size={size === 'sm' ? 12 : size === 'md' ? 14 : 16} 
+          className={size === 'sm' ? 'h-3 w-3' : size === 'md' ? 'h-3.5 w-3.5' : 'h-4 w-4'} 
         />
         {statusText}
       </Badge>
@@ -77,7 +77,7 @@ export function DrinkingWindowIndicator({
             <div className="text-gray-400 flex items-center gap-1">
               <Icon 
                 name={dataSource.isExpertData ? 'check-circle' : 'info'} 
-                size={10} 
+                className="h-2.5 w-2.5" 
               />
               <span>{dataSource.source}</span>
               {dataSource.isExpertData && (

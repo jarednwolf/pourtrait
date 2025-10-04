@@ -133,7 +133,7 @@ export function RecommendationHistory({
             <Button
               key={filterType}
               onClick={() => handleTypeChange(filterType)}
-              variant={selectedType === filterType ? 'default' : 'outline'}
+              variant={selectedType === filterType ? 'primary' : 'outline'}
               size="sm"
             >
               {filterType === 'all' ? 'All' : 
@@ -310,8 +310,8 @@ function RecommendationHistoryItem({ recommendation }: RecommendationHistoryItem
 
   const getFeedbackIcon = (feedback?: string) => {
     switch (feedback) {
-      case 'accepted': return 'thumbs-up'
-      case 'rejected': return 'thumbs-down'
+      case 'accepted': return 'check-circle'
+      case 'rejected': return 'x-circle'
       case 'modified': return 'edit'
       default: return 'clock'
     }

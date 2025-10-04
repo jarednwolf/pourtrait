@@ -61,19 +61,19 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
     return null;
   }
 
-  const getAlertVariant = (severity: ErrorSeverity) => {
+  const getAlertVariant = (severity: ErrorSeverity): 'default' | 'info' | 'success' | 'warning' | 'error' => {
     switch (severity) {
       case ErrorSeverity.CRITICAL:
       case ErrorSeverity.HIGH:
-        return 'error';
+        return 'error'
       case ErrorSeverity.MEDIUM:
-        return 'warning';
+        return 'warning'
       case ErrorSeverity.LOW:
-        return 'info';
+        return 'info'
       default:
-        return 'info';
+        return 'info'
     }
-  };
+  }
 
   const getIcon = (severity: ErrorSeverity) => {
     switch (severity) {

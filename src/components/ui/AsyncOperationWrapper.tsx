@@ -5,7 +5,7 @@
 import React, { ReactNode } from 'react';
 import { ErrorAlert } from './ErrorAlert';
 import { LoadingState } from './LoadingState';
-import { Button } from './Button';
+// Button is not used directly here; actions are rendered via ErrorAlert
 import { useAsyncOperation } from '@/hooks/useAsyncOperation';
 import { AppError } from '@/lib/errors';
 

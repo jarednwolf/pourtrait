@@ -28,8 +28,8 @@ export class DataExportService {
     try {
       // Get user data
       const { data: user } = await supabase
-        .from('users')
-        .select('id, email, name, created_at, experience_level')
+        .from('user_profiles')
+        .select('id, name, created_at, experience_level')
         .eq('id', userId)
         .single()
 
@@ -75,7 +75,7 @@ export class DataExportService {
 
       // Remove personal notes if not requested
       if (!options.includePersonalNotes) {
-        exportData.wines = exportData.wines.map(wine => ({
+        exportData.wines = exportData.wines.map((wine: any) => ({
           ...wine,
           personal_notes: undefined
         }))
@@ -282,7 +282,7 @@ export class DataExportService {
         supabase.from('wines').select('id').eq('user_id', userId),
         supabase.from('consumption_history').select('id').eq('user_id', userId),
         supabase.from('taste_profiles').select('id').eq('user_id', userId).single(),
-        supabase.from('users').select('created_at, updated_at').eq('id', userId).single()
+        supabase.from('user_profiles').select('created_at, updated_at').eq('id', userId).single()
       ])
 
       return {

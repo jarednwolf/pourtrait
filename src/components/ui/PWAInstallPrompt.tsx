@@ -48,8 +48,8 @@ export function PWAInstallPrompt({
     try {
       const installed = await promptInstall()
       if (installed) {
-        onInstall?.()    
-  }
+        onInstall?.()
+      }
     } catch (error) {
       console.error('Error installing PWA:', error)
     }

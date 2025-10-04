@@ -5,10 +5,10 @@ import { WineCard } from './WineCard'
 import { WineSearchInterface } from './WineSearchInterface'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/EmptyState'
-import type { Wine } from '@/lib/supabase'
+import type { Wine } from '@/types'
 import type { InventoryFilters } from '@/types'
 
 interface WineInventoryListProps {
@@ -207,8 +207,8 @@ export function WineInventoryList({
             {/* View Mode Toggle */}
             {onViewModeChange && (
               <div className="flex border border-gray-300 rounded-md overflow-hidden">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  <Button
+                  variant={viewMode === 'grid' ? 'primary' : 'outline'}
                   size="sm"
                   onClick={() => onViewModeChange('grid')}
                   className="rounded-none border-0"
@@ -216,7 +216,7 @@ export function WineInventoryList({
                   <Icon name="grid" className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  variant={viewMode === 'list' ? 'primary' : 'outline'}
                   size="sm"
                   onClick={() => onViewModeChange('list')}
                   className="rounded-none border-0 border-l border-gray-300"
@@ -250,7 +250,7 @@ export function WineInventoryList({
                   {WINE_TYPES.map(type => (
                     <Button
                       key={type.value}
-                      variant={filters.type?.includes(type.value as any) ? 'default' : 'outline'}
+                      variant={filters.type?.includes(type.value as any) ? 'primary' : 'outline'}
                       size="sm"
                       onClick={() => handleTypeToggle(type.value)}
                     >
@@ -267,7 +267,7 @@ export function WineInventoryList({
                   {DRINKING_WINDOW_STATUS.map(status => (
                     <Button
                       key={status.value}
-                      variant={filters.drinkingWindowStatus?.includes(status.value as any) ? 'default' : 'outline'}
+                      variant={filters.drinkingWindowStatus?.includes(status.value as any) ? 'primary' : 'outline'}
                       size="sm"
                       onClick={() => handleStatusToggle(status.value)}
                     >

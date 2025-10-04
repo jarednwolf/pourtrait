@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { Wine, Notification } from '@/types'
 import { DrinkingWindowService } from '@/lib/services/drinking-window'
-import { NotificationService } from '@/lib/services/notification-service'
+// import { NotificationService } from '@/lib/services/notification-service'
 import { useDrinkingWindowNotifications } from '@/hooks/useDrinkingWindowNotifications'
 import { DrinkingWindowIndicator, DrinkingUrgencyBadge } from './DrinkingWindowIndicator'
-import { WineCard } from './WineCard'
+// import { WineCard } from './WineCard'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
@@ -137,7 +137,7 @@ function DrinkingWindowAlertItem({ wine, urgencyScore }: DrinkingWindowAlertItem
           />
         ) : (
           <div className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center">
-            <Icon name="wine" size={20} className="text-gray-400" />
+            <Icon name="wine" className="text-gray-400 h-5 w-5" />
           </div>
         )}
       </div>
@@ -153,10 +153,7 @@ function DrinkingWindowAlertItem({ wine, urgencyScore }: DrinkingWindowAlertItem
           
           <div className="flex flex-col items-end gap-1">
             <DrinkingUrgencyBadge urgencyScore={urgencyScore} />
-            <DrinkingWindowIndicator 
-              drinkingWindow={wine.drinkingWindow}
-              size="sm"
-            />
+            <DrinkingWindowIndicator drinkingWindow={wine.drinkingWindow} size="sm" />
           </div>
         </div>
         

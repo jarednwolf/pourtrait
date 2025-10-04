@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+// import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
@@ -36,7 +36,7 @@ function getDemoPicks(): { top: Pick; alternatives: Pick[] } {
 }
 
 export default function OnboardingCompleted() {
-  const search = useSearchParams()
+  // const search = useSearchParams()
   const picks = getDemoPicks()
 
   useEffect(() => {

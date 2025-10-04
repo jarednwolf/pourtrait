@@ -27,7 +27,7 @@ export function useDataExport(): UseDataExportReturn {
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const exportData = async (format: 'csv' | 'json' | 'pdf', options: ExportOptions = {}) => {
+  const exportData = async (format: 'csv' | 'json' | 'pdf', options: ExportOptions = { format }) => {
     setIsExporting(true)
     setError(null)
 

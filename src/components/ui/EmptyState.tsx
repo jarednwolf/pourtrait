@@ -3,9 +3,10 @@
 import React from 'react'
 import { Card, CardContent } from './Card'
 import { Icon } from './Icon'
+import type { IconName } from './Icon'
 
 interface EmptyStateProps {
-  icon?: string
+  icon?: IconName
   title: string
   description?: string
   children?: React.ReactNode

@@ -1,17 +1,17 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Bell, BellRing } from 'lucide-react'
+import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { NotificationCenter } from './NotificationCenter'
-import { useDrinkingWindowNotifications } from '@/lib/services/notification-service'
+import { useDrinkingWindowNotifications } from '@/hooks/useDrinkingWindowNotifications'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useAuth } from '@/hooks/useAuth'
 
 export function NotificationBell() {
   const { user } = useAuth()
-  const { notifications, loading } = useDrinkingWindowNotifications(user?.id || '')
+  const { notifications } = useDrinkingWindowNotifications(user?.id || '')
   const { isSubscribed, subscribe, canSubscribe } = usePushNotifications()
   const [showCenter, setShowCenter] = useState(false)
   const [showPushPrompt, setShowPushPrompt] = useState(false)
@@ -68,11 +68,7 @@ export function NotificationBell() {
           className="relative p-2"
           aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         >
-          {unreadCount > 0 ? (
-            <BellRing className="h-5 w-5 text-amber-600" />
-          ) : (
-            <Bell className="h-5 w-5 text-gray-600" />
-          )}
+          <Icon name={unreadCount > 0 ? 'bell' : 'bell'} className={`h-5 w-5 ${unreadCount > 0 ? 'text-amber-600' : 'text-gray-600'}`} />
           
           {unreadCount > 0 && (
             <Badge 
@@ -87,7 +83,7 @@ export function NotificationBell() {
         {showPushPrompt && (
           <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border p-4 z-50">
             <div className="flex items-start space-x-3">
-              <BellRing className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+              <Icon name="bell" className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <h4 className="font-medium text-gray-900 text-sm">
                   Enable Push Notifications

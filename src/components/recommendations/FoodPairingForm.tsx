@@ -252,7 +252,6 @@ export function FoodPairingForm({ onSubmit, loading = false, className = '' }: F
           <Button
             type="submit"
             disabled={!isValid || loading}
-            loading={loading}
           >
             {loading ? 'Finding Pairings...' : 'Find Wine Pairings'}
           </Button>

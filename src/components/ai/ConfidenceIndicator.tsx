@@ -61,7 +61,7 @@ export function ConfidenceIndicator({
   const config = sizeConfig[size]
 
   // Color configurations
-  const colorConfig = {
+  const colorConfig: Record<'green' | 'yellow' | 'red', { bg: string; fill: string; text: string; icon: string }> = {
     green: {
       bg: 'bg-green-100',
       fill: 'bg-green-500',
@@ -82,7 +82,7 @@ export function ConfidenceIndicator({
     }
   }
 
-  const colors = colorConfig[color as keyof typeof colorConfig]
+  const colors = colorConfig[color as 'green' | 'yellow' | 'red']
 
   const tooltipText = `${label}: ${percentage}% confidence in this recommendation`
 
@@ -93,7 +93,7 @@ export function ConfidenceIndicator({
     >
       {/* Confidence Icon */}
       <Icon 
-        name={level === 'high' ? 'check-circle' : level === 'medium' ? 'exclamation-circle' : 'question-mark-circle'}
+        name={level === 'high' ? 'check-circle' : level === 'medium' ? 'exclamation-circle' : 'help-circle'}
         className={`${config.icon} ${colors.icon}`}
       />
 

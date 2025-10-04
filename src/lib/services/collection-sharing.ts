@@ -88,7 +88,18 @@ export class CollectionSharingService {
         throw new Error('Failed to create shared collection')
       }
 
-      return sharedCollection as SharedCollection
+      return {
+        id: sharedCollection.id,
+        userId: sharedCollection.user_id,
+        title: sharedCollection.title,
+        description: sharedCollection.description ?? undefined,
+        wines: (sharedCollection.wines as any[]) || [],
+        isPublic: !!sharedCollection.is_public,
+        shareToken: (sharedCollection as any).share_token,
+        createdAt: new Date(sharedCollection.created_at || new Date().toISOString()),
+        updatedAt: new Date(sharedCollection.updated_at || new Date().toISOString()),
+        viewCount: sharedCollection.view_count || 0
+      }
 
     } catch (error) {
       console.error('Error creating shared collection:', error)
@@ -131,7 +142,8 @@ export class CollectionSharingService {
    */
   async getUserSharedCollections(userId: string): Promise<SharedCollection[]> {
     try {
-      const { data: collections, error } = await this.supabase
+      const supabase = this.getSupabaseClient()
+      const { data: collections, error } = await supabase
         .from('shared_collections')
         .select('*')
         .eq('user_id', userId)
@@ -141,7 +153,18 @@ export class CollectionSharingService {
         throw new Error('Failed to fetch shared collections')
       }
 
-      return collections as SharedCollection[]
+      return (collections || []).map((c: any) => ({
+        id: c.id,
+        userId: c.user_id,
+        title: c.title,
+        description: c.description ?? undefined,
+        wines: (c.wines as any[]) || [],
+        isPublic: !!c.is_public,
+        shareToken: c.share_token,
+        createdAt: new Date(c.created_at || new Date().toISOString()),
+        updatedAt: new Date(c.updated_at || new Date().toISOString()),
+        viewCount: c.view_count || 0
+      }))
 
     } catch (error) {
       console.error('Error fetching user shared collections:', error)
@@ -158,7 +181,8 @@ export class CollectionSharingService {
     updates: Partial<ShareOptions>
   ): Promise<SharedCollection> {
     try {
-      const { data: collection, error } = await this.supabase
+      const supabase = this.getSupabaseClient()
+      const { data: collection, error } = await supabase
         .from('shared_collections')
         .update({
           title: updates.title,
@@ -174,7 +198,18 @@ export class CollectionSharingService {
         throw new Error('Failed to update shared collection')
       }
 
-      return collection as SharedCollection
+      return {
+        id: collection.id,
+        userId: collection.user_id,
+        title: collection.title,
+        description: collection.description ?? undefined,
+        wines: (collection.wines as any[]) || [],
+        isPublic: !!collection.is_public,
+        shareToken: collection.share_token,
+        createdAt: new Date(collection.created_at || new Date().toISOString()),
+        updatedAt: new Date(collection.updated_at || new Date().toISOString()),
+        viewCount: collection.view_count || 0
+      }
 
     } catch (error) {
       console.error('Error updating shared collection:', error)
@@ -187,7 +222,8 @@ export class CollectionSharingService {
    */
   async deleteSharedCollection(collectionId: string, userId: string): Promise<void> {
     try {
-      const { error } = await this.supabase
+      const supabase = this.getSupabaseClient()
+      const { error } = await supabase
         .from('shared_collections')
         .delete()
         .eq('id', collectionId)

@@ -404,7 +404,7 @@ function RecommendationCard({
                 size="sm"
                 className="px-2"
               >
-                <Icon name="thumbs-up" className="w-4 h-4" />
+                <Icon name="check-circle" className="w-4 h-4" />
               </Button>
               <Button
                 onClick={() => handleFeedback('rejected')}
@@ -412,7 +412,7 @@ function RecommendationCard({
                 size="sm"
                 className="px-2"
               >
-                <Icon name="thumbs-down" className="w-4 h-4" />
+                <Icon name="x-circle" className="w-4 h-4" />
               </Button>
             </div>
           )}
@@ -507,7 +507,7 @@ function PurchaseRecommendationCard({
                 size="sm"
                 className="px-2"
               >
-                <Icon name="thumbs-up" className="w-4 h-4" />
+                <Icon name="check-circle" className="w-4 h-4" />
               </Button>
               <Button
                 onClick={() => handleFeedback('rejected')}
@@ -515,7 +515,7 @@ function PurchaseRecommendationCard({
                 size="sm"
                 className="px-2"
               >
-                <Icon name="thumbs-down" className="w-4 h-4" />
+                <Icon name="x-circle" className="w-4 h-4" />
               </Button>
             </div>
           )}

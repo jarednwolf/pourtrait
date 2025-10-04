@@ -41,7 +41,6 @@ export class ErrorBoundary extends Component<Props, State> {
       ErrorSeverity.HIGH,
       {
         timestamp: new Date(),
-        stack: error.stack
       }
     );
 

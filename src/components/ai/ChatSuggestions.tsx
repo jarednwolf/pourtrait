@@ -17,7 +17,7 @@ interface ChatSuggestionsProps {
 
 interface Suggestion {
   text: string
-  icon: string
+  icon: import('@/components/ui/Icon').IconName
   category: string
   experienceLevel: ('beginner' | 'intermediate' | 'advanced')[]
 }
@@ -48,7 +48,7 @@ const SUGGESTIONS: Suggestion[] = [
   },
   {
     text: "Suggest a wine under $30 for a dinner party",
-    icon: "currency-dollar",
+    icon: "dollar-sign",
     category: "Budget",
     experienceLevel: ['beginner', 'intermediate', 'advanced']
   },
@@ -56,7 +56,7 @@ const SUGGESTIONS: Suggestion[] = [
   // Beginner-friendly suggestions
   {
     text: "I'm new to wine. What should I try first?",
-    icon: "academic-cap",
+    icon: "book-open",
     category: "Learning",
     experienceLevel: ['beginner']
   },
@@ -88,7 +88,7 @@ const SUGGESTIONS: Suggestion[] = [
   },
   {
     text: "Suggest wines from emerging regions",
-    icon: "globe-alt",
+    icon: "globe",
     category: "Discovery",
     experienceLevel: ['intermediate', 'advanced']
   },
@@ -100,7 +100,7 @@ const SUGGESTIONS: Suggestion[] = [
   },
   {
     text: "Recommend a wine for aging 10+ years",
-    icon: "archive",
+    icon: "save",
     category: "Cellar",
     experienceLevel: ['intermediate', 'advanced']
   },
@@ -148,13 +148,13 @@ const SUGGESTIONS: Suggestion[] = [
   },
   {
     text: "How do I properly store opened wine?",
-    icon: "archive",
+    icon: "save",
     category: "Storage",
     experienceLevel: ['beginner', 'intermediate']
   },
   {
     text: "What's the ideal serving temperature for Chardonnay?",
-    icon: "thermometer",
+    icon: "info",
     category: "Service",
     experienceLevel: ['beginner', 'intermediate']
   }
@@ -189,14 +189,14 @@ export function ChatSuggestions({
   })
 
   // Group suggestions by category
-  const groupedSuggestions = filteredSuggestions.reduce((groups, suggestion) => {
-    const category = suggestion.category
-    if (!groups[category]) {
-      groups[category] = []
-    }
-    groups[category].push(suggestion)
-    return groups
-  }, {} as Record<string, Suggestion[]>)
+  // const groupedSuggestions = filteredSuggestions.reduce((groups, suggestion) => {
+  //   const category = suggestion.category
+  //   if (!groups[category]) {
+  //     groups[category] = []
+  //   }
+  //   groups[category].push(suggestion)
+  //   return groups
+  // }, {} as Record<string, Suggestion[]>)
 
   // Limit to most relevant suggestions (max 8)
   const limitedSuggestions = filteredSuggestions.slice(0, 8)

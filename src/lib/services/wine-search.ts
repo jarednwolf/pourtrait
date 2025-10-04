@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { Wine } from '@/lib/supabase'
+import type { Wine } from '@/types'
 import type { 
   SearchFilters, 
   SearchResult, 
@@ -138,7 +138,7 @@ export class WineSearchService {
         // For relevance sorting, we'll handle this client-side after fetching
         query = query.order('name', { ascending: true })
       } else {
-        query = query.order(column, { ascending, nullsLast: true })
+        query = query.order(column, { ascending })
       }
     } else {
       // Default sorting
@@ -154,11 +154,36 @@ export class WineSearchService {
       throw new Error(`Search failed: ${error.message}`)
     }
 
-    let wines = data || []
+    let wines = (data || []) as any[]
+
+    // Map DB fields to domain type where necessary
+    const mapDbToWine = (db: any): Wine => ({
+      id: db.id,
+      userId: db.user_id,
+      name: db.name,
+      producer: db.producer,
+      vintage: db.vintage,
+      region: db.region,
+      country: db.country,
+      varietal: db.varietal || [],
+      type: db.type,
+      quantity: db.quantity || 0,
+      purchasePrice: db.purchase_price ?? undefined,
+      purchaseDate: db.purchase_date ? new Date(db.purchase_date) : undefined,
+      personalRating: db.personal_rating ?? undefined,
+      personalNotes: db.personal_notes ?? undefined,
+      imageUrl: db.image_url ?? undefined,
+      drinkingWindow: (db.drinking_window || {}) as any,
+      externalData: db.external_data || {},
+      createdAt: new Date(db.created_at),
+      updatedAt: new Date(db.updated_at)
+    })
 
     // Apply relevance scoring if searching by text
     if (filters.sortBy === 'relevance' && filters.query) {
-      wines = this.scoreAndSortByRelevance(wines, filters.query)
+      wines = this.scoreAndSortByRelevance(wines.map(mapDbToWine), filters.query)
+    } else {
+      wines = wines.map(mapDbToWine)
     }
 
     const total = count || 0
@@ -516,7 +541,7 @@ export class WineSearchService {
     const counts = new Map<string, number>()
     
     wines.forEach(wine => {
-      const status = (wine.drinking_window as any)?.currentStatus
+      const status = (wine.drinkingWindow as any)?.currentStatus
       if (status) {
         counts.set(status, (counts.get(status) || 0) + 1)
       }
@@ -549,7 +574,7 @@ export class WineSearchService {
     
     return ranges.map(range => {
       const count = wines.filter(wine => {
-        const price = wine.purchase_price
+        const price = wine.purchasePrice
         if (!price) return false
         
         if (range.max === Infinity) {
@@ -577,7 +602,7 @@ export class WineSearchService {
     
     return ranges.map(range => {
       const count = wines.filter(wine => {
-        const rating = wine.personal_rating
+        const rating = wine.personalRating
         return rating && rating >= range.min && rating <= range.max
       }).length
       

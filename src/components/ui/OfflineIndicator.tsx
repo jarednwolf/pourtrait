@@ -25,7 +25,7 @@ export function OfflineIndicator({
 }: OfflineIndicatorProps) {
   const { isOnline } = usePWA()
   const [showOfflineMessage, setShowOfflineMessage] = useState(false)
-  const [hasPendingSync, setHasPendingSync] = useState(false)
+  const [hasPendingSync] = useState(false)
 
   // Show offline message when going offline
   useEffect(() => {
@@ -54,9 +54,7 @@ export function OfflineIndicator({
     return () => clearInterval(interval)
   }, [])
 
-  if (isOnline && !hasPendingSync) {
-    return null
-  }
+  if (isOnline && !hasPendingSync) return null
 
   return (
     <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-40 ${className}`}>

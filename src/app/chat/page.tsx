@@ -13,8 +13,8 @@ import { track } from '@/lib/utils/track'
 
 export default function ChatPage() {
   const search = useSearchParams()
-  const initialMessage = useMemo(() => search?.get('q') || '', [search])
-  const shouldAutoSend = useMemo(() => search?.get('send') === '1', [search])
+  const initialMessage = useMemo(() => search?.get('prompt') || search?.get('q') || '', [search])
+  const shouldAutoSend = useMemo(() => search?.get('autoSend') === 'true' || search?.get('send') === '1', [search])
 
   useEffect(() => {
     if (initialMessage) {

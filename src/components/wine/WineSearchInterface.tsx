@@ -10,7 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { WineCard } from './WineCard'
 import { useWineSearch } from '@/hooks/useWineSearch'
 import type { SearchFilters, QuickFilter, SavedSearch } from '@/types'
-import type { Wine } from '@/lib/supabase'
+import type { Wine } from '@/types'
 
 interface WineSearchInterfaceProps {
   onWineView?: (wine: Wine) => void
@@ -192,7 +192,7 @@ export function WineSearchInterface({
                         <Icon 
                           name={suggestion.type === 'wine' ? 'wine' : 
                                 suggestion.type === 'producer' ? 'building' :
-                                suggestion.type === 'region' ? 'map-pin' : 'grape'}
+                                suggestion.type === 'region' ? 'map-pin' : 'leaf'}
                           className="h-4 w-4 text-gray-400"
                         />
                         <span>{suggestion.label}</span>
@@ -248,7 +248,7 @@ export function WineSearchInterface({
                   size="sm"
                   onClick={() => setShowSavedSearches(!showSavedSearches)}
                 >
-                  <Icon name="bookmark" className="h-4 w-4 mr-2" />
+                  <Icon name="save" className="h-4 w-4 mr-2" />
                   Saved
                 </Button>
 
@@ -307,7 +307,7 @@ export function WineSearchInterface({
                 {onViewModeChange && (
                   <div className="flex border border-gray-300 rounded-md overflow-hidden">
                     <Button
-                      variant={viewMode === 'grid' ? 'default' : 'outline'}
+                      variant={viewMode === 'grid' ? 'primary' : 'outline'}
                       size="sm"
                       onClick={() => onViewModeChange('grid')}
                       className="rounded-none border-0"
@@ -315,7 +315,7 @@ export function WineSearchInterface({
                       <Icon name="grid" className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant={viewMode === 'list' ? 'default' : 'outline'}
+                      variant={viewMode === 'list' ? 'primary' : 'outline'}
                       size="sm"
                       onClick={() => onViewModeChange('list')}
                       className="rounded-none border-0 border-l border-gray-300"

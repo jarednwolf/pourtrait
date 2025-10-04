@@ -2,9 +2,7 @@ import * as React from 'react'
 import { cn } from '@/lib/design-system/utils'
 import { inputVariants, type InputVariants } from '@/lib/design-system/variants'
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement>,
-    InputVariants {}
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>, InputVariants {}
 
 /**
  * Professional input component with consistent styling
@@ -15,7 +13,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <input
         type={type}
-        className={cn(inputVariants({ size, state, className }))}
+        className={cn(inputVariants({ size: size as any, state, className }))}
         ref={ref}
         {...props}
       />

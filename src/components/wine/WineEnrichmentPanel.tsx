@@ -162,7 +162,7 @@ const EnrichmentSuggestionsDisplay: React.FC<EnrichmentSuggestionsDisplayProps> 
           </>
         ) : (
           <>
-            <Icon name="download" className="w-4 h-4 mr-2" />
+            <Icon name="arrow-down-tray" className="w-4 h-4 mr-2" />
             Enrich Data
           </>
         )}
@@ -293,16 +293,16 @@ export const WineEnrichmentPanel: React.FC<WineEnrichmentPanelProps> = ({
       )}
 
       {/* Wine External Data Display */}
-      {wine.external_data && Object.keys(wine.external_data).length > 0 && (
+      {(wine as any).external_data && Object.keys((wine as any).external_data).length > 0 && (
         <Card className="p-4">
           <h3 className="text-lg font-semibold mb-4">External Data</h3>
           
           {/* Professional Ratings */}
-          {wine.external_data.professionalRatings && wine.external_data.professionalRatings.length > 0 && (
+          {(wine as any).external_data.professionalRatings && (wine as any).external_data.professionalRatings.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Professional Ratings</h4>
               <div className="space-y-2">
-                {wine.external_data.professionalRatings.map((rating, index) => (
+                {(wine as any).external_data.professionalRatings.map((rating: any, index: number) => (
                   <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                     <div>
                       <div className="font-medium text-sm">{rating.source}</div>
@@ -327,53 +327,53 @@ export const WineEnrichmentPanel: React.FC<WineEnrichmentPanelProps> = ({
           )}
 
           {/* Tasting Notes */}
-          {wine.external_data.tastingNotes && (
+          {(wine as any).external_data.tastingNotes && (
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Tasting Notes</h4>
               <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
-                {wine.external_data.tastingNotes}
+                {(wine as any).external_data.tastingNotes}
               </p>
             </div>
           )}
 
           {/* Technical Details */}
           <div className="grid grid-cols-2 gap-4 text-sm">
-            {wine.external_data.alcoholContent && (
+            {(wine as any).external_data.alcoholContent && (
               <div>
                 <span className="font-medium text-gray-700">Alcohol:</span>
-                <span className="ml-2 text-gray-600">{wine.external_data.alcoholContent}%</span>
+                <span className="ml-2 text-gray-600">{(wine as any).external_data.alcoholContent}%</span>
               </div>
             )}
             
-            {wine.external_data.servingTemperature && (
+            {(wine as any).external_data.servingTemperature && (
               <div>
                 <span className="font-medium text-gray-700">Serving Temp:</span>
                 <span className="ml-2 text-gray-600">
-                  {wine.external_data.servingTemperature.min}-{wine.external_data.servingTemperature.max}°C
+                  {(wine as any).external_data.servingTemperature.min}-{(wine as any).external_data.servingTemperature.max}°C
                 </span>
               </div>
             )}
             
-            {wine.external_data.decantingTime && (
+            {(wine as any).external_data.decantingTime && (
               <div>
                 <span className="font-medium text-gray-700">Decanting:</span>
-                <span className="ml-2 text-gray-600">{wine.external_data.decantingTime} min</span>
+                <span className="ml-2 text-gray-600">{(wine as any).external_data.decantingTime} min</span>
               </div>
             )}
             
-            {wine.external_data.agingPotential && (
+            {(wine as any).external_data.agingPotential && (
               <div>
                 <span className="font-medium text-gray-700">Aging Potential:</span>
-                <span className="ml-2 text-gray-600">{wine.external_data.agingPotential} years</span>
+                <span className="ml-2 text-gray-600">{(wine as any).external_data.agingPotential} years</span>
               </div>
             )}
           </div>
 
           {/* Last Updated */}
-          {wine.external_data.lastUpdated && (
+          {(wine as any).external_data.lastUpdated && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="text-xs text-gray-500">
-                Last updated: {new Date(wine.external_data.lastUpdated).toLocaleString()}
+                Last updated: {new Date((wine as any).external_data.lastUpdated).toLocaleString()}
               </div>
             </div>
           )}

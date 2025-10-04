@@ -98,7 +98,7 @@ export function DemoRecommendations({
       {/* Recommendations */}
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-gray-900">Recommended Wines</h3>
-        {recommendations.map((wine, index) => (
+        {recommendations.map((wine) => (
           <Card key={wine.id} className="hover:shadow-lg transition-shadow">
             <CardContent className="pt-6">
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
@@ -113,7 +113,7 @@ export function DemoRecommendations({
                       </p>
                     </div>
                     <div className="flex items-center space-x-2 ml-4">
-                      <Badge variant="secondary" className="capitalize">
+                      <Badge variant="primary" className="capitalize">
                         {wine.type}
                       </Badge>
                       <div className="flex items-center text-sm text-gray-500">

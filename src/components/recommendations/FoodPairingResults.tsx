@@ -161,7 +161,7 @@ function PairingCard({ pairing, rank, onSelect, isPrimary }: PairingCardProps) {
 
   const getConfidenceIcon = (confidence: number) => {
     if (confidence > 0.8) return 'star'
-    if (confidence > 0.6) return 'thumbs-up'
+    if (confidence > 0.6) return 'check-circle'
     return 'help-circle'
   }
 
@@ -269,10 +269,10 @@ function PairingCard({ pairing, rank, onSelect, isPrimary }: PairingCardProps) {
       )}
 
       {/* Pairing Notes */}
-      {pairing.pairingNotes && (
+      {pairing.pairingExplanation && (
         <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
           <h6 className="text-sm font-medium text-green-900 mb-1">Pairing Notes</h6>
-          <p className="text-sm text-green-800">{pairing.pairingNotes}</p>
+          <p className="text-sm text-green-800">{pairing.pairingExplanation}</p>
         </div>
       )}
     </Card>

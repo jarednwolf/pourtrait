@@ -70,10 +70,10 @@ export function WineCard({
       <Card className="hover:shadow-md transition-shadow cursor-pointer">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
-            {wine.image_url && (
+            {wine.imageUrl && (
               <div className="relative w-12 h-16 flex-shrink-0">
                 <Image
-                  src={wine.image_url}
+                  src={wine.imageUrl}
                   alt={`${wine.name} bottle`}
                   fill
                   className="object-cover rounded"
@@ -110,8 +110,8 @@ export function WineCard({
               
               <div className="flex items-center justify-between mt-2">
                 <div className="flex items-center gap-2">
-                  {wine.personal_rating && renderRating(wine.personal_rating)}
-                  {wine.purchase_price && renderPrice(wine.purchase_price)}
+                  {wine.personalRating && renderRating(wine.personalRating)}
+                  {wine.purchasePrice && renderPrice(wine.purchasePrice)}
                 </div>
                 
                 <span className="text-sm text-gray-500">
@@ -182,10 +182,10 @@ export function WineCard({
       
       <CardContent className="pt-0">
         <div onClick={handleCardClick}>
-          {wine.image_url && (
+            {wine.imageUrl && (
             <div className="relative w-full h-48 mb-4 bg-gray-100 rounded-lg overflow-hidden">
               <Image
-                src={wine.image_url}
+                  src={wine.imageUrl}
                 alt={`${wine.name} bottle`}
                 fill
                 className="object-cover"
@@ -223,14 +223,14 @@ export function WineCard({
             
             <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-3">
-                {wine.personal_rating && renderRating(wine.personal_rating)}
-                {wine.purchase_price && renderPrice(wine.purchase_price)}
+                {wine.personalRating && renderRating(wine.personalRating)}
+                {wine.purchasePrice && renderPrice(wine.purchasePrice)}
               </div>
             </div>
             
-            {wine.personal_notes && (
+            {wine.personalNotes && (
               <div className="text-sm text-gray-600 pt-2 border-t">
-                <p className="line-clamp-2">{wine.personal_notes}</p>
+                <p className="line-clamp-2">{wine.personalNotes}</p>
               </div>
             )}
           </div>

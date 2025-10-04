@@ -10,7 +10,7 @@ import type {
   QuickFilter
 } from '@/types'
 import { QUICK_FILTERS, DEFAULT_SEARCH_CONFIG } from '@/types/search'
-import type { Wine } from '@/lib/supabase'
+import type { Wine } from '@/types'
 
 interface UseWineSearchOptions {
   autoSearch?: boolean

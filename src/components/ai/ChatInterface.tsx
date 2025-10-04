@@ -5,10 +5,7 @@ import { useAIChat } from '@/hooks/useAIRecommendations'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
-import { ErrorAlert } from '@/components/ui/ErrorAlert'
-import { LoadingState } from '@/components/ui/LoadingState'
-import { useAsyncOperation } from '@/hooks/useAsyncOperation'
-import { AppError } from '@/lib/errors'
+// Removed unused imports
 import { track } from '@/lib/utils/track'
 
 // ============================================================================
