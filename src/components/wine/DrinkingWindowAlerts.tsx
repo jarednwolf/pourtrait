@@ -128,6 +128,7 @@ function DrinkingWindowAlertItem({ wine, urgencyScore }: DrinkingWindowAlertItem
     <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
       <div className="flex-shrink-0">
         {wine.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={wine.imageUrl}
             alt={wine.name}

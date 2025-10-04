@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/utils/logger'
 
 // Configure function timeout for Vercel
 export const maxDuration = 60
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Processing scheduled notifications...')
+    logger.info('Processing scheduled notifications...')
 
     // Process pending notifications
     await NotificationScheduler.processPendingNotifications()
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Also process drinking window alerts for all users (legacy support)
     await NotificationService.processAllUserAlerts()
 
-    console.log('Notification processing completed successfully')
+    logger.info('Notification processing completed successfully')
 
     return NextResponse.json({
       success: true,
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error processing notifications:', error)
+    logger.error('Error processing notifications:', { error } as any)
     
     return NextResponse.json(
       { 
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
     const authorized = Boolean(cronHeader) || (cronSecret ? authHeader === `Bearer ${cronSecret}` : false)
 
     if (authorized) {
-      console.log('Cron-triggered notification processing...')
+      logger.info('Cron-triggered notification processing...')
 
       await NotificationScheduler.processPendingNotifications()
       await NotificationService.processAllUserAlerts()
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
       service: 'notification-processor'
     })
   } catch (error) {
-    console.error('Health check failed:', error)
+    logger.error('Health check failed:', { error } as any)
     
     return NextResponse.json(
       {

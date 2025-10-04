@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/utils/logger'
 import { createServerClient } from '@/lib/supabase'
 // import { analytics } from '@/lib/monitoring/analytics'
 import { errorTracker } from '@/lib/monitoring/error-tracking'
@@ -141,7 +142,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Dashboard API error:', error)
+    logger.error('Dashboard API error:', { error } as any)
     
     // Track the error
     await errorTracker.trackError(
@@ -234,7 +235,7 @@ async function getSystemHealth(supabase: any): Promise<SystemHealthMetrics> {
     }
 
   } catch (error) {
-    console.error('Error getting system health:', error)
+    logger.error('Error getting system health:', { error } as any)
     return {
       overall: 'unhealthy',
       services: {
@@ -297,7 +298,7 @@ async function getPerformanceMetrics(supabase: any, timeRange: string): Promise<
     }
 
   } catch (error) {
-    console.error('Error getting performance metrics:', error)
+    logger.error('Error getting performance metrics:', { error } as any)
     return {
       averageResponseTime: 0,
       p95ResponseTime: 0,
@@ -369,7 +370,7 @@ async function getErrorMetrics(supabase: any, timeRange: string): Promise<ErrorM
     }
 
   } catch (error) {
-    console.error('Error getting error metrics:', error)
+    logger.error('Error getting error metrics:', { error } as any)
     return {
       totalErrors: 0,
       errorRate: 0,
@@ -426,7 +427,7 @@ async function getBusinessMetrics(supabase: any, timeRange: string): Promise<Bus
     }
 
   } catch (error) {
-    console.error('Error getting business metrics:', error)
+    logger.error('Error getting business metrics:', { error } as any)
     return {
       dailyActiveUsers: 0,
       winesAdded: 0,
@@ -470,7 +471,7 @@ async function getAlertMetrics(supabase: any): Promise<AlertMetrics> {
     }
 
   } catch (error) {
-    console.error('Error getting alert metrics:', error)
+    logger.error('Error getting alert metrics:', { error } as any)
     return {
       activeAlerts: 0,
       criticalAlerts: 0,
@@ -522,7 +523,7 @@ async function getUptimeMetrics(supabase: any): Promise<UptimeMetrics> {
     }
 
   } catch (error) {
-    console.error('Error getting uptime metrics:', error)
+    logger.error('Error getting uptime metrics:', { error } as any)
     return {
       uptime24h: 100,
       uptime7d: 100,

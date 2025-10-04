@@ -4,6 +4,7 @@
  */
 
 import { analytics } from './analytics'
+import { logger } from '@/lib/utils/logger'
 import { createServerClient } from '@/lib/supabase'
 
 // Error severity levels
@@ -90,10 +91,10 @@ export class ErrorTracker {
 
       // Log to console in development
       if (!this.isProduction) {
-        console.error(`[${severity.toUpperCase()}] ${errorMessage}`, {
+        logger.error(`[${severity.toUpperCase()}] ${errorMessage}`, {
           stack: errorStack,
           context
-        })
+        } as any)
       }
 
       // Send to Sentry if configured
@@ -122,7 +123,7 @@ export class ErrorTracker {
 
     } catch (trackingError) {
       // Don't let error tracking failures break the application
-      console.error('Failed to track error:', trackingError)
+      logger.error('Failed to track error:', { trackingError } as any)
     }
   }
 
@@ -166,7 +167,7 @@ export class ErrorTracker {
       }
 
     } catch (error) {
-      console.error('Failed to track performance:', error)
+      logger.error('Failed to track performance:', { error } as any)
     }
   }
 
@@ -228,7 +229,7 @@ export class ErrorTracker {
       })
 
     } catch (error) {
-      console.error('Failed to track API call:', error)
+      logger.error('Failed to track API call:', { error } as any)
     }
   }
 
@@ -292,7 +293,7 @@ export class ErrorTracker {
       }
 
     } catch (error) {
-      console.error('Failed to track database query:', error)
+      logger.error('Failed to track database query:', { error } as any)
     }
   }
 
@@ -356,7 +357,7 @@ export class ErrorTracker {
       }
 
     } catch (error) {
-      console.error('Failed to track AI service:', error)
+      logger.error('Failed to track AI service:', { error } as any)
     }
   }
 
@@ -424,7 +425,7 @@ export class ErrorTracker {
       }
 
     } catch (error) {
-      console.error('Failed to get error statistics:', error)
+      logger.error('Failed to get error statistics:', { error } as any)
       return {
         totalErrors: 0,
         errorsBySeverity: {},

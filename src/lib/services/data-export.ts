@@ -1,5 +1,6 @@
 import { Wine, User, TasteProfile, ConsumptionRecord } from '@/types'
 import { supabase } from '@/lib/supabase'
+import { logger } from '@/lib/utils/logger'
 
 export interface ExportOptions {
   format: 'csv' | 'json' | 'pdf'
@@ -40,7 +41,7 @@ export class DataExportService {
         .order('created_at', { ascending: false })
 
       // Map DB wines to domain Wine type
-      const mapDbWine = (w: any): Wine => ({
+      const mapDbWine = (w: Record<string, any>): Wine => ({
         id: w.id,
         userId: w.user_id,
         name: w.name,
@@ -56,7 +57,7 @@ export class DataExportService {
         personalRating: w.personal_rating,
         personalNotes: w.personal_notes,
         imageUrl: w.image_url,
-        drinkingWindow: w.drinking_window as any,
+        drinkingWindow: w.drinking_window as unknown as Wine['drinkingWindow'],
         externalData: w.external_data || {},
         createdAt: new Date(w.created_at),
         updatedAt: new Date(w.updated_at)
@@ -80,11 +81,11 @@ export class DataExportService {
         if (tasteProfile) {
           exportData.tasteProfile = {
             userId: tasteProfile.user_id,
-            redWinePreferences: tasteProfile.red_wine_preferences as any,
-            whiteWinePreferences: tasteProfile.white_wine_preferences as any,
-            sparklingPreferences: tasteProfile.sparkling_preferences as any,
-            generalPreferences: tasteProfile.general_preferences as any,
-            learningHistory: tasteProfile.learning_history as any,
+            redWinePreferences: tasteProfile.red_wine_preferences as unknown as TasteProfile['redWinePreferences'],
+            whiteWinePreferences: tasteProfile.white_wine_preferences as unknown as TasteProfile['whiteWinePreferences'],
+            sparklingPreferences: tasteProfile.sparkling_preferences as unknown as TasteProfile['sparklingPreferences'],
+            generalPreferences: tasteProfile.general_preferences as unknown as TasteProfile['generalPreferences'],
+            learningHistory: tasteProfile.learning_history as unknown as TasteProfile['learningHistory'],
             confidenceScore: tasteProfile.confidence_score ?? 0,
             lastUpdated: new Date(tasteProfile.last_updated || new Date().toISOString())
           }
@@ -117,15 +118,15 @@ export class DataExportService {
 
       // Remove personal notes if not requested
       if (!options.includePersonalNotes) {
-        exportData.wines = exportData.wines.map((wine: any) => ({
+        exportData.wines = exportData.wines.map((wine: Wine) => ({
           ...wine,
-          personal_notes: undefined
+          personalNotes: undefined
         }))
       }
 
       return exportData
     } catch (error) {
-      console.error('Error exporting user data:', error)
+      logger.error('Error exporting user data:', { error } as any)
       throw new Error('Failed to export user data')
     }
   }
@@ -247,7 +248,7 @@ export class DataExportService {
           })
 
         if (upsertProfileError) {
-          console.error('Failed to restore taste profile:', upsertProfileError)
+          logger.error('Failed to restore taste profile:', { error: upsertProfileError } as any)
         }
       }
 
@@ -275,12 +276,12 @@ export class DataExportService {
             .insert(historyWithUserId)
 
           if (insertHistoryError) {
-            console.error('Failed to restore consumption history:', insertHistoryError)
+            logger.error('Failed to restore consumption history:', { error: insertHistoryError } as any)
           }
         }
       }
     } catch (error) {
-      console.error('Error restoring backup:', error)
+      logger.error('Error restoring backup:', { error } as any)
       throw new Error('Failed to restore data from backup')
     }
   }
@@ -303,11 +304,11 @@ export class DataExportService {
       const { error } = await supabase.auth.admin.deleteUser(userId)
       
       if (error) {
-        console.error('Error deleting user account:', error)
+        logger.error('Error deleting user account:', { error } as any)
         throw new Error('Failed to delete user account')
       }
     } catch (error) {
-      console.error('Error deleting user data:', error)
+      logger.error('Error deleting user data:', { error } as any)
       throw new Error('Failed to delete user data')
     }
   }
@@ -338,7 +339,7 @@ export class DataExportService {
         lastActivity: userResult.data?.updated_at || ''
       }
     } catch (error) {
-      console.error('Error getting export stats:', error)
+      logger.error('Error getting export stats:', { error } as any)
       throw new Error('Failed to get export statistics')
     }
   }

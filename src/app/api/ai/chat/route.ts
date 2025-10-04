@@ -1,6 +1,7 @@
 // AI Chat API Route - Conversational Sommelier Interface
 
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/utils/logger'
 import { OpenAI } from 'openai'
 
 // Configure function timeout for Vercel
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
     )
 
     if (!validation.passed) {
-      console.warn('AI response validation failed:', validation.errors)
+      logger.warn('AI response validation failed', { errors: validation.errors } as any)
       
       // Return a safe fallback response
       return NextResponse.json({
@@ -170,7 +171,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('AI Chat API Error:', error)
+    logger.error('AI Chat API Error:', { error } as any)
     
     return NextResponse.json(
       { 
@@ -306,7 +307,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Streaming Chat API Error:', error)
+    logger.error('Streaming Chat API Error:', { error } as any)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -343,7 +344,7 @@ async function logChatInteraction(
         created_at: new Date().toISOString()
       })
   } catch (error) {
-    console.error('Error logging chat interaction:', error)
+    logger.error('Error logging chat interaction:', { error } as any)
   }
 }
 

@@ -1,4 +1,5 @@
 import { Wine } from '@/types'
+import { logger } from '@/lib/utils/logger'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/database.types'
 
@@ -93,16 +94,16 @@ export class CollectionSharingService {
         userId: sharedCollection.user_id,
         title: sharedCollection.title,
         description: sharedCollection.description ?? undefined,
-        wines: (sharedCollection.wines as any[]) || [],
+        wines: (sharedCollection.wines as unknown as Wine[]) || [],
         isPublic: !!sharedCollection.is_public,
-        shareToken: (sharedCollection as any).share_token,
+        shareToken: (sharedCollection as { share_token: string }).share_token,
         createdAt: new Date(sharedCollection.created_at || new Date().toISOString()),
         updatedAt: new Date(sharedCollection.updated_at || new Date().toISOString()),
         viewCount: sharedCollection.view_count || 0
       }
 
     } catch (error) {
-      console.error('Error creating shared collection:', error)
+      logger.error('Error creating shared collection:', { error } as any)
       throw new Error('Failed to create shared collection')
     }
   }
@@ -134,16 +135,16 @@ export class CollectionSharingService {
         userId: collection.user_id,
         title: collection.title,
         description: collection.description ?? undefined,
-        wines: (collection.wines as any[]) || [],
+        wines: (collection.wines as unknown as Wine[]) || [],
         isPublic: !!collection.is_public,
-        shareToken: (collection as any).share_token,
+        shareToken: (collection as { share_token: string }).share_token,
         createdAt: new Date(collection.created_at || new Date().toISOString()),
         updatedAt: new Date(collection.updated_at || new Date().toISOString()),
         viewCount: collection.view_count || 0
       }
 
     } catch (error) {
-      console.error('Error fetching shared collection:', error)
+      logger.error('Error fetching shared collection:', { error } as any)
       return null
     }
   }
@@ -164,12 +165,12 @@ export class CollectionSharingService {
         throw new Error('Failed to fetch shared collections')
       }
 
-      return (collections || []).map((c: any) => ({
+      return (collections || []).map((c: { [key: string]: any }) => ({
         id: c.id,
         userId: c.user_id,
         title: c.title,
         description: c.description ?? undefined,
-        wines: (c.wines as any[]) || [],
+        wines: (c.wines as unknown as Wine[]) || [],
         isPublic: !!c.is_public,
         shareToken: c.share_token,
         createdAt: new Date(c.created_at || new Date().toISOString()),
@@ -178,7 +179,7 @@ export class CollectionSharingService {
       }))
 
     } catch (error) {
-      console.error('Error fetching user shared collections:', error)
+      logger.error('Error fetching user shared collections:', { error } as any)
       throw new Error('Failed to fetch shared collections')
     }
   }
@@ -214,7 +215,7 @@ export class CollectionSharingService {
         userId: collection.user_id,
         title: collection.title,
         description: collection.description ?? undefined,
-        wines: (collection.wines as any[]) || [],
+        wines: (collection.wines as unknown as Wine[]) || [],
         isPublic: !!collection.is_public,
         shareToken: collection.share_token,
         createdAt: new Date(collection.created_at || new Date().toISOString()),
@@ -223,7 +224,7 @@ export class CollectionSharingService {
       }
 
     } catch (error) {
-      console.error('Error updating shared collection:', error)
+      logger.error('Error updating shared collection:', { error } as any)
       throw new Error('Failed to update shared collection')
     }
   }
@@ -245,7 +246,7 @@ export class CollectionSharingService {
       }
 
     } catch (error) {
-      console.error('Error deleting shared collection:', error)
+      logger.error('Error deleting shared collection:', { error } as any)
       throw new Error('Failed to delete shared collection')
     }
   }
@@ -277,7 +278,7 @@ export class CollectionSharingService {
         userId: collection.user_id,
         title: collection.title,
         description: collection.description ?? undefined,
-        wines: (collection.wines as any[]) || [],
+        wines: (collection.wines as unknown as Wine[]) || [],
         isPublic: !!collection.is_public,
         shareToken: collection.share_token,
         createdAt: new Date(collection.created_at || new Date().toISOString()),
@@ -286,7 +287,7 @@ export class CollectionSharingService {
       }
 
     } catch (error) {
-      console.error('Error updating collection visibility:', error)
+      logger.error('Error updating collection visibility:', { error } as any)
       throw new Error('Failed to update collection visibility')
     }
   }

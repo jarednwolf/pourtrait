@@ -4,6 +4,7 @@
  */
 
 import { createServerClient } from '@/lib/supabase'
+import { logger } from '@/lib/utils/logger'
 
 // Types for analytics events
 export interface AnalyticsEvent {
@@ -68,7 +69,7 @@ export class AnalyticsService {
       await this.sendToExternalAnalytics(event)
 
     } catch (error) {
-      console.error('Failed to track event:', error)
+      logger.error('Failed to track event:', { error } as any)
       // Don't throw - analytics failures shouldn't break the app
     }
   }
@@ -96,7 +97,7 @@ export class AnalyticsService {
       }
 
     } catch (error) {
-      console.error('Failed to track performance:', error)
+      logger.error('Failed to track performance:', { error } as any)
     }
   }
 
@@ -134,7 +135,7 @@ export class AnalyticsService {
       }
 
     } catch (error) {
-      console.error('Failed to track error:', error)
+      logger.error('Failed to track error:', { error } as any)
     }
   }
 
@@ -166,7 +167,7 @@ export class AnalyticsService {
       }
 
     } catch (error) {
-      console.error('Failed to track wine metrics:', error)
+      logger.error('Failed to track wine metrics:', { error } as any)
     }
   }
 
@@ -219,7 +220,7 @@ export class AnalyticsService {
       }
 
     } catch (error) {
-      console.error('Failed to get dashboard metrics:', error)
+      logger.error('Failed to get dashboard metrics:', { error } as any)
       return {
         userActivity: [],
         performanceMetrics: [],
@@ -278,7 +279,7 @@ export class AnalyticsService {
           })
         })
       } catch (error) {
-        console.error('Failed to send to PostHog:', error)
+        logger.warn('Failed to send to PostHog:', { error } as any)
       }
     }
   }
@@ -312,7 +313,7 @@ export class AnalyticsService {
 
   private async alertCriticalPerformance(metric: PerformanceMetric): Promise<void> {
     // Send alert to monitoring service (PagerDuty, Slack, etc.)
-    console.error(`Critical performance issue: ${metric.name} = ${metric.value}${metric.unit}`)
+    logger.error(`Critical performance issue: ${metric.name} = ${metric.value}${metric.unit}`)
     
     // Store critical alert
     const supabase = createServerClient()
@@ -327,7 +328,7 @@ export class AnalyticsService {
 
   private async alertCriticalError(errorEvent: ErrorEvent): Promise<void> {
     // Send critical error alert
-    console.error('Critical error occurred:', errorEvent.error)
+    logger.error('Critical error occurred:', { error: errorEvent.error } as any)
     
     const supabase = createServerClient()
     await supabase.from('alerts').insert({

@@ -2,6 +2,7 @@
 // Implements intelligent food pairing recommendations with educational explanations
 
 import { Wine, TasteProfile, RecommendationContext, Recommendation } from '@/types'
+import { logger } from '@/lib/utils/logger'
 import { AIRecommendationEngine } from '@/lib/ai/recommendation-engine'
 import { AIRecommendationRequest } from '@/lib/ai/types'
 import { createClient } from '@supabase/supabase-js'
@@ -254,7 +255,7 @@ export class FoodPairingService {
       }
 
     } catch (error) {
-      console.error('Error generating food pairings:', error)
+      logger.error('Error generating food pairings:', { error } as any)
       throw error
     }
   }
@@ -319,7 +320,7 @@ export class FoodPairingService {
       }
 
     } catch (error) {
-      console.error('Error generating contextual recommendations:', error)
+      logger.error('Error generating contextual recommendations:', { error } as any)
       throw error
     }
   }
@@ -559,7 +560,7 @@ export class FoodPairingService {
         educationalContext: rec.educationalContext
       }))
     } catch (error) {
-      console.error('Error generating AI pairings:', error)
+      logger.error('Error generating AI pairings:', { error } as any)
       return []
     }
   }
