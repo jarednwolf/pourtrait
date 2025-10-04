@@ -12,10 +12,14 @@ import { useAuth } from '@/hooks/useAuth'
 export function NotificationBell() {
   const { user } = useAuth()
   const { notifications } = useDrinkingWindowNotifications(user?.id || '')
-  if (!notifications) return null
   const { isSubscribed, subscribe, canSubscribe } = usePushNotifications()
   const [showCenter, setShowCenter] = useState(false)
   const [showPushPrompt, setShowPushPrompt] = useState(false)
+
+  // Early return after all hooks
+  if (!notifications) {
+    return null
+  }
 
   // Count unread notifications
   const unreadCount = notifications.filter(n => !n.read).length
@@ -59,7 +63,9 @@ export function NotificationBell() {
     return
   }, [])
 
-  if (!user) return null
+  if (!user) {
+    return null
+  }
 
   return (
     <>

@@ -95,7 +95,7 @@ export class AIRecommendationEngine {
 
       // Generate AI response with retry logic
       const aiResponse = await withRetry(
-        () => this.generateAIResponse(request, contextAnalysis, ragContext, promptTemplate),
+        () => this.generateAIResponse(request, ragContext, promptTemplate),
         {
           maxAttempts: 3,
           baseDelay: 1000,
@@ -133,8 +133,7 @@ export class AIRecommendationEngine {
       // Parse recommendations from response
       const recommendations = await this.parseRecommendations(
         enhancedResponse,
-        request,
-        contextAnalysis
+        request
       )
 
       // Calculate confidence
@@ -180,7 +179,7 @@ export class AIRecommendationEngine {
         reasoning: this.extractReasoning(enhancedResponse),
         confidence,
         educationalNotes: this.extractEducationalNotes(enhancedResponse, request.experienceLevel),
-        followUpQuestions: this.generateFollowUpQuestions(request, contextAnalysis),
+        followUpQuestions: this.generateFollowUpQuestions(request),
         responseMetadata
       }
 
@@ -215,12 +214,11 @@ export class AIRecommendationEngine {
    */
   private async generateAIResponse(
     request: AIRecommendationRequest,
-    contextAnalysis: any,
     ragContext: any,
     promptTemplate: any
   ): Promise<{ content: string; tokensUsed: number }> {
     
-    const userPrompt = this.buildUserPrompt(request, contextAnalysis, ragContext);
+    const userPrompt = this.buildUserPrompt(request, ragContext);
 
     try {
       const completion = await this.openai.chat.completions.create({
@@ -276,7 +274,6 @@ export class AIRecommendationEngine {
    */
   private buildUserPrompt(
     request: AIRecommendationRequest,
-    _contextAnalysis: any,
     ragContext: any
   ): string {
     let prompt = `User Query: "${request.query}"\n\n`
@@ -326,8 +323,7 @@ export class AIRecommendationEngine {
    */
   private async parseRecommendations(
     response: string,
-    request: AIRecommendationRequest,
-    _contextAnalysis: any
+    request: AIRecommendationRequest
   ): Promise<AIRecommendation[]> {
     // This is a simplified parser - in production, you might use more sophisticated NLP
     const recommendations: AIRecommendation[] = []
@@ -339,10 +335,10 @@ export class AIRecommendationEngine {
       for (const match of wineMatches.slice(0, 3)) { // Limit to 3 recommendations
         const recommendation: AIRecommendation = {
           type: request.inventory && request.inventory.length > 0 ? 'inventory' : 'purchase',
-          reasoning: this.extractReasoningForWine(response, match),
+          reasoning: this.extractReasoningForWine(response),
           confidence: 0.8, // Default confidence
           educationalContext: request.experienceLevel === 'beginner' ? 
-            this.generateEducationalContext(match) : undefined
+            this.generateEducationalContext() : undefined
         }
 
         // Try to match with inventory
@@ -412,7 +408,7 @@ export class AIRecommendationEngine {
     return educationalSentences.length > 0 ? educationalSentences.join('. ') + '.' : undefined
   }
 
-  private generateFollowUpQuestions(request: AIRecommendationRequest, _contextAnalysis: any): string[] {
+  private generateFollowUpQuestions(request: AIRecommendationRequest): string[] {
     const questions: string[] = []
     
     if (!request.context.foodPairing) {
@@ -430,17 +426,17 @@ export class AIRecommendationEngine {
     return questions.slice(0, 2) // Limit to 2 questions
   }
 
-  private extractReasoningForWine(response: string, _wineMatch: string): string {
-    // Find sentences that mention this specific wine
+  private extractReasoningForWine(response: string): string {
+    // Find sentences that mention wine recommendations
     const sentences = response.split('.')
     const relevantSentences = sentences.filter(sentence => 
-      sentence.includes(_wineMatch.split(' ')[0]) // Match on first word (producer)
+      sentence.toLowerCase().includes('wine') || sentence.toLowerCase().includes('recommend')
     )
     
     return relevantSentences.length > 0 ? relevantSentences[0].trim() + '.' : 'Recommended based on your preferences.'
   }
 
-  private generateEducationalContext(_wineMatch: string): string {
+  private generateEducationalContext(): string {
     // Generate basic educational context for beginners
     return `This wine represents a classic example of its style and region, making it an excellent choice for learning about wine characteristics.`
   }

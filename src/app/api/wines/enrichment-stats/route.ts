@@ -4,7 +4,7 @@
  * Provides endpoints for getting enrichment statistics and managing enrichment data
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { WineEnrichmentService } from '@/lib/services/wine-enrichment'

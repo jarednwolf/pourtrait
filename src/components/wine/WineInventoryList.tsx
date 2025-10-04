@@ -61,6 +61,29 @@ export function WineInventoryList({
   onViewModeChange,
   useSearch = false
 }: WineInventoryListProps) {
+  // Initialize all hooks unconditionally
+  const [filters, setFilters] = useState<InventoryFilters>({
+    search: '',
+    type: [],
+    sortBy: 'name',
+    sortOrder: 'asc'
+  })
+  
+  const [showFilters, setShowFilters] = useState(false)
+  const [localSearch, setLocalSearch] = useState('')
+
+  // Debounced search
+  useEffect(() => {
+    if (!useSearch) {
+      const timer = setTimeout(() => {
+        handleFilterChange('search', localSearch)
+      }, 300)
+
+      return () => clearTimeout(timer)
+    }
+    return
+  }, [localSearch, useSearch])
+
   // If search is enabled, use the new search interface
   if (useSearch) {
     return (
@@ -79,24 +102,6 @@ export function WineInventoryList({
   if (!wines) {
     wines = []
   }
-  const [filters, setFilters] = useState<InventoryFilters>({
-    search: '',
-    type: [],
-    sortBy: 'name',
-    sortOrder: 'asc'
-  })
-  
-  const [showFilters, setShowFilters] = useState(false)
-  const [localSearch, setLocalSearch] = useState('')
-
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      handleFilterChange('search', localSearch)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [localSearch])
 
   const handleFilterChange = (key: keyof InventoryFilters, value: any) => {
     const newFilters = { ...filters, [key]: value }

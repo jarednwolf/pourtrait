@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { WineSearchService } from '@/lib/services/wine-search'
 import type { SearchFilters } from '@/types'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = createRouteHandlerClient({ cookies })
     

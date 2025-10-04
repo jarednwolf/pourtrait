@@ -166,8 +166,8 @@ export class ContextAnalyzer {
     return {
       priceRange: context.priceRange,
       availability,
-      timeConstraints: this.extractTimeConstraints(context),
-      dietaryRestrictions: this.extractDietaryRestrictions(context)
+      timeConstraints: this.extractTimeConstraints(),
+      dietaryRestrictions: this.extractDietaryRestrictions()
     }
   }
 
@@ -339,12 +339,12 @@ export class ContextAnalyzer {
     return Math.max(1, Math.round((varietyScore + experienceScore) / 2))
   }
 
-  private static extractTimeConstraints(_context: RecommendationContext): string | undefined {
+  private static extractTimeConstraints(): string | undefined {
     // This could be enhanced to parse time-related constraints from context
     return undefined
   }
 
-  private static extractDietaryRestrictions(_context: RecommendationContext): string[] | undefined {
+  private static extractDietaryRestrictions(): string[] | undefined {
     // This could be enhanced to parse dietary restrictions from context
     return undefined
   }
