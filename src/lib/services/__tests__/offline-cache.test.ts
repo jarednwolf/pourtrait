@@ -129,7 +129,7 @@ describe('OfflineCacheService', () => {
     it('should cache wines for a user', async () => {
       const wines = [mockWine]
       
-      mockIDBObjectStore.put.mockImplementation((_data) => {
+      mockIDBObjectStore.put.mockImplementation((_unused) => {
         const request = { ...mockIDBRequest }
         setTimeout(() => {
           if (request.onsuccess) {
