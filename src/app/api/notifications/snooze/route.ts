@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import { NotificationScheduler } from '@/lib/services/notification-scheduler'
+// import { NotificationScheduler } from '@/lib/services/notification-scheduler'
 
 interface SnoozeRequest {
   notificationId: string

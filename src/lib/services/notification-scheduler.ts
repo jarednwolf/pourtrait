@@ -6,7 +6,7 @@
 
 import { supabase } from '@/lib/supabase'
 import { NotificationService, DrinkingWindowAlert } from './notification-service'
-import { pushNotificationService, wineNotificationTemplates } from './push-notifications'
+import { wineNotificationTemplates } from './push-notifications'
 
 export interface ScheduledNotification {
   id: string
@@ -188,7 +188,7 @@ export class NotificationScheduler {
           }
         } catch (error) {
           console.error('Push notification failed:', error)
-          deliveryResults.push({ type: 'push', success: false, error: error.message })
+          deliveryResults.push({ type: 'push', success: false, error: (error as Error).message })
         }
       }
 
@@ -206,7 +206,7 @@ export class NotificationScheduler {
           deliverySuccess = true
         } catch (error) {
           console.error('Email notification failed:', error)
-          deliveryResults.push({ type: 'email', success: false, error: error.message })
+          deliveryResults.push({ type: 'email', success: false, error: (error as Error).message })
         }
       }
 
@@ -222,7 +222,7 @@ export class NotificationScheduler {
         deliverySuccess = true
       } catch (error) {
         console.error('In-app notification failed:', error)
-        deliveryResults.push({ type: 'in_app', success: false, error: error.message })
+        deliveryResults.push({ type: 'in_app', success: false, error: (error as Error).message })
       }
 
       // Log delivery attempt
@@ -241,7 +241,7 @@ export class NotificationScheduler {
     } catch (error) {
       console.error('Error delivering notification:', error)
       await this.logDeliveryAttempt(notification.id, 'failed', [
-        { type: 'system', success: false, error: error.message }
+        { type: 'system', success: false, error: (error as Error).message }
       ])
       await this.markNotificationStatus(notification.id, 'failed')
     }
@@ -396,23 +396,23 @@ export class NotificationScheduler {
     const alerts = await NotificationService.generateDrinkingWindowAlerts(
       userId,
       wines,
-      { drinkingWindowAlerts: true, email: preferences.emailEnabled }
+      { drinkingWindowAlerts: true, recommendations: false, push: false, email: preferences.emailEnabled }
     )
 
-    for (const alert of alerts) {
-      const scheduledFor = this.calculateScheduleTime(alert, preferences)
+    for (const _alert of alerts) {
+      const scheduledFor = this.calculateScheduleTime(_alert, preferences)
       
       const payload: NotificationPayload = {
-        title: wineNotificationTemplates.drinkingWindow(alert.wine.name, alert.type).title,
-        body: alert.message,
+        title: wineNotificationTemplates.drinkingWindow(_alert.wine.name, _alert.type).title,
+        body: _alert.message,
         data: {
           type: 'drinking_window',
-          wineId: alert.wine.id,
-          urgency: alert.urgency,
-          wine: alert.wine
+          wineId: _alert.wine.id,
+          urgency: _alert.urgency,
+          wine: _alert.wine
         },
-        tag: `drinking-window-${alert.wine.id}`,
-        requireInteraction: alert.urgency === 'critical'
+        tag: `drinking-window-${_alert.wine.id}`,
+        requireInteraction: _alert.urgency === 'critical'
       }
 
       await this.scheduleNotification(userId, 'drinking_window', scheduledFor, payload)
@@ -423,7 +423,7 @@ export class NotificationScheduler {
    * Calculate when to schedule notification based on preferences
    */
   private static calculateScheduleTime(
-    alert: DrinkingWindowAlert,
+    _alert: DrinkingWindowAlert,
     preferences: NotificationPreferences
   ): Date {
     const now = new Date()

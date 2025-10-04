@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const startTime = Date.now()
     
     // Check database connection
     const supabase = createServerClient()
-    const { data: dbHealth, error: dbError } = await supabase
+    const { error: dbError } = await supabase
       .from('user_profiles')
       .select('count')
       .limit(1)
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Support HEAD requests for simple uptime checks
-export async function HEAD(request: NextRequest) {
+export async function HEAD() {
   try {
     // Quick database ping
     const supabase = createServerClient()

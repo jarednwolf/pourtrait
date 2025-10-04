@@ -6,7 +6,6 @@ import type {
   SearchFacets, 
   SearchSuggestion,
   SavedSearch,
-  SearchHistory,
   FacetCount
 } from '@/types'
 
@@ -236,11 +235,36 @@ export class WineSearchService {
     }
 
     // Get all wines for facet calculation
-    const { data: wines } = await buildBaseQuery().select('*')
+    const { data: dbWines } = await buildBaseQuery().select('*')
     
-    if (!wines) {
+    if (!dbWines) {
       return this.getEmptyFacets()
     }
+
+    // Map DB fields to domain type
+    const mapDbToWine = (db: any): Wine => ({
+      id: db.id,
+      userId: db.user_id,
+      name: db.name,
+      producer: db.producer,
+      vintage: db.vintage,
+      region: db.region,
+      country: db.country,
+      varietal: db.varietal || [],
+      type: db.type,
+      quantity: db.quantity || 0,
+      purchasePrice: db.purchase_price ?? undefined,
+      purchaseDate: db.purchase_date ? new Date(db.purchase_date) : undefined,
+      personalRating: db.personal_rating ?? undefined,
+      personalNotes: db.personal_notes ?? undefined,
+      imageUrl: db.image_url ?? undefined,
+      drinkingWindow: (db.drinking_window || {}) as any,
+      externalData: db.external_data || {},
+      createdAt: new Date(db.created_at),
+      updatedAt: new Date(db.updated_at)
+    })
+
+    const wines = dbWines.map(mapDbToWine)
 
     // Calculate facets
     const facets: SearchFacets = {
@@ -380,10 +404,10 @@ export class WineSearchService {
       id: data.id,
       userId: data.user_id,
       name: data.name,
-      filters: JSON.parse(data.filters),
-      isDefault: data.is_default,
-      createdAt: new Date(data.created_at),
-      updatedAt: new Date(data.updated_at)
+      filters: typeof data.filters === 'string' ? JSON.parse(data.filters) : data.filters,
+      isDefault: data.is_default ?? undefined,
+      createdAt: data.created_at ? new Date(data.created_at) : new Date(),
+      updatedAt: data.updated_at ? new Date(data.updated_at) : new Date()
     }
   }
 
@@ -406,10 +430,10 @@ export class WineSearchService {
       id: item.id,
       userId: item.user_id,
       name: item.name,
-      filters: JSON.parse(item.filters),
-      isDefault: item.is_default,
-      createdAt: new Date(item.created_at),
-      updatedAt: new Date(item.updated_at)
+      filters: typeof item.filters === 'string' ? JSON.parse(item.filters) : item.filters,
+      isDefault: item.is_default ?? undefined,
+      createdAt: item.created_at ? new Date(item.created_at) : new Date(),
+      updatedAt: item.updated_at ? new Date(item.updated_at) : new Date()
     }))
   }
 
@@ -483,7 +507,7 @@ export class WineSearchService {
     if (wine.producer.toLowerCase().includes(query)) score += 25
     if (wine.region.toLowerCase().includes(query)) score += 15
     if (wine.country.toLowerCase().includes(query)) score += 8
-    if (wine.personal_notes?.toLowerCase().includes(query)) score += 10
+    if (wine.personalNotes?.toLowerCase().includes(query)) score += 10
     
     // Varietal matches
     wine.varietal?.forEach(v => {

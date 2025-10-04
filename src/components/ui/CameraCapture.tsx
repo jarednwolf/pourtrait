@@ -71,9 +71,7 @@ export function CameraCapture({ onCapture, onCancel, className = '' }: CameraCap
     // Convert to blob and create preview URL
     canvas.toBlob((blob) => {
       if (blob) {
-        const file = new File([blob], `wine-label-${Date.now()}.jpg`, { type: 'image/jpeg' })
         const preview = URL.createObjectURL(blob)
-        
         setCapturedImage(preview)
         stopCamera()
       }

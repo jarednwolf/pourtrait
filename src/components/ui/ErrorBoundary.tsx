@@ -9,7 +9,6 @@ import { AppError, ErrorType, ErrorSeverity } from '../../lib/errors';
 import { errorHandler } from '../../lib/errors/error-handler';
 import { Button } from './Button';
 import { Card } from './Card';
-import { Alert } from './Alert';
 
 interface Props {
   children: ReactNode;

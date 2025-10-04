@@ -395,7 +395,7 @@ export function WineEntryForm({
               </label>
               <textarea
                 id="personalNotes"
-                value={formData.personalNotes}
+            value={formData.personalNotes ?? ''}
                 onChange={(e) => handleInputChange('personalNotes', e.target.value)}
                 placeholder="Your thoughts about this wine..."
                 rows={3}
@@ -403,7 +403,7 @@ export function WineEntryForm({
                 maxLength={1000}
               />
               <p className="text-xs text-gray-500 mt-1">
-                {formData.personalNotes.length}/1000 characters
+                {(formData.personalNotes ?? '').length}/1000 characters
               </p>
             </div>
           </div>

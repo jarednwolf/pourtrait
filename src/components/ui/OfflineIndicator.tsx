@@ -31,24 +31,20 @@ export function OfflineIndicator({
   useEffect(() => {
     if (!isOnline) {
       setShowOfflineMessage(true)
-      // Auto-hide after 5 seconds
       const timer = setTimeout(() => {
         setShowOfflineMessage(false)
       }, 5000)
       return () => clearTimeout(timer)
-    } else {
-      setShowOfflineMessage(false)
     }
+    setShowOfflineMessage(false)
+    return
   }, [isOnline])
 
   // Check for pending sync operations (this would integrate with your sync service)
   useEffect(() => {
-    // This would check your offline cache service for pending operations
-    // For now, we'll simulate it
     const checkPendingSync = () => {
-      // setHasPendingSync(offlineCacheService.hasPendingOperations())
+      // no-op for now
     }
-    
     checkPendingSync()
     const interval = setInterval(checkPendingSync, 5000)
     return () => clearInterval(interval)
@@ -132,6 +128,7 @@ export function useNetworkStatus() {
         connection?.removeEventListener('change', handleConnectionChange)
       }
     }
+    return
   }, [])
 
   return {

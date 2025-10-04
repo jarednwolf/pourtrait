@@ -2,7 +2,7 @@
  * Fallback mechanisms for when primary services fail
  */
 
-import { AppError, ErrorType } from '../errors';
+// Fallback utilities
 
 export interface FallbackOptions<T> {
   fallbackValue?: T;
@@ -48,7 +48,7 @@ export class AIServiceFallbacks {
   /**
    * Fallback for wine recommendations when AI is unavailable
    */
-  static getRecommendationFallback(userPreferences?: any) {
+  static getRecommendationFallback(_userPreferences?: any) {
     return {
       recommendations: [
         {

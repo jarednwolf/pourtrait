@@ -95,12 +95,13 @@ export function useAsyncOperation<T = any>(
 
       options.onSuccess?.(result);
     } catch (error) {
+      const handled = errorHandler.handleError(error as Error)
       const appError = error instanceof AppError 
         ? error 
-        : errorHandler.handleError(error as Error).error || new AppError(
+        : new AppError(
             'UNKNOWN_ERROR' as any,
             (error as Error).message,
-            'An unexpected error occurred'
+            handled.userMessage || 'An unexpected error occurred'
           );
 
       setState({

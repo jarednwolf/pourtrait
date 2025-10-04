@@ -834,7 +834,7 @@ export class FoodPairingService {
 
   private buildFoodPairingQuery(
     request: FoodPairingRequest,
-    foodAnalysis: FoodAnalysis
+    _foodAnalysis: FoodAnalysis
   ): string {
     let query = `What wine from my inventory pairs best with ${request.foodDescription}?`
 
@@ -882,8 +882,8 @@ export class FoodPairingService {
 
   private rankPairings(
     pairings: FoodPairingRecommendation[],
-    tasteProfile: TasteProfile,
-    foodAnalysis: FoodAnalysis
+    _tasteProfile: TasteProfile,
+    _foodAnalysis: FoodAnalysis
   ): FoodPairingRecommendation[] {
     return pairings.sort((a, b) => {
       // Primary sort by pairing score
@@ -905,8 +905,8 @@ export class FoodPairingService {
   }
 
   private generateEducationalContext(
-    wine: Wine,
-    foodAnalysis: FoodAnalysis,
+    _wine: Wine,
+    _foodAnalysis: FoodAnalysis,
     rule: PairingRule
   ): string {
     return `This pairing follows the classic principle that ${rule.reasoning.toLowerCase()}. ${rule.examples[0]} is a traditional example of this pairing style.`
@@ -942,7 +942,7 @@ export class FoodPairingService {
   private generateEducationalNotes(
     foodAnalysis: FoodAnalysis,
     pairings: FoodPairingRecommendation[],
-    tasteProfile: TasteProfile
+    _tasteProfile: TasteProfile
   ): string {
     if (pairings.length === 0) return "No suitable pairings found in your inventory."
 
@@ -1006,7 +1006,7 @@ export class FoodPairingService {
     return reasoning + "."
   }
 
-  private generateContextualExplanation(wine: Wine, filters: ContextualFilter): string {
+  private generateContextualExplanation(_wine: Wine, filters: ContextualFilter): string {
     return `Selected based on your specified criteria: ${Object.entries(filters)
       .filter(([_, value]) => value !== undefined)
       .map(([key, _]) => key.replace(/([A-Z])/g, ' $1').toLowerCase())
@@ -1022,7 +1022,7 @@ export class FoodPairingService {
 
   private buildContextualReasoning(
     filters: ContextualFilter,
-    topPairing: FoodPairingRecommendation
+    _topPairing: FoodPairingRecommendation
   ): string {
     return `Based on your criteria (${Object.keys(filters).join(', ')}), this wine offers the best combination of personal preference alignment and contextual appropriateness.`
   }
@@ -1061,7 +1061,7 @@ export class FoodPairingService {
 
   private generateContextualServingTips(
     filters: ContextualFilter,
-    pairing: FoodPairingRecommendation
+    _pairing: FoodPairingRecommendation
   ): ServingTips {
     const tips: ServingTips = {}
 
@@ -1092,7 +1092,7 @@ export class FoodPairingService {
     })
   }
 
-  private generateEmptyInventoryResponse(filters: ContextualFilter): FoodPairingResponse {
+  private generateEmptyInventoryResponse(_filters: ContextualFilter): FoodPairingResponse {
     return {
       pairings: [],
       reasoning: "No wines in your inventory match the specified criteria.",

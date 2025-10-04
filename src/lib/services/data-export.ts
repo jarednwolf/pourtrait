@@ -1,6 +1,5 @@
 import { Wine, User, TasteProfile, ConsumptionRecord } from '@/types'
 import { supabase } from '@/lib/supabase'
-import type { Database } from '@/lib/database.types'
 
 export interface ExportOptions {
   format: 'csv' | 'json' | 'pdf'
@@ -40,9 +39,32 @@ export class DataExportService {
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
+      // Map DB wines to domain Wine type
+      const mapDbWine = (w: any): Wine => ({
+        id: w.id,
+        userId: w.user_id,
+        name: w.name,
+        producer: w.producer,
+        vintage: w.vintage,
+        region: w.region,
+        country: w.country,
+        varietal: w.varietal || [],
+        type: w.type,
+        quantity: w.quantity || 0,
+        purchasePrice: w.purchase_price,
+        purchaseDate: w.purchase_date ? new Date(w.purchase_date) : undefined,
+        personalRating: w.personal_rating,
+        personalNotes: w.personal_notes,
+        imageUrl: w.image_url,
+        drinkingWindow: w.drinking_window as any,
+        externalData: w.external_data || {},
+        createdAt: new Date(w.created_at),
+        updatedAt: new Date(w.updated_at)
+      })
+
       const exportData: UserDataExport = {
         user: user || {},
-        wines: wines || [],
+        wines: (wines || []).map(mapDbWine),
         exportDate: new Date().toISOString(),
         version: '1.0'
       }
@@ -56,7 +78,16 @@ export class DataExportService {
           .single()
         
         if (tasteProfile) {
-          exportData.tasteProfile = tasteProfile
+          exportData.tasteProfile = {
+            userId: tasteProfile.user_id,
+            redWinePreferences: tasteProfile.red_wine_preferences as any,
+            whiteWinePreferences: tasteProfile.white_wine_preferences as any,
+            sparklingPreferences: tasteProfile.sparkling_preferences as any,
+            generalPreferences: tasteProfile.general_preferences as any,
+            learningHistory: tasteProfile.learning_history as any,
+            confidenceScore: tasteProfile.confidence_score ?? 0,
+            lastUpdated: new Date(tasteProfile.last_updated || new Date().toISOString())
+          }
         }
       }
 
@@ -69,7 +100,18 @@ export class DataExportService {
           .order('consumed_at', { ascending: false })
         
         if (consumptionHistory) {
-          exportData.consumptionHistory = consumptionHistory
+          exportData.consumptionHistory = consumptionHistory.map(h => ({
+            id: h.id,
+            userId: h.user_id,
+            wineId: h.wine_id,
+            rating: h.rating ?? undefined,
+            notes: h.notes ?? undefined,
+            consumedAt: new Date(h.consumed_at),
+            occasion: h.occasion ?? undefined,
+            foodPairing: h.food_pairing ?? undefined,
+            companions: h.companions ?? undefined,
+            createdAt: new Date(h.created_at)
+          }))
         }
       }
 
@@ -123,13 +165,13 @@ export class DataExportService {
         this.escapeCsvValue(Array.isArray(wine.varietal) ? wine.varietal.join('; ') : wine.varietal || ''),
         wine.type || '',
         wine.quantity || 0,
-        wine.purchase_price || '',
-        wine.purchase_date || '',
-        wine.personal_rating || '',
-        wine.drinking_window?.peak_start_date || '',
-        wine.drinking_window?.peak_end_date || '',
-        wine.drinking_window?.current_status || '',
-        this.escapeCsvValue(wine.personal_notes || '')
+        wine.purchasePrice || '',
+        wine.purchaseDate || '',
+        wine.personalRating || '',
+        wine.drinkingWindow?.peakStartDate || '',
+        wine.drinkingWindow?.peakEndDate || '',
+        wine.drinkingWindow?.currentStatus || '',
+        this.escapeCsvValue(wine.personalNotes || '')
       ].join(','))
     ]
 
@@ -169,7 +211,7 @@ export class DataExportService {
       }
 
       // Start transaction-like operations
-      const { error: deleteWinesError } = await this.getSupabase()
+      const { error: deleteWinesError } = await supabase
         .from('wines')
         .delete()
         .eq('user_id', userId)
@@ -186,7 +228,7 @@ export class DataExportService {
           id: undefined // Let database generate new IDs
         }))
 
-        const { error: insertWinesError } = await this.getSupabase()
+        const { error: insertWinesError } = await supabase
           .from('wines')
           .insert(winesWithUserId)
 
@@ -197,7 +239,7 @@ export class DataExportService {
 
       // Restore taste profile if included
       if (backupData.tasteProfile) {
-        const { error: upsertProfileError } = await this.getSupabase()
+        const { error: upsertProfileError } = await supabase
           .from('taste_profiles')
           .upsert({
             ...backupData.tasteProfile,
@@ -211,19 +253,24 @@ export class DataExportService {
 
       // Restore consumption history if included
       if (backupData.consumptionHistory && backupData.consumptionHistory.length > 0) {
-        const { error: deleteHistoryError } = await this.getSupabase()
+        const { error: deleteHistoryError } = await supabase
           .from('consumption_history')
           .delete()
           .eq('user_id', userId)
 
         if (!deleteHistoryError) {
           const historyWithUserId = backupData.consumptionHistory.map(record => ({
-            ...record,
             user_id: userId,
-            id: undefined
+            wine_id: record.wineId,
+            consumed_at: record.consumedAt.toISOString(),
+            rating: record.rating,
+            notes: record.notes,
+            occasion: record.occasion,
+            food_pairing: record.foodPairing,
+            companions: record.companions
           }))
 
-          const { error: insertHistoryError } = await this.getSupabase()
+          const { error: insertHistoryError } = await supabase
             .from('consumption_history')
             .insert(historyWithUserId)
 
@@ -244,7 +291,6 @@ export class DataExportService {
   async deleteAllUserData(userId: string): Promise<void> {
     try {
       // Delete in order to respect foreign key constraints
-      const supabase = this.getSupabase()
       await Promise.all([
         supabase.from('consumption_history').delete().eq('user_id', userId),
         supabase.from('recommendations').delete().eq('user_id', userId),
@@ -254,7 +300,7 @@ export class DataExportService {
       ])
 
       // Finally delete user profile (handled by Supabase Auth)
-      const { error } = await this.getSupabase().auth.admin.deleteUser(userId)
+      const { error } = await supabase.auth.admin.deleteUser(userId)
       
       if (error) {
         console.error('Error deleting user account:', error)
@@ -277,7 +323,6 @@ export class DataExportService {
     lastActivity: string
   }> {
     try {
-      const supabase = this.getSupabase()
       const [winesResult, historyResult, profileResult, userResult] = await Promise.all([
         supabase.from('wines').select('id').eq('user_id', userId),
         supabase.from('consumption_history').select('id').eq('user_id', userId),

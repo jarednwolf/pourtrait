@@ -200,7 +200,7 @@ export class ExpertDrinkingWindowService {
       (!data.producer || data.producer === '') // Generic regional data
     )
     
-    return match
+    return match ?? null
   }
   
   /**

@@ -51,6 +51,7 @@ export interface ErrorContext {
   userAgent?: string;
   url?: string;
   additionalData?: Record<string, any>;
+  retryAfter?: number;
 }
 
 export class AppError extends Error {

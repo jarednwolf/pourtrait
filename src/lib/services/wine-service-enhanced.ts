@@ -38,7 +38,7 @@ export class EnhancedWineService {
         personal_rating: wineInput.personalRating,
         personal_notes: wineInput.personalNotes,
         image_url: wineInput.imageUrl,
-        drinking_window: drinkingWindow,
+        drinking_window: (drinkingWindow as any),
         external_data: {}
       })
       .select()
@@ -75,7 +75,7 @@ export class EnhancedWineService {
       updates.region !== undefined ||
       updates.producer !== undefined
     
-    let drinkingWindow = currentWine.drinking_window
+    let drinkingWindow = currentWine.drinking_window as any
     
     if (needsRecalculation) {
       // Merge current data with updates for calculation
@@ -87,7 +87,7 @@ export class EnhancedWineService {
       drinkingWindow = DrinkingWindowService.calculateDrinkingWindow(wineForCalculation)
     } else {
       // Just update the status of existing drinking window
-      drinkingWindow = DrinkingWindowService.updateDrinkingWindowStatus(currentWine.drinking_window)
+      drinkingWindow = DrinkingWindowService.updateDrinkingWindowStatus(currentWine.drinking_window as any)
     }
     
     // Update wine in database
@@ -107,7 +107,7 @@ export class EnhancedWineService {
         ...(updates.personalRating !== undefined && { personal_rating: updates.personalRating }),
         ...(updates.personalNotes !== undefined && { personal_notes: updates.personalNotes }),
         ...(updates.imageUrl !== undefined && { image_url: updates.imageUrl }),
-        drinking_window: drinkingWindow,
+        drinking_window: (drinkingWindow as any),
         updated_at: new Date().toISOString()
       })
       .eq('id', wineId)
@@ -151,8 +151,8 @@ export class EnhancedWineService {
     })
     
     // Batch update wines with changed status (optional optimization)
-    const winesToUpdate = winesWithUpdatedStatus.filter((wine, index) => 
-      wine.drinkingWindow.currentStatus !== data[index].drinking_window.currentStatus
+    const winesToUpdate = winesWithUpdatedStatus.filter((wine, index) =>
+      wine.drinkingWindow.currentStatus !== ((data[index].drinking_window as any)?.currentStatus)
     )
     
     if (winesToUpdate.length > 0) {
@@ -161,7 +161,7 @@ export class EnhancedWineService {
         winesToUpdate.map(wine =>
           supabase
             .from('wines')
-            .update({ drinking_window: wine.drinkingWindow })
+            .update({ drinking_window: (wine.drinkingWindow as any) })
             .eq('id', wine.id)
         )
       )
@@ -207,14 +207,14 @@ export class EnhancedWineService {
         }
         
         // Update status for each wine
-        const updates = wines.map(wine => {
+      const updates = wines.map(wine => {
           const updatedDrinkingWindow = DrinkingWindowService.updateDrinkingWindowStatus(
-            wine.drinking_window as DrinkingWindow
+            wine.drinking_window as any
           )
           
           return supabase
             .from('wines')
-            .update({ drinking_window: updatedDrinkingWindow })
+            .update({ drinking_window: (updatedDrinkingWindow as any) })
             .eq('id', wine.id)
         })
         

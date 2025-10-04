@@ -37,6 +37,7 @@ export function PWAInstallPrompt({
 
       return () => clearTimeout(timer)
     }
+    return
   }, [canInstall, isStandalone, isDismissed])
 
   // Don't show if already installed or dismissed

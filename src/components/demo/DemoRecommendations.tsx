@@ -140,7 +140,7 @@ export function DemoRecommendations({
                       <span className="font-medium text-gray-700">Varietals:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {wine.varietal.map(v => (
-                          <Badge key={v} variant="outline" className="text-xs">
+                          <Badge key={v} variant="secondary" className="text-xs">
                             {v}
                           </Badge>
                         ))}

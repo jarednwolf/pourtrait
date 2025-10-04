@@ -42,6 +42,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
     } else {
       setIsVisible(false);
     }
+    return;
   }, [error, autoHide, autoHideDelay, onDismiss]);
 
   const handleDismiss = () => {
@@ -57,9 +58,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
     }
   };
 
-  if (!error || !isVisible) {
-    return null;
-  }
+  if (!error || !isVisible) return null;
 
   const getAlertVariant = (severity: ErrorSeverity): 'default' | 'info' | 'success' | 'warning' | 'error' => {
     switch (severity) {

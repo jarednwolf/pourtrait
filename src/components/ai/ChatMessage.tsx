@@ -205,8 +205,8 @@ export function SystemMessage({
     success: 'bg-green-50 text-green-800 border-green-200'
   }
 
-  const typeIcons = {
-    info: 'information-circle',
+  const typeIcons: Record<NonNullable<{ type?: 'info' | 'warning' | 'error' | 'success' }['type']>, import('@/components/ui/Icon').IconName> = {
+    info: 'info',
     warning: 'exclamation-triangle',
     error: 'x-circle',
     success: 'check-circle'

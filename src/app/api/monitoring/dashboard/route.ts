@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { analytics } from '@/lib/monitoring/analytics'
+// import { analytics } from '@/lib/monitoring/analytics'
 import { errorTracker } from '@/lib/monitoring/error-tracking'
 
 // Types for dashboard data
@@ -167,7 +167,7 @@ export async function GET(request: NextRequest) {
 async function getSystemHealth(supabase: any): Promise<SystemHealthMetrics> {
   try {
     // Check database health
-    const { data: dbTest, error: dbError } = await supabase
+    const { error: dbError } = await supabase
       .from('user_profiles')
       .select('count')
       .limit(1)
@@ -479,7 +479,7 @@ async function getAlertMetrics(supabase: any): Promise<AlertMetrics> {
   }
 }
 
-async function getUptimeMetrics(supabase: any, timeRange: string): Promise<UptimeMetrics> {
+async function getUptimeMetrics(supabase: any, _timeRange: string): Promise<UptimeMetrics> {
   try {
     // Get system health records
     const { data: healthRecords } = await supabase
@@ -493,7 +493,9 @@ async function getUptimeMetrics(supabase: any, timeRange: string): Promise<Uptim
       const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
       const relevantRecords = records?.filter(r => new Date(r.timestamp) >= cutoff) || []
       
-      if (relevantRecords.length === 0) return 100
+      if (relevantRecords.length === 0) {
+        return 100
+      }
       
       const healthyRecords = relevantRecords.filter(r => r.status === 'healthy')
       return (healthyRecords.length / relevantRecords.length) * 100

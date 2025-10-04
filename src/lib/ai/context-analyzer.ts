@@ -175,7 +175,7 @@ export class ContextAnalyzer {
    * Analyzes urgency context
    */
   private static analyzeUrgency(
-    context: RecommendationContext, 
+    _context: RecommendationContext, 
     inventory?: Wine[], 
     query?: string
   ): UrgencyContext {
@@ -339,12 +339,12 @@ export class ContextAnalyzer {
     return Math.max(1, Math.round((varietyScore + experienceScore) / 2))
   }
 
-  private static extractTimeConstraints(context: RecommendationContext): string | undefined {
+  private static extractTimeConstraints(_context: RecommendationContext): string | undefined {
     // This could be enhanced to parse time-related constraints from context
     return undefined
   }
 
-  private static extractDietaryRestrictions(context: RecommendationContext): string[] | undefined {
+  private static extractDietaryRestrictions(_context: RecommendationContext): string[] | undefined {
     // This could be enhanced to parse dietary restrictions from context
     return undefined
   }

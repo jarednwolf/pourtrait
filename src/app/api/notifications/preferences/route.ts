@@ -28,7 +28,7 @@ interface NotificationPreferences {
 }
 
 // GET - Retrieve user notification preferences
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = createRouteHandlerClient({ cookies })
     

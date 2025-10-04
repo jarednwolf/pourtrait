@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react'
 import { useAuth } from './useAuth'
 import { 
   PersonalizedRecommendationResponse, 
-  EnhancedRecommendation,
   RecommendationAnalytics
 } from '@/lib/services/personalized-recommendations'
 import { RecommendationContext, Recommendation } from '@/types'

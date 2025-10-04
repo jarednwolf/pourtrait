@@ -48,7 +48,6 @@ class ErrorHandler {
     // Default options
     const {
       logError = true,
-      notifyUser = true,
       trackMetrics = true
     } = options;
 
@@ -155,8 +154,8 @@ class ErrorHandler {
    */
   private trackErrorMetrics(error: AppError): void {
     // In a real application, this would send to analytics service
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'exception', {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'exception', {
         description: error.type,
         fatal: error.severity === ErrorSeverity.CRITICAL,
         custom_map: {

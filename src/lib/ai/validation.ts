@@ -252,7 +252,7 @@ export class ResponseValidator {
           message: `Potential misconception detected: ${misconception.text}`,
           severity: misconception.severity
         })
-        score -= misconception.severity === 'high' ? 30 : misconception.severity === 'medium' ? 15 : 5
+        score -= misconception.severity === 'medium' ? 15 : 5
       }
     })
 
@@ -322,7 +322,7 @@ export class ResponseEnhancer {
     formatted = formatted.replace(/\n{3,}/g, '\n\n')
 
     // Capitalize first letter of sentences
-    formatted = formatted.replace(/(^|\. )([a-z])/g, (match, prefix, letter) => 
+    formatted = formatted.replace(/(^|\. )([a-z])/g, (_match, prefix, letter) => 
       prefix + letter.toUpperCase()
     )
 

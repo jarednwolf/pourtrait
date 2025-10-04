@@ -45,12 +45,12 @@ export function RestaurantWineRecommendations({
     error, 
     analysisResult, 
     analyzeWineList, 
-    clearError 
+    /* clearError */
   } = useRestaurantWineAnalysis()
 
   const [mealContext, setMealContext] = useState<MealContext>({})
   const [showMealForm, setShowMealForm] = useState(false)
-  const [filters, setFilters] = useState<FilterOptions>({
+  const [filters] = useState<FilterOptions>({
     minScore: 0.3,
     wineTypes: [],
     priceRange: null,
@@ -582,7 +582,7 @@ function DetailedRecommendationCard({
               <h5 className="text-sm font-medium text-gray-900 mb-2">Matched fields:</h5>
               <div className="flex flex-wrap gap-1">
                 {recommendation.wine.matchedFields.map((field, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
+                  <Badge key={index} variant="secondary" className="text-xs">
                     {field}
                   </Badge>
                 ))}

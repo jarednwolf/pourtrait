@@ -14,15 +14,7 @@ interface NotificationCenterProps {
   onClose: () => void
 }
 
-interface NotificationItem {
-  id: string
-  type: string
-  title: string
-  message: string
-  data: any
-  read: boolean
-  createdAt: string
-}
+// local type removed; using shared Notification type
 
 export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps) {
   const { user } = useAuth()

@@ -32,12 +32,23 @@ export function ConfidenceIndicator({
 
   // Determine confidence level and styling
   const getConfidenceLevel = (conf: number) => {
-    if (conf >= 0.8) return { level: 'high', color: 'green', label: 'High confidence' }
-    if (conf >= 0.6) return { level: 'medium', color: 'yellow', label: 'Medium confidence' }
-    return { level: 'low', color: 'red', label: 'Low confidence' }
+    if (conf >= 0.8) return { level: 'high' as const }
+    if (conf >= 0.6) return { level: 'medium' as const }
+    return { level: 'low' as const }
   }
 
-  const { level, color, label } = getConfidenceLevel(clampedConfidence)
+  const { level } = getConfidenceLevel(clampedConfidence)
+
+  // Map level to color
+  const getColorForLevel = (l: typeof level) => {
+    switch (l) {
+      case 'high': return 'green'
+      case 'medium': return 'yellow'
+      case 'low': return 'red'
+    }
+  }
+
+  const color = getColorForLevel(level)
 
   // Size configurations
   const sizeConfig = {
@@ -82,9 +93,9 @@ export function ConfidenceIndicator({
     }
   }
 
-  const colors = colorConfig[color as 'green' | 'yellow' | 'red']
+  const colors = colorConfig[color]
 
-  const tooltipText = `${label}: ${percentage}% confidence in this recommendation`
+  const tooltipText = `${level}: ${percentage}% confidence in this recommendation`
 
   return (
     <div 
@@ -92,8 +103,8 @@ export function ConfidenceIndicator({
       title={showTooltip ? tooltipText : undefined}
     >
       {/* Confidence Icon */}
-      <Icon 
-        name={level === 'high' ? 'check-circle' : level === 'medium' ? 'exclamation-circle' : 'help-circle'}
+      <Icon
+        name={level === 'high' ? 'check-circle' as const : level === 'medium' ? 'exclamation-circle' as const : 'help-circle' as const}
         className={`${config.icon} ${colors.icon}`}
       />
 
@@ -132,14 +143,12 @@ export function DetailedConfidenceIndicator({
   }>
   className?: string
 }) {
-  const { level, color, label } = (() => {
-    const clampedConfidence = Math.max(0, Math.min(1, confidence))
-    if (clampedConfidence >= 0.8) return { level: 'high', color: 'green', label: 'High confidence' }
-    if (clampedConfidence >= 0.6) return { level: 'medium', color: 'yellow', label: 'Medium confidence' }
-    return { level: 'low', color: 'red', label: 'Low confidence' }
+  const { level } = (() => {
+    const _c = Math.max(0, Math.min(1, confidence))
+    if (_c >= 0.8) return { level: 'high' as const }
+    if (_c >= 0.6) return { level: 'medium' as const }
+    return { level: 'low' as const }
   })()
-
-  const percentage = Math.round(confidence * 100)
 
   return (
     <div className={`p-3 bg-gray-50 rounded-lg border ${className}`}>
@@ -223,16 +232,16 @@ export function UncertaintyIndicator({
 
   const config = levelConfig[uncertaintyLevel]
 
-  const colorClasses = {
+  const colorClasses: Record<'blue' | 'yellow' | 'red', string> = {
     blue: 'bg-blue-50 border-blue-200 text-blue-800',
     yellow: 'bg-yellow-50 border-yellow-200 text-yellow-800',
     red: 'bg-red-50 border-red-200 text-red-800'
   }
 
   return (
-    <div className={`p-3 rounded-lg border ${colorClasses[config.color]} ${className}`}>
+    <div className={`p-3 rounded-lg border ${colorClasses[config.color as 'blue' | 'yellow' | 'red']} ${className}`}>
       <div className="flex items-start space-x-2">
-        <Icon name={config.icon} className="w-4 h-4 mt-0.5 flex-shrink-0" />
+        <Icon name={config.icon as any} className="w-4 h-4 mt-0.5 flex-shrink-0" />
         <div className="flex-1">
           <h4 className="text-sm font-medium mb-1">{config.title}</h4>
           <p className="text-xs mb-2">{config.description}</p>

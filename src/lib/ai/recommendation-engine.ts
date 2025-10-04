@@ -19,14 +19,12 @@ import { aiLogger } from '../utils/logger'
 import { performanceMonitor } from '../monitoring/performance'
 // Conditional import for Edge Runtime compatibility
 let VectorService: any = null
-let WineKnowledgeService: any = null
 
 // Only import vector services in Node.js runtime
 if (typeof window === 'undefined' && process.env.NEXT_RUNTIME !== 'edge') {
   try {
     const vectorModule = require('./vector-service')
     VectorService = vectorModule.VectorService
-    WineKnowledgeService = vectorModule.WineKnowledgeService
   } catch (error) {
     console.warn('Vector service not available in this runtime:', error)
   }
@@ -39,7 +37,6 @@ if (typeof window === 'undefined' && process.env.NEXT_RUNTIME !== 'edge') {
 export class AIRecommendationEngine {
   private openai: OpenAI
   private vectorService: any
-  private knowledgeService: any
 
   constructor() {
     this.openai = new OpenAI({
@@ -47,12 +44,10 @@ export class AIRecommendationEngine {
     })
     
     // Initialize vector services only if available
-    if (VectorService && WineKnowledgeService) {
+    if (VectorService) {
       this.vectorService = new VectorService()
-      this.knowledgeService = new WineKnowledgeService()
     } else {
       this.vectorService = null
-      this.knowledgeService = null
     }
   }
 
@@ -281,7 +276,7 @@ export class AIRecommendationEngine {
    */
   private buildUserPrompt(
     request: AIRecommendationRequest,
-    contextAnalysis: any,
+    _contextAnalysis: any,
     ragContext: any
   ): string {
     let prompt = `User Query: "${request.query}"\n\n`
@@ -316,7 +311,7 @@ export class AIRecommendationEngine {
     // Add RAG context
     if (ragContext.wineKnowledge.length > 0) {
       prompt += `\nRelevant Wine Knowledge:\n`
-      ragContext.wineKnowledge.slice(0, 3).forEach(knowledge => {
+      ragContext.wineKnowledge.slice(0, 3).forEach((knowledge: any) => {
         prompt += `- ${knowledge.content}\n`
       })
     }
@@ -332,7 +327,7 @@ export class AIRecommendationEngine {
   private async parseRecommendations(
     response: string,
     request: AIRecommendationRequest,
-    contextAnalysis: any
+    _contextAnalysis: any
   ): Promise<AIRecommendation[]> {
     // This is a simplified parser - in production, you might use more sophisticated NLP
     const recommendations: AIRecommendation[] = []
@@ -417,7 +412,7 @@ export class AIRecommendationEngine {
     return educationalSentences.length > 0 ? educationalSentences.join('. ') + '.' : undefined
   }
 
-  private generateFollowUpQuestions(request: AIRecommendationRequest, contextAnalysis: any): string[] {
+  private generateFollowUpQuestions(request: AIRecommendationRequest, _contextAnalysis: any): string[] {
     const questions: string[] = []
     
     if (!request.context.foodPairing) {
@@ -435,17 +430,17 @@ export class AIRecommendationEngine {
     return questions.slice(0, 2) // Limit to 2 questions
   }
 
-  private extractReasoningForWine(response: string, wineMatch: string): string {
+  private extractReasoningForWine(response: string, _wineMatch: string): string {
     // Find sentences that mention this specific wine
     const sentences = response.split('.')
     const relevantSentences = sentences.filter(sentence => 
-      sentence.includes(wineMatch.split(' ')[0]) // Match on first word (producer)
+      sentence.includes(_wineMatch.split(' ')[0]) // Match on first word (producer)
     )
     
     return relevantSentences.length > 0 ? relevantSentences[0].trim() + '.' : 'Recommended based on your preferences.'
   }
 
-  private generateEducationalContext(wineMatch: string): string {
+  private generateEducationalContext(_wineMatch: string): string {
     // Generate basic educational context for beginners
     return `This wine represents a classic example of its style and region, making it an excellent choice for learning about wine characteristics.`
   }

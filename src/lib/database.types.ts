@@ -660,8 +660,30 @@ export interface Database {
           metadata: Json | null
           date: string | null
         }
-        Insert: Partial<Row> & { feature_name: string }
-        Update: Partial<Row>
+        Insert: {
+          id?: string
+          feature_name: string
+          user_id?: string | null
+          usage_count?: number | null
+          first_used?: string | null
+          last_used?: string | null
+          success_rate?: number | null
+          average_duration?: number | null
+          metadata?: Json | null
+          date?: string | null
+        }
+        Update: {
+          id?: string
+          feature_name?: string
+          user_id?: string | null
+          usage_count?: number | null
+          first_used?: string | null
+          last_used?: string | null
+          success_rate?: number | null
+          average_duration?: number | null
+          metadata?: Json | null
+          date?: string | null
+        }
         Relationships: []
       }
       ,
@@ -681,8 +703,36 @@ export interface Database {
           error_message: string | null
           created_at: string | null
         }
-        Insert: Partial<Row> & { endpoint: string; method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'; status_code: number; response_time: number }
-        Update: Partial<Row>
+        Insert: {
+          id?: string
+          endpoint: string
+          method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+          status_code: number
+          response_time: number
+          user_id?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          ip_address?: string | null
+          request_size?: number | null
+          response_size?: number | null
+          error_message?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          endpoint?: string
+          method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+          status_code?: number
+          response_time?: number
+          user_id?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          ip_address?: string | null
+          request_size?: number | null
+          response_size?: number | null
+          error_message?: string | null
+          created_at?: string | null
+        }
         Relationships: []
       }
       ,
@@ -697,8 +747,24 @@ export interface Database {
           created_at: string | null
           updated_at: string | null
         }
-        Insert: Partial<Row> & { user_id: string; name: string; filters: Json }
-        Update: Partial<Row>
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          filters: Json
+          is_default?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          filters?: Json
+          is_default?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
         Relationships: []
       }
       ,
@@ -710,8 +776,20 @@ export interface Database {
           filters: Json | null
           created_at: string | null
         }
-        Insert: Partial<Row> & { user_id: string; query: string }
-        Update: Partial<Row>
+        Insert: {
+          id?: string
+          user_id: string
+          query: string
+          filters?: Json | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          query?: string
+          filters?: Json | null
+          created_at?: string | null
+        }
         Relationships: []
       }
       ,
@@ -723,12 +801,35 @@ export interface Database {
           description: string | null
           wines: Json
           is_public: boolean | null
+          share_token: string
           view_count: number | null
           created_at: string | null
           updated_at: string | null
         }
-        Insert: Partial<Row> & { user_id: string; title: string; wines: Json }
-        Update: Partial<Row>
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          description?: string | null
+          wines: Json
+          is_public?: boolean | null
+          share_token?: string
+          view_count?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          description?: string | null
+          wines?: Json
+          is_public?: boolean | null
+          share_token?: string
+          view_count?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
         Relationships: []
       }
       ,
@@ -742,8 +843,24 @@ export interface Database {
           created_at: string | null
           updated_at: string | null
         }
-        Insert: Partial<Row> & { user_id: string }
-        Update: Partial<Row>
+        Insert: {
+          id?: string
+          user_id: string
+          payload?: Json | null
+          scheduled_for?: string | null
+          status?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          payload?: Json | null
+          scheduled_for?: string | null
+          status?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
         Relationships: []
       }
       ,
@@ -755,8 +872,20 @@ export interface Database {
           details: Json | null
           created_at: string | null
         }
-        Insert: Partial<Row> & { scheduled_notification_id: string }
-        Update: Partial<Row>
+        Insert: {
+          id?: string
+          scheduled_notification_id: string
+          status?: string | null
+          details?: Json | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          scheduled_notification_id?: string
+          status?: string | null
+          details?: Json | null
+          created_at?: string | null
+        }
         Relationships: []
       }
     }

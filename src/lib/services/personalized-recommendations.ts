@@ -540,7 +540,7 @@ export class PersonalizedRecommendationService {
     return "This wine should complement your meal nicely."
   }
 
-  private generateLearningOpportunity(wine: Wine, tasteProfile: TasteProfile): string | undefined {
+  private generateLearningOpportunity(_wine: Wine, _tasteProfile: TasteProfile): string | undefined {
     // For now, return undefined since we don't have experienceLevel in TasteProfile
     return undefined
   }
@@ -581,7 +581,7 @@ export class PersonalizedRecommendationService {
   }
 
   private analyzeTasteProfileGaps(
-    tasteProfile: TasteProfile,
+    _tasteProfile: TasteProfile,
     consumptionHistory: ConsumptionRecord[],
     inventory: Wine[]
   ): TasteProfileGapAnalysis {
@@ -608,7 +608,7 @@ export class PersonalizedRecommendationService {
     return {
       missingRegions: allRegions.filter(r => !experiencedRegions.has(r)),
       missingVarietals: allVarietals.filter(v => !experiencedVarietals.has(v)),
-      underrepresentedTypes: allTypes.filter(t => !experiencedTypes.has(t)),
+      underrepresentedTypes: allTypes.filter(t => !experiencedTypes.has(t as any)),
       priceRangeGaps: [],
       recommendedExpansions: []
     }
@@ -656,7 +656,7 @@ export class PersonalizedRecommendationService {
 
   private async enhancePurchaseRecommendation(
     rec: any,
-    gapAnalysis: TasteProfileGapAnalysis,
+    _gapAnalysis: TasteProfileGapAnalysis,
     tasteProfile: TasteProfile,
     context?: RecommendationContext
   ): Promise<EnhancedRecommendation> {

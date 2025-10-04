@@ -15,9 +15,11 @@ interface ChatSuggestionsProps {
   className?: string
 }
 
+import type { IconName } from '@/components/ui/Icon'
+
 interface Suggestion {
   text: string
-  icon: import('@/components/ui/Icon').IconName
+  icon: IconName
   category: string
   experienceLevel: ('beginner' | 'intermediate' | 'advanced')[]
 }
@@ -62,7 +64,7 @@ const SUGGESTIONS: Suggestion[] = [
   },
   {
     text: "What's the difference between Cabernet and Merlot?",
-    icon: "question-mark-circle",
+    icon: "help-circle",
     category: "Learning",
     experienceLevel: ['beginner']
   },
@@ -108,7 +110,7 @@ const SUGGESTIONS: Suggestion[] = [
   // Advanced suggestions
   {
     text: "Analyze the 2020 Bordeaux vintage quality",
-    icon: "chart-bar",
+    icon: "chart",
     category: "Analysis",
     experienceLevel: ['advanced']
   },
@@ -314,6 +316,8 @@ export function ContextualSuggestions({
 // Quick Action Suggestions
 // ============================================================================
 
+type QuickAction = { text: string; icon: IconName; color: 'purple' | 'blue' | 'green' | 'orange' }
+
 export function QuickActionSuggestions({
   onSuggestionSelect,
   className = ''
@@ -321,7 +325,7 @@ export function QuickActionSuggestions({
   onSuggestionSelect: (suggestion: string) => void
   className?: string
 }) {
-  const quickActions = [
+  const quickActions: QuickAction[] = [
     {
       text: "What should I drink tonight?",
       icon: "wine-glass",
@@ -339,7 +343,7 @@ export function QuickActionSuggestions({
     },
     {
       text: "Teach me about wine",
-      icon: "academic-cap",
+      icon: "book-open",
       color: "orange"
     }
   ]

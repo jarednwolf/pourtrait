@@ -14,7 +14,7 @@ import { ExternalWineDataService } from '@/lib/services/external-wine-data'
 // GET /api/wines/enrichment-stats - Get enrichment statistics for user
 // ============================================================================
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = createRouteHandlerClient({ cookies })
     
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 // DELETE /api/wines/enrichment-stats - Clear enrichment cache
 // ============================================================================
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
   try {
     const supabase = createRouteHandlerClient({ cookies })
     

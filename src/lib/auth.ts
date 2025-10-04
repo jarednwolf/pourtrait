@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
-import type { User, Session, AuthError } from '@supabase/supabase-js'
-import type { UserProfile, UserProfileInsert } from './supabase'
+import type { User, AuthError } from '@supabase/supabase-js'
+import type { UserProfile } from './supabase'
 
 export interface AuthUser extends User {
   profile?: UserProfile
@@ -238,7 +238,7 @@ export class AuthService {
       
       return {
         ...user,
-        profile,
+        profile: profile ?? undefined,
       }
     } catch (error) {
       console.error('Get current user error:', error)

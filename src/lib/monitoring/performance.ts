@@ -185,8 +185,8 @@ class PerformanceMonitor {
   }
 
   private sendToAnalytics(metric: PerformanceMetric): void {
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'performance_metric', {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'performance_metric', {
         metric_name: metric.name,
         metric_value: metric.value,
         metric_unit: metric.unit,
@@ -290,32 +290,33 @@ export function trackWebVitals(): void {
   }
 
   // Track Core Web Vitals when available
-  import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-    getCLS((metric) => {
+  import('web-vitals').then((webVitals: any) => {
+    const { getCLS, getFID, getFCP, getLCP, getTTFB } = webVitals
+    getCLS((metric: any) => {
       performanceMonitor.recordMetric('cls', metric.value, 'count', {
         rating: metric.rating
       });
     });
 
-    getFID((metric) => {
+    getFID((metric: any) => {
       performanceMonitor.recordMetric('fid', metric.value, 'ms', {
         rating: metric.rating
       });
     });
 
-    getFCP((metric) => {
+    getFCP((metric: any) => {
       performanceMonitor.recordMetric('fcp', metric.value, 'ms', {
         rating: metric.rating
       });
     });
 
-    getLCP((metric) => {
+    getLCP((metric: any) => {
       performanceMonitor.recordMetric('lcp', metric.value, 'ms', {
         rating: metric.rating
       });
     });
 
-    getTTFB((metric) => {
+    getTTFB((metric: any) => {
       performanceMonitor.recordMetric('ttfb', metric.value, 'ms', {
         rating: metric.rating
       });

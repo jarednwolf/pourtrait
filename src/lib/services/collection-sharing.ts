@@ -126,10 +126,21 @@ export class CollectionSharingService {
       // Increment view count
       await supabase
         .from('shared_collections')
-        .update({ view_count: collection.view_count + 1 })
+        .update({ view_count: (collection.view_count ?? 0) + 1 })
         .eq('id', collection.id)
 
-      return collection as SharedCollection
+      return {
+        id: collection.id,
+        userId: collection.user_id,
+        title: collection.title,
+        description: collection.description ?? undefined,
+        wines: (collection.wines as any[]) || [],
+        isPublic: !!collection.is_public,
+        shareToken: (collection as any).share_token,
+        createdAt: new Date(collection.created_at || new Date().toISOString()),
+        updatedAt: new Date(collection.updated_at || new Date().toISOString()),
+        viewCount: collection.view_count || 0
+      }
 
     } catch (error) {
       console.error('Error fetching shared collection:', error)
@@ -248,7 +259,8 @@ export class CollectionSharingService {
     isPublic: boolean
   ): Promise<SharedCollection> {
     try {
-      const { data: collection, error } = await this.supabase
+      const supabase = this.getSupabaseClient()
+      const { data: collection, error } = await supabase
         .from('shared_collections')
         .update({ is_public: isPublic })
         .eq('id', collectionId)
@@ -260,7 +272,18 @@ export class CollectionSharingService {
         throw new Error('Failed to update collection visibility')
       }
 
-      return collection as SharedCollection
+      return {
+        id: collection.id,
+        userId: collection.user_id,
+        title: collection.title,
+        description: collection.description ?? undefined,
+        wines: (collection.wines as any[]) || [],
+        isPublic: !!collection.is_public,
+        shareToken: collection.share_token,
+        createdAt: new Date(collection.created_at || new Date().toISOString()),
+        updatedAt: new Date(collection.updated_at || new Date().toISOString()),
+        viewCount: collection.view_count || 0
+      }
 
     } catch (error) {
       console.error('Error updating collection visibility:', error)

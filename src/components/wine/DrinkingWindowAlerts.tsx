@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Wine, Notification } from '@/types'
 import { DrinkingWindowService } from '@/lib/services/drinking-window'
 // import { NotificationService } from '@/lib/services/notification-service'
@@ -10,7 +10,7 @@ import { DrinkingWindowIndicator, DrinkingUrgencyBadge } from './DrinkingWindowI
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { Alert } from '@/components/ui/Alert'
+// import { Alert } from '@/components/ui/Alert'
 
 interface DrinkingWindowAlertsProps {
   userId: string
@@ -55,7 +55,7 @@ export function DrinkingWindowAlerts({
     return (
       <Card className={`p-6 ${className}`}>
         <div className="flex items-center gap-3 text-green-700">
-          <Icon name="check-circle" size={20} />
+          <Icon name="check-circle" size="lg" />
           <div>
             <h3 className="font-medium">All wines are aging well</h3>
             <p className="text-sm text-gray-600">No immediate drinking window alerts</p>
@@ -69,7 +69,7 @@ export function DrinkingWindowAlerts({
     <Card className={`p-6 ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Icon name="alert-triangle" size={20} className="text-amber-600" />
+          <Icon name="alert-triangle" size="lg" className="text-amber-600" />
           <h3 className="text-lg font-semibold">Drinking Window Alerts</h3>
           {winesNeedingAttention.length > 0 && (
             <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">
@@ -124,8 +124,6 @@ interface DrinkingWindowAlertItemProps {
 }
 
 function DrinkingWindowAlertItem({ wine, urgencyScore }: DrinkingWindowAlertItemProps) {
-  const statusChange = DrinkingWindowService.getDrinkingUrgencyScore(wine)
-  
   return (
     <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
       <div className="flex-shrink-0">
@@ -158,7 +156,7 @@ function DrinkingWindowAlertItem({ wine, urgencyScore }: DrinkingWindowAlertItem
         </div>
         
         <div className="mt-2">
-          <DrinkingWindowMessage wine={wine} urgencyScore={urgencyScore} />
+          <DrinkingWindowMessage wine={wine} />
         </div>
       </div>
     </div>
@@ -167,10 +165,9 @@ function DrinkingWindowAlertItem({ wine, urgencyScore }: DrinkingWindowAlertItem
 
 interface DrinkingWindowMessageProps {
   wine: Wine
-  urgencyScore: number
 }
 
-function DrinkingWindowMessage({ wine, urgencyScore }: DrinkingWindowMessageProps) {
+function DrinkingWindowMessage({ wine }: DrinkingWindowMessageProps) {
   const { drinkingWindow } = wine
   const now = new Date()
   
@@ -223,7 +220,7 @@ interface NotificationItemProps {
 function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
   return (
     <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-      <Icon name="bell" size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+      <Icon name="bell" size="md" className="text-blue-600 mt-0.5 flex-shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-blue-900">{notification.title}</p>
         <p className="text-xs text-blue-700 mt-1">{notification.message}</p>
@@ -237,7 +234,7 @@ function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
         onClick={onMarkRead}
         className="text-blue-600 hover:text-blue-800 p-1"
       >
-        <Icon name="x" size={14} />
+        <Icon name="x" size="sm" />
       </Button>
     </div>
   )

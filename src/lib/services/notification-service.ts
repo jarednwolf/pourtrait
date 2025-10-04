@@ -18,7 +18,7 @@ export class NotificationService {
    * Generate drinking window alerts for a user's wine collection
    */
   static async generateDrinkingWindowAlerts(
-    userId: string,
+    _userId: string,
     wines: Wine[],
     settings: NotificationSettings
   ): Promise<DrinkingWindowAlert[]> {
@@ -109,7 +109,7 @@ export class NotificationService {
    * Send email notification for high priority alerts
    */
   static async sendEmailAlert(
-    userEmail: string,
+    _userEmail: string,
     alerts: DrinkingWindowAlert[]
   ): Promise<void> {
     const highPriorityAlerts = alerts.filter(alert => 
@@ -155,8 +155,31 @@ export class NotificationService {
       
       for (const user of users || []) {
         try {
-          const wines = user.wines || []
-          const settings = user.preferences?.notifications || { drinkingWindowAlerts: true }
+          const rawWines = (user as any).wines || []
+          const settings = ((user.preferences as any)?.notifications) || { drinkingWindowAlerts: true, recommendations: false, push: false, email: false }
+          
+          // Map DB wines to domain Wine[]
+          const wines: Wine[] = rawWines.map((w: any) => ({
+            id: w.id,
+            userId: w.user_id,
+            name: w.name,
+            producer: w.producer,
+            vintage: w.vintage,
+            region: w.region,
+            country: w.country,
+            varietal: w.varietal || [],
+            type: w.type,
+            quantity: w.quantity || 0,
+            purchasePrice: w.purchase_price,
+            purchaseDate: w.purchase_date ? new Date(w.purchase_date) : undefined,
+            personalRating: w.personal_rating,
+            personalNotes: w.personal_notes,
+            imageUrl: w.image_url,
+            drinkingWindow: w.drinking_window as any,
+            externalData: w.external_data || {},
+            createdAt: new Date(w.created_at),
+            updatedAt: new Date(w.updated_at)
+          }))
           
           const alerts = await this.generateDrinkingWindowAlerts(
             user.id,
@@ -202,7 +225,17 @@ export class NotificationService {
       throw error
     }
     
-    return data || []
+    // Map DB notifications to domain Notification type
+    return (data || []).map(n => ({
+      id: n.id,
+      userId: n.user_id,
+      type: n.type as 'drinking_window' | 'recommendation' | 'system',
+      title: n.title,
+      message: n.message,
+      read: n.read ?? false,
+      data: (n.data as Record<string, any>) ?? undefined,
+      createdAt: new Date(n.created_at)
+    }))
   }
   
   /**

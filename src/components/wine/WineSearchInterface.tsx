@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { WineCard } from './WineCard'
 import { useWineSearch } from '@/hooks/useWineSearch'
-import type { SearchFilters, QuickFilter, SavedSearch } from '@/types'
 import type { Wine } from '@/types'
 
 interface WineSearchInterfaceProps {
@@ -57,7 +56,7 @@ export function WineSearchInterface({
     filters,
     updateFilter,
     clearFilters,
-    search,
+    // search,
     loadMore,
     getSuggestions,
     clearSuggestions,
@@ -97,7 +96,7 @@ export function WineSearchInterface({
   }
 
   // Handle suggestion selection
-  const handleSuggestionSelect = (suggestion: any) => {
+  const handleSuggestionSelect = (suggestion: { type: string; value: string }) => {
     updateFilter('query', suggestion.value)
     setShowSuggestions(false)
     searchInputRef.current?.focus()
@@ -236,7 +235,7 @@ export function WineSearchInterface({
                   <Icon name="filter" className="h-4 w-4 mr-2" />
                   Filters
                   {hasActiveFilters && (
-                    <Badge variant="default" className="ml-2 h-4 w-4 p-0 text-xs">
+                    <Badge variant="secondary" className="ml-2 h-4 w-4 p-0 text-xs">
                       !
                     </Badge>
                   )}
@@ -344,7 +343,7 @@ export function WineSearchInterface({
                 {WINE_TYPES.map(type => (
                   <Button
                     key={type.value}
-                    variant={filters.type?.includes(type.value as any) ? 'default' : 'outline'}
+                    variant={filters.type?.includes(type.value as any) ? 'primary' : 'outline'}
                     size="sm"
                     onClick={() => handleTypeToggle(type.value)}
                     className="text-xs"

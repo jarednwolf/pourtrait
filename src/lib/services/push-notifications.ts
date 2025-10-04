@@ -13,6 +13,12 @@ interface PushSubscriptionData {
   }
 }
 
+interface NotificationAction {
+  action: string
+  title: string
+  icon?: string
+}
+
 interface NotificationPayload {
   title: string
   body: string
@@ -115,7 +121,7 @@ class PushNotificationService {
 
       const subscription = await this.serviceWorkerRegistration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey),
+        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey) as any,
       })
 
       const subscriptionData: PushSubscriptionData = {
@@ -182,7 +188,7 @@ class PushNotificationService {
           body: payload.body,
           icon: payload.icon || '/icons/icon-192x192.png',
           badge: payload.badge || '/icons/icon-72x72.png',
-          image: payload.image,
+          // image: payload.image,  // Removed: not in NotificationOptions
           tag: payload.tag,
           data: payload.data,
           requireInteraction: payload.requireInteraction,
@@ -196,12 +202,12 @@ class PushNotificationService {
         body: payload.body,
         icon: payload.icon || '/icons/icon-192x192.png',
         badge: payload.badge || '/icons/icon-72x72.png',
-        image: payload.image,
+        // image: payload.image,  // Removed: not in NotificationOptions
         tag: payload.tag,
         data: payload.data,
-        actions: payload.actions,
+        // actions: payload.actions,  // Removed: not in standard NotificationOptions
         requireInteraction: payload.requireInteraction,
-        vibrate: [200, 100, 200],
+        // vibrate: [200, 100, 200],  // Removed: not in standard NotificationOptions
       })
     } catch (error) {
       console.error('Error showing notification:', error)

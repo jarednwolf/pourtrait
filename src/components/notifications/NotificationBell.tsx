@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth'
 export function NotificationBell() {
   const { user } = useAuth()
   const { notifications } = useDrinkingWindowNotifications(user?.id || '')
+  if (!notifications) return null
   const { isSubscribed, subscribe, canSubscribe } = usePushNotifications()
   const [showCenter, setShowCenter] = useState(false)
   const [showPushPrompt, setShowPushPrompt] = useState(false)
@@ -29,6 +30,7 @@ export function NotificationBell() {
 
       return () => clearTimeout(timer)
     }
+    return
   }, [canSubscribe, isSubscribed, user])
 
   const handleBellClick = () => {
@@ -54,6 +56,7 @@ export function NotificationBell() {
     if (dismissed) {
       setShowPushPrompt(false)
     }
+    return
   }, [])
 
   if (!user) return null

@@ -1,6 +1,6 @@
 // AI Recommendation Engine Types
 
-import { Wine, TasteProfile, RecommendationContext, Recommendation } from '@/types'
+import { Wine, TasteProfile, RecommendationContext } from '@/types'
 
 // ============================================================================
 // AI Service Configuration
