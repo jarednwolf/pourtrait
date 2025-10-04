@@ -30,7 +30,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ## Documentation
 
-Complete documentation is available in the `docs/` directory:
+Complete documentation is available in the `docs/` directory. A sample `.env.local.example` has been added to the repo root to simplify environment setup. Use it to populate your Vercel production environment variables.
 
 - **[Setup & Installation](./docs/01-setup/README.md)** - Getting started, requirements, troubleshooting
 - **[Development](./docs/02-development/README.md)** - Coding guidelines, testing, deployment

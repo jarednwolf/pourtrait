@@ -57,14 +57,33 @@ export async function POST(request: NextRequest) {
 // GET endpoint for health check
 export async function GET(request: NextRequest) {
   try {
-    // Basic health check - verify database connectivity
-    const healthCheck = {
+    // Support Vercel Cron GET semantics: if x-vercel-cron header is present
+    // or a valid Authorization bearer token is provided, run processing.
+    const cronHeader = request.headers.get('x-vercel-cron')
+    const authHeader = request.headers.get('authorization')
+    const cronSecret = process.env.CRON_SECRET || process.env.NOTIFICATION_CRON_SECRET
+
+    const authorized = Boolean(cronHeader) || (cronSecret ? authHeader === `Bearer ${cronSecret}` : false)
+
+    if (authorized) {
+      console.log('Cron-triggered notification processing...')
+
+      await NotificationScheduler.processPendingNotifications()
+      await NotificationService.processAllUserAlerts()
+
+      return NextResponse.json({
+        success: true,
+        message: 'Notifications processed successfully (cron GET)',
+        timestamp: new Date().toISOString()
+      })
+    }
+
+    // Default: health response
+    return NextResponse.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
       service: 'notification-processor'
-    }
-
-    return NextResponse.json(healthCheck)
+    })
   } catch (error) {
     console.error('Health check failed:', error)
     
