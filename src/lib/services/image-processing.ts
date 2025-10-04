@@ -7,11 +7,11 @@ import {
   ImageProcessingOptions,
   ImageUploadResult
 } from '@/types'
-import { ImageProcessingError, WineRecognitionError } from '../errors'
-import { withRetry, retryConditions } from '../utils/retry'
-import { ImageProcessingFallbacks } from '../utils/fallback'
+import { ImageProcessingError as _ImageProcessingError, WineRecognitionError as _WineRecognitionError } from '../errors'
+import { withRetry as _withRetry, retryConditions as _retryConditions } from '../utils/retry'
+import { ImageProcessingFallbacks as _ImageProcessingFallbacks } from '../utils/fallback'
 import { imageLogger } from '../utils/logger'
-import { performanceMonitor } from '../monitoring/performance'
+import { performanceMonitor as _performanceMonitor } from '../monitoring/performance'
 
 /**
  * Image Processing Service
@@ -33,7 +33,7 @@ export class ImageProcessingService {
    * Recognize wine label from image buffer
    */
   async recognizeWineLabel(imageBuffer: Buffer): Promise<WineRecognitionResult> {
-    const startTime = performance.now();
+    const _startTime = performance.now();
     
     imageLogger.info('Starting wine label recognition', {
       imageSize: imageBuffer.length,
@@ -223,7 +223,7 @@ export class ImageProcessingService {
           break
       }
 
-      const optimizedBuffer = await sharpInstance.toBuffer()
+      const _optimizedBuffer = await sharpInstance.toBuffer()
       
       // In a real implementation, you would upload to your storage service here
       // For now, we'll return a placeholder URL
@@ -445,7 +445,7 @@ export class ImageProcessingService {
   /**
    * Fallback text extraction when no vision service is available
    */
-  private async fallbackTextExtraction(imageBuffer: Buffer): Promise<OCRResult> {
+  private async fallbackTextExtraction(_imageBuffer: Buffer): Promise<OCRResult> {
     return {
       success: false,
       extractedText: '',

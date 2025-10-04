@@ -5,7 +5,7 @@
  * wine characteristics, pairing information, regional data, and expert insights.
  */
 
-import { Wine, ProfessionalRating, ExternalWineData } from '@/types'
+import { Wine } from '@/types'
 import { ExternalWineDataService } from './external-wine-data'
 
 // ============================================================================
@@ -218,7 +218,7 @@ const VARIETAL_PROFILES: VarietalProfile[] = [
   }
 ]
 
-const FOOD_PAIRING_RULES: FoodPairingRule[] = [
+const _FOOD_PAIRING_RULES: FoodPairingRule[] = [
   {
     foodCategory: 'Red Meat',
     recommendedWineTypes: ['red'],

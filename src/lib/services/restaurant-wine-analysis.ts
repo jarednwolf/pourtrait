@@ -2,8 +2,7 @@ import {
   ExtractedWineListItem, 
   TasteProfile, 
   RecommendationContext,
-  Wine,
-  WineSuggestion
+  Wine
 } from '@/types'
 import { createClient } from '@supabase/supabase-js'
 
@@ -467,12 +466,12 @@ export class RestaurantWineAnalysisService {
     }
 
     let score = 0
-    let factors = 0
+    let _factors = 0
 
     // Check preferred regions
     if (flavorProfile.preferredRegions.includes(wine.region)) {
       score += 0.3
-      factors++
+      _factors++
     }
 
     // Check preferred varietals
@@ -481,7 +480,7 @@ export class RestaurantWineAnalysisService {
     )
     if (hasPreferredVarietal) {
       score += 0.3
-      factors++
+      _factors++
     }
 
     // Check disliked characteristics
@@ -495,7 +494,7 @@ export class RestaurantWineAnalysisService {
     // General preferences
     if (tasteProfile.generalPreferences.preferredRegions?.includes(wine.region)) {
       score += 0.2
-      factors++
+      _factors++
     }
 
     return Math.max(0, Math.min(1, score))
@@ -704,7 +703,7 @@ export class RestaurantWineAnalysisService {
     match: RestaurantWineMatch,
     tasteProfile: TasteProfile | null,
     context: RecommendationContext & { meal?: MealContext },
-    reasoning: string[]
+    _reasoning: string[]
   ): string {
     const wine = match.extractedWine
     const explanationParts: string[] = []
