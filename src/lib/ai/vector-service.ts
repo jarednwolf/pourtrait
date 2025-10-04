@@ -3,7 +3,6 @@
 import { Pinecone } from '@pinecone-database/pinecone'
 import { OpenAI } from 'openai'
 import { 
-  WineVector, 
   WineVectorMetadata, 
   VectorSearchResult, 
   RAGContext, 
@@ -149,7 +148,7 @@ export class VectorService {
   async generateRAGContext(
     query: string,
     userProfile: TasteProfile,
-    inventory?: Wine[]
+    _inventory?: Wine[]
   ): Promise<RAGContext> {
     try {
       // Search for relevant wine knowledge
@@ -197,7 +196,7 @@ export class VectorService {
       const filters: Partial<WineVectorMetadata> = {}
 
       // Add preferred regions with null checks
-      const allPreferredRegions = [
+      const _allPreferredRegions = [
         ...(userProfile.redWinePreferences?.preferredRegions || []),
         ...(userProfile.whiteWinePreferences?.preferredRegions || []),
         ...(userProfile.sparklingPreferences?.preferredRegions || [])
