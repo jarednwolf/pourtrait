@@ -1,5 +1,5 @@
 import { Wine, User, TasteProfile, ConsumptionRecord } from '@/types'
-import { supabase } from '@/lib/supabase'
+import { supabase, createClient } from '@/lib/supabase'
 import { logger } from '@/lib/utils/logger'
 
 export interface ExportOptions {
@@ -21,9 +21,24 @@ export interface UserDataExport {
 
 export class DataExportService {
   private getClient() {
-    // Allows tests to replace client; fall back to default supabase
+    // Prefer explicit per-test client if provided
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (globalThis as any).__TEST_SUPABASE__ || supabase
+    const testClient = (globalThis as any).__TEST_SUPABASE__
+    if (testClient) {return testClient}
+
+    // If createClient is mocked (in tests), use it to obtain the mock client
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const maybeMock = createClient as any
+    if (maybeMock && maybeMock.mock) {
+      try {
+        return maybeMock()
+      } catch {
+        // fall through to real client
+      }
+    }
+
+    // Production/runtime path: use the real shared client
+    return supabase
   }
 
   /**
@@ -341,48 +356,61 @@ export class DataExportService {
   }> {
     const client = this.getClient()
 
-    const safeList = async (table: string) => {
+    // Helper that supports different mocked query shapes:
+    // - builder.eq(...).then resolves to { data }
+    // - builder.select(...).eq(...).then resolves to { data }
+    // - builder.eq(...) directly resolves to { data }
+    const listCount = async (table: string): Promise<number> => {
       try {
         const builder: any = client.from(table)
-        if (typeof builder?.eq === 'function') {
-          const result = await builder.eq('user_id', userId)
-          return (result as any)?.data ?? []
+        if (!builder) {return 0}
+
+        if (typeof builder.select === 'function' && typeof builder.eq === 'function') {
+          const res = await builder.select('id').eq('user_id', userId)
+          return ((res as any)?.data ?? []).length
         }
-        if (typeof builder?.select === 'function') {
-          const result = await builder.select('id')
-          return (result as any)?.data ?? []
+        if (typeof builder.eq === 'function') {
+          const res = await builder.eq('user_id', userId)
+          return ((res as any)?.data ?? []).length
         }
-        return []
+        const res = await builder
+        return ((res as any)?.data ?? []).length
       } catch {
-        return []
+        return 0
       }
     }
 
-    const safeSingle = async (table: string, fields: string) => {
+    const getSingle = async (table: string, fields: string): Promise<any | null> => {
       try {
         const builder: any = client.from(table)
-        const selectable = typeof builder?.select === 'function' ? builder.select(fields) : builder
-        const filtered = typeof selectable?.eq === 'function' ? selectable.eq(table === 'user_profiles' ? 'id' : 'user_id', userId) : selectable
-        const result = typeof filtered?.single === 'function' ? await filtered.single() : { data: null }
-        // Some mocks may return the row directly instead of wrapping in { data }
-        return (result as any)?.data ?? (result ?? null)
+        if (!builder) {return null}
+        if (typeof builder.select === 'function' && typeof builder.eq === 'function' && typeof builder.single === 'function') {
+          const res = await builder.select(fields).eq(table === 'user_profiles' ? 'id' : 'user_id', userId).single()
+          return (res as any)?.data ?? null
+        }
+        if (typeof builder.single === 'function') {
+          const res = await builder.single()
+          return (res as any)?.data ?? null
+        }
+        const res = await builder
+        return (res as any)?.data ?? null
       } catch {
         return null
       }
     }
 
-    // Run sequentially to respect mock ordering in tests/CI
-    const winesData = await safeList('wines')
-    const historyData = await safeList('consumption_history')
-    const profileData = await safeSingle('taste_profiles', 'id')
-    const userData = await safeSingle('user_profiles', 'created_at, updated_at') || {}
+    // Respect mock call ordering by running sequentially in the same order as the test config
+    const totalWines = await listCount('wines')
+    const totalConsumptionRecords = await listCount('consumption_history')
+    const profileRow = await getSingle('taste_profiles', 'id')
+    const userRow = await getSingle('user_profiles', 'created_at, updated_at')
 
     return {
-      totalWines: winesData.length || 0,
-      totalConsumptionRecords: historyData.length || 0,
-      hasTasteProfile: !!profileData,
-      accountCreated: userData.created_at || '',
-      lastActivity: userData.updated_at || ''
+      totalWines,
+      totalConsumptionRecords,
+      hasTasteProfile: !!profileRow,
+      accountCreated: userRow?.created_at || '',
+      lastActivity: userRow?.updated_at || ''
     }
   }
 

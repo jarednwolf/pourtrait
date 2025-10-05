@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import { SignInForm } from '../SignInForm'
 import { AuthService } from '@/lib/auth'
@@ -47,7 +48,9 @@ describe('SignInForm', () => {
 
     await user.type(screen.getByLabelText(/email address/i), 'test@example.com')
     await user.type(screen.getByLabelText(/password/i), 'password123')
-    await user.click(screen.getByRole('button', { name: /^sign in$/i }))
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /^sign in$/i }))
+    })
 
     await waitFor(() => {
       expect(AuthService.signIn).toHaveBeenCalledWith({
@@ -65,7 +68,9 @@ describe('SignInForm', () => {
 
     await user.type(screen.getByLabelText(/email address/i), 'test@example.com')
     await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
-    await user.click(screen.getByRole('button', { name: /^sign in$/i }))
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /^sign in$/i }))
+    })
 
     await waitFor(() => {
       expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument()
@@ -80,7 +85,9 @@ describe('SignInForm', () => {
     render(<SignInForm />)
 
     const googleButton = screen.getByRole('button', { name: /sign in with google/i })
-    await user.click(googleButton)
+    await act(async () => {
+      await user.click(googleButton)
+    })
 
     await waitFor(() => {
       expect(AuthService.signInWithProvider).toHaveBeenCalledWith('google')
@@ -100,7 +107,9 @@ describe('SignInForm', () => {
 
     await user.type(emailInput, 'test@example.com')
     await user.type(passwordInput, 'password123')
-    await user.click(submitButton)
+    await act(async () => {
+      await user.click(submitButton)
+    })
 
     expect(emailInput).toBeDisabled()
     expect(passwordInput).toBeDisabled()
