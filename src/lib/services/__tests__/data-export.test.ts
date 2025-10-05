@@ -343,6 +343,8 @@ describe('DataExportService', () => {
 
 describe.sequential('getExportStats', () => {
     it('should return export statistics', async () => {
+      // Use a fresh service instance and stub its internal client getter
+      const service = new DataExportService() as any
       // Mock the Promise.all results
       const mockWinesQuery = {
         select: vi.fn().mockReturnThis(),
@@ -372,13 +374,16 @@ describe.sequential('getExportStats', () => {
         })
       }
 
-      mockSupabase.from
+      const clientForStats = { from: vi.fn() }
+      ;(clientForStats.from as any)
         .mockReturnValueOnce(mockWinesQuery)
         .mockReturnValueOnce(mockHistoryQuery)
         .mockReturnValueOnce(mockProfileQuery)
         .mockReturnValueOnce(mockUserQuery)
 
-      const stats = await dataExportService.getExportStats('user1')
+      vi.spyOn(service, 'getClient').mockReturnValue(clientForStats as any)
+
+      const stats = await service.getExportStats('user1')
 
       expect(stats).toEqual({
         totalWines: 2,
