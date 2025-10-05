@@ -341,7 +341,7 @@ describe('DataExportService', () => {
     })
   })
 
-  describe('getExportStats', () => {
+describe.sequential('getExportStats', () => {
     it('should return export statistics', async () => {
       // Mock the Promise.all results
       const mockWinesQuery = {

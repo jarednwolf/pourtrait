@@ -373,11 +373,15 @@ export class DataExportService {
       try {
         const builder: any = client.from(table)
         if (!builder) {return 0}
-
-        if (typeof builder.select === 'function' && typeof builder.eq === 'function') {
-          const res = await builder.select('id').eq('user_id', userId)
-          return ((res as any)?.data ?? []).length
+        // Prefer chaining select -> eq when supported by the mock
+        if (typeof builder.select === 'function') {
+          const selectable = builder.select('id')
+          if (selectable && typeof selectable.eq === 'function') {
+            const res = await selectable.eq('user_id', userId)
+            return ((res as any)?.data ?? []).length
+          }
         }
+        // Fall back to calling eq directly on the builder
         if (typeof builder.eq === 'function') {
           const res = await builder.eq('user_id', userId)
           return ((res as any)?.data ?? []).length
@@ -393,8 +397,15 @@ export class DataExportService {
       try {
         const builder: any = client.from(table)
         if (!builder) {return null}
-        if (typeof builder.select === 'function' && typeof builder.eq === 'function' && typeof builder.single === 'function') {
-          const res = await builder.select(fields).eq(table === 'user_profiles' ? 'id' : 'user_id', userId).single()
+        if (typeof builder.select === 'function') {
+          const selectable = builder.select(fields)
+          if (selectable && typeof selectable.eq === 'function' && typeof selectable.single === 'function') {
+            const res = await selectable.eq(table === 'user_profiles' ? 'id' : 'user_id', userId).single()
+            return (res as any)?.data ?? null
+          }
+        }
+        if (typeof builder.eq === 'function' && typeof builder.single === 'function') {
+          const res = await builder.eq(table === 'user_profiles' ? 'id' : 'user_id', userId).single()
           return (res as any)?.data ?? null
         }
         if (typeof builder.single === 'function') {
