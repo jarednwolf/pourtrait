@@ -215,9 +215,9 @@ describe('usePWA', () => {
     })
 
     it('should return null if push notifications not supported', async () => {
-      // Mock unsupported environment
-      Object.defineProperty(window, 'PushManager', {
-        value: undefined,
+      // Mock unsupported environment: remove serviceWorker capability
+      Object.defineProperty(window, 'navigator', {
+        value: { onLine: true },
         writable: true,
       })
 
@@ -227,7 +227,7 @@ describe('usePWA', () => {
         return await result.current.registerForPushNotifications()
       })
 
-      expect(subscription).toBe(null)
+      expect(subscription).toBeNull()
     })
   })
 
@@ -264,7 +264,7 @@ describe('usePWA', () => {
       mockNotification.permission = 'granted'
       const mockNotificationConstructor = vi.fn()
       Object.defineProperty(window, 'Notification', {
-        value: mockNotificationConstructor,
+        value: Object.assign(mockNotificationConstructor, { permission: 'granted' }),
         writable: true,
       })
 

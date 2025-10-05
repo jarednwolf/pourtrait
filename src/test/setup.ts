@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
 
+// Provide a jest alias for tests that still reference jest APIs
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(globalThis as any).jest = vi
+
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
   useRouter() {

@@ -7,20 +7,20 @@ describe('Home Page', () => {
     render(<Home />)
     
     const heading = screen.getByRole('heading', { level: 1 })
-    expect(heading).toHaveTextContent('Welcome to Pourtrait')
+    expect(heading).toHaveTextContent('Your AI Sommelier for everyday wine decisions')
   })
 
   it('displays the tagline', () => {
     render(<Home />)
     
-    const tagline = screen.getByText('Your AI-powered personal wine sommelier')
+    const tagline = screen.getByText(/Get a fast, personalized pick for tonight/) 
     expect(tagline).toBeInTheDocument()
   })
 
-  it('shows initialization success message', () => {
+  it('shows hero actions', () => {
     render(<Home />)
     
-    const successMessage = screen.getByText('Project foundation successfully initialized!')
-    expect(successMessage).toBeInTheDocument()
+    const cta = screen.getByRole('link', { name: /Tonight’s pick/i })
+    expect(cta).toBeInTheDocument()
   })
 })

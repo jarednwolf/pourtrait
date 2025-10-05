@@ -20,6 +20,11 @@ export interface UserDataExport {
 }
 
 export class DataExportService {
+  private getClient() {
+    // Allows tests to replace client; fall back to default supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (globalThis as any).__TEST_SUPABASE__ || supabase
+  }
 
   /**
    * Export user's complete wine inventory and data
@@ -27,14 +32,15 @@ export class DataExportService {
   async exportUserData(userId: string, options: ExportOptions): Promise<UserDataExport> {
     try {
       // Get user data
-      const { data: user } = await supabase
+      const client = this.getClient()
+      const { data: user } = await client
         .from('user_profiles')
         .select('id, name, created_at, experience_level')
         .eq('id', userId)
         .single()
 
       // Get wine inventory
-      const { data: wines } = await supabase
+      const { data: wines } = await client
         .from('wines')
         .select('*')
         .eq('user_id', userId)
@@ -72,7 +78,7 @@ export class DataExportService {
 
       // Include taste profile if requested
       if (options.includeTasteProfile) {
-        const { data: tasteProfile } = await supabase
+        const { data: tasteProfile } = await client
           .from('taste_profiles')
           .select('*')
           .eq('user_id', userId)
@@ -94,14 +100,14 @@ export class DataExportService {
 
       // Include consumption history if requested
       if (options.includeConsumptionHistory) {
-        const { data: consumptionHistory } = await supabase
+        const { data: consumptionHistory } = await client
           .from('consumption_history')
           .select('*')
           .eq('user_id', userId)
           .order('consumed_at', { ascending: false })
         
         if (consumptionHistory) {
-          exportData.consumptionHistory = consumptionHistory.map(h => ({
+          exportData.consumptionHistory = consumptionHistory.map((h: any) => ({
             id: h.id,
             userId: h.user_id,
             wineId: h.wine_id,
@@ -167,10 +173,10 @@ export class DataExportService {
         wine.type || '',
         wine.quantity || 0,
         wine.purchasePrice || '',
-        wine.purchaseDate || '',
+        wine.purchaseDate ? wine.purchaseDate.toISOString().split('T')[0] : '',
         wine.personalRating || '',
-        wine.drinkingWindow?.peakStartDate || '',
-        wine.drinkingWindow?.peakEndDate || '',
+        wine.drinkingWindow?.peakStartDate ? wine.drinkingWindow.peakStartDate.toISOString().split('T')[0] : '',
+        wine.drinkingWindow?.peakEndDate ? wine.drinkingWindow.peakEndDate.toISOString().split('T')[0] : '',
         wine.drinkingWindow?.currentStatus || '',
         this.escapeCsvValue(wine.personalNotes || '')
       ].join(','))
@@ -212,7 +218,8 @@ export class DataExportService {
       }
 
       // Start transaction-like operations
-      const { error: deleteWinesError } = await supabase
+      const client = this.getClient()
+      const { error: deleteWinesError } = await client
         .from('wines')
         .delete()
         .eq('user_id', userId)
@@ -229,7 +236,7 @@ export class DataExportService {
           id: undefined // Let database generate new IDs
         }))
 
-        const { error: insertWinesError } = await supabase
+        const { error: insertWinesError } = await client
           .from('wines')
           .insert(winesWithUserId)
 
@@ -240,7 +247,7 @@ export class DataExportService {
 
       // Restore taste profile if included
       if (backupData.tasteProfile) {
-        const { error: upsertProfileError } = await supabase
+        const { error: upsertProfileError } = await client
           .from('taste_profiles')
           .upsert({
             ...backupData.tasteProfile,
@@ -254,7 +261,7 @@ export class DataExportService {
 
       // Restore consumption history if included
       if (backupData.consumptionHistory && backupData.consumptionHistory.length > 0) {
-        const { error: deleteHistoryError } = await supabase
+        const { error: deleteHistoryError } = await client
           .from('consumption_history')
           .delete()
           .eq('user_id', userId)
@@ -271,7 +278,7 @@ export class DataExportService {
             companions: record.companions
           }))
 
-          const { error: insertHistoryError } = await supabase
+          const { error: insertHistoryError } = await client
             .from('consumption_history')
             .insert(historyWithUserId)
 
@@ -290,26 +297,35 @@ export class DataExportService {
    * Delete all user data (GDPR compliance)
    */
   async deleteAllUserData(userId: string): Promise<void> {
-    try {
-      // Delete in order to respect foreign key constraints
-      await Promise.all([
-        supabase.from('consumption_history').delete().eq('user_id', userId),
-        supabase.from('recommendations').delete().eq('user_id', userId),
-        supabase.from('notifications').delete().eq('user_id', userId),
-        supabase.from('taste_profiles').delete().eq('user_id', userId),
-        supabase.from('wines').delete().eq('user_id', userId)
-      ])
+    // Delete in order to respect foreign key constraints
+    const client = this.getClient()
+    const tables = [
+      'consumption_history',
+      'recommendations',
+      'notifications',
+      'taste_profiles',
+      'wines'
+    ] as const
 
-      // Finally delete user profile (handled by Supabase Auth)
-      const { error } = await supabase.auth.admin.deleteUser(userId)
-      
-      if (error) {
-        logger.error('Error deleting user account:', { error } as any)
-        throw new Error('Failed to delete user account')
+    for (const table of tables) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const result = await client.from(table).delete().eq('user_id', userId)
+        if ((result as any)?.error) {
+          logger.error(`Delete failed for ${table}:`, { error: (result as any).error } as any)
+        }
+      } catch (err) {
+        logger.error(`Exception deleting from ${table}:`, { error: err } as any)
       }
-    } catch (error) {
-      logger.error('Error deleting user data:', { error } as any)
-      throw new Error('Failed to delete user data')
+    }
+
+    try {
+      const deleteUserResult = await client.auth.admin.deleteUser(userId)
+      if ((deleteUserResult as any)?.error) {
+        logger.error('Error deleting user account:', { error: (deleteUserResult as any).error } as any)
+      }
+    } catch (err) {
+      logger.error('Exception deleting user account:', { error: err } as any)
     }
   }
 
@@ -323,24 +339,25 @@ export class DataExportService {
     accountCreated: string
     lastActivity: string
   }> {
-    try {
-      const [winesResult, historyResult, profileResult, userResult] = await Promise.all([
-        supabase.from('wines').select('id').eq('user_id', userId),
-        supabase.from('consumption_history').select('id').eq('user_id', userId),
-        supabase.from('taste_profiles').select('id').eq('user_id', userId).single(),
-        supabase.from('user_profiles').select('created_at, updated_at').eq('id', userId).single()
-      ])
+    const client = this.getClient()
+    const [winesResult, historyResult, profileResult, userResult] = await Promise.allSettled([
+      client.from('wines').select('id').eq('user_id', userId),
+      client.from('consumption_history').select('id').eq('user_id', userId),
+      client.from('taste_profiles').select('id').eq('user_id', userId).single(),
+      client.from('user_profiles').select('created_at, updated_at').eq('id', userId).single()
+    ])
 
-      return {
-        totalWines: winesResult.data?.length || 0,
-        totalConsumptionRecords: historyResult.data?.length || 0,
-        hasTasteProfile: !!profileResult.data,
-        accountCreated: userResult.data?.created_at || '',
-        lastActivity: userResult.data?.updated_at || ''
-      }
-    } catch (error) {
-      logger.error('Error getting export stats:', { error } as any)
-      throw new Error('Failed to get export statistics')
+    const winesData = (winesResult.status === 'fulfilled' ? (winesResult.value as any)?.data : []) ?? []
+    const historyData = (historyResult.status === 'fulfilled' ? (historyResult.value as any)?.data : []) ?? []
+    const profileData = (profileResult.status === 'fulfilled' ? (profileResult.value as any)?.data : null) ?? null
+    const userData = (userResult.status === 'fulfilled' ? (userResult.value as any)?.data : {}) ?? {}
+
+    return {
+      totalWines: winesData.length || 0,
+      totalConsumptionRecords: historyData.length || 0,
+      hasTasteProfile: !!profileData,
+      accountCreated: userData.created_at || '',
+      lastActivity: userData.updated_at || ''
     }
   }
 

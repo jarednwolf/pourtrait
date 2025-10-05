@@ -125,7 +125,10 @@ describe('WineSearchService', () => {
       const result = await WineSearchService.searchWines(userId, filters)
 
       expect(result).toEqual({
-        items: mockWines,
+        items: mockWines.map(w => ({
+          ...w,
+          imageUrl: w.imageUrl ?? undefined,
+        })),
         total: 2,
         page: 1,
         limit: 20,

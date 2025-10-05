@@ -113,9 +113,39 @@ export function useDataExport(): UseDataExportReturn {
     setError(null)
 
     try {
-      // Read the backup file
-      const backupText = await backupFile.text()
-      const backupData = JSON.parse(backupText)
+      // Prefer native File/Blob.text(), else FileReader, else Response/Blob
+      const readAsText = async (fileLike: any): Promise<string> => {
+        if (fileLike && typeof fileLike.text === 'function') {
+          return await fileLike.text()
+        }
+        if (typeof FileReader !== 'undefined' && (fileLike instanceof Blob || (fileLike && typeof fileLike.size === 'number'))) {
+          return await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(String(reader.result ?? ''))
+            reader.onerror = () => reject(reader.error)
+            try {
+              reader.readAsText(fileLike)
+            } catch (e) {
+              reject(e)
+            }
+          })
+        }
+        if (typeof Blob !== 'undefined') {
+          return await new Response(new Blob([fileLike as any])).text()
+        }
+        return String((fileLike as any)?.content ?? fileLike)
+      }
+
+      const backupText = await readAsText(backupFile)
+
+      let backupData: unknown
+      try {
+        const sanitized = String(backupText).replace(/^\uFEFF/, '').trim()
+        backupData = JSON.parse(sanitized)
+      } catch {
+        setError('Backup restore failed')
+        throw new Error('Backup restore failed')
+      }
 
       const response = await fetch('/api/data/backup?action=restore', {
         method: 'POST',
@@ -134,7 +164,7 @@ export function useDataExport(): UseDataExportReturn {
       return result
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Backup restore failed')
+      setError('Backup restore failed')
       throw err
     } finally {
       setIsRestoring(false)

@@ -161,7 +161,12 @@ export function usePWA(): PWAState & PWAActions {
 
   // Show a notification
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
-    if (!('Notification' in window) || Notification.permission !== 'granted') {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      console.warn('Notifications not available')
+      return
+    }
+
+    if (Notification.permission !== 'granted') {
       console.warn('Notifications not available or not permitted')
       return
     }
@@ -180,14 +185,16 @@ export function usePWA(): PWAState & PWAActions {
 
   // Register for push notifications
   const registerForPushNotifications = useCallback(async (): Promise<string | null> => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
       console.warn('Push notifications not supported')
       return null
     }
 
     try {
       const registration = await navigator.serviceWorker.ready
-      
+      // Guard if pushManager is not available on registration
+      if (!registration.pushManager) {return null}
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,

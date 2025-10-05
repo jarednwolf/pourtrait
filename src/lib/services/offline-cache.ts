@@ -245,10 +245,17 @@ class OfflineCacheService {
 
     return new Promise((resolve) => {
       const request = store.get('syncQueue')
+      if (!request) {return resolve()}
       request.onsuccess = () => {
-        const result = request.result
-        if (result && result.data) {
-          this.syncQueue = result.data
+        const result = (request as any).result
+        if (result && Array.isArray(result.data)) {
+          this.syncQueue = result.data as SyncQueueItem[]
+        } else if (result && result.data) {
+          try {
+            this.syncQueue = Array.from(result.data as any)
+          } catch {
+            this.syncQueue = []
+          }
         }
         resolve()
       }
@@ -325,6 +332,11 @@ class OfflineCacheService {
 export const offlineCacheService = new OfflineCacheService()
 
 // Initialize the service when the module is loaded (client-side only)
-if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+if (
+  typeof window !== 'undefined' &&
+  typeof navigator !== 'undefined' &&
+  // Allow tests to disable auto init
+  (window as any).__DISABLE_OFFLINE_CACHE__ !== true
+) {
   offlineCacheService.initialize().catch(console.error)
 }

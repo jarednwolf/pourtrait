@@ -160,7 +160,7 @@ describe('PWAInstallPrompt', () => {
 
   it('should handle dismiss button click', async () => {
     render(<PWAInstallPrompt onDismiss={mockOnDismiss} />)
-    jest.advanceTimersByTime(3000)
+    vi.advanceTimersByTime(3000)
     
     await waitFor(() => {
       expect(screen.getByText('Not Now')).toBeInTheDocument()
@@ -176,7 +176,7 @@ describe('PWAInstallPrompt', () => {
 
   it('should handle close button click', async () => {
     render(<PWAInstallPrompt onDismiss={mockOnDismiss} />)
-    jest.advanceTimersByTime(3000)
+    vi.advanceTimersByTime(3000)
     
     await waitFor(() => {
       expect(screen.getByLabelText('Dismiss install prompt')).toBeInTheDocument()
@@ -224,9 +224,9 @@ describe('PWAInstallButton', () => {
       isOnline: true,
       installPrompt: null,
       promptInstall: mockPromptInstall,
-      requestNotificationPermission: jest.fn(),
-      showNotification: jest.fn(),
-      registerForPushNotifications: jest.fn(),
+      requestNotificationPermission: vi.fn(),
+      showNotification: vi.fn(),
+      registerForPushNotifications: vi.fn(),
     })
 
     render(<PWAInstallButton />)
@@ -243,9 +243,9 @@ describe('PWAInstallButton', () => {
       isOnline: true,
       installPrompt: null,
       promptInstall: mockPromptInstall,
-      requestNotificationPermission: jest.fn(),
-      showNotification: jest.fn(),
-      registerForPushNotifications: jest.fn(),
+      requestNotificationPermission: vi.fn(),
+      showNotification: vi.fn(),
+      registerForPushNotifications: vi.fn(),
     })
 
     render(<PWAInstallButton />)

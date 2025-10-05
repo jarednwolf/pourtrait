@@ -84,6 +84,9 @@ const mockWine: Wine = {
 describe('OfflineCacheService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Prevent auto initialization side-effects in tests
+    ;(global as any).window = global.window || ({} as any)
+    ;(window as any).__DISABLE_OFFLINE_CACHE__ = true
     
     // Mock successful database initialization
     mockIndexedDB.open.mockImplementation(() => {
@@ -108,11 +111,9 @@ describe('OfflineCacheService', () => {
 
     it('should handle database initialization errors', async () => {
       mockIndexedDB.open.mockImplementation(() => {
-        const request = { ...mockIDBRequest }
+        const request = { ...mockIDBRequest, error: new Error('init failed') as any }
         setTimeout(() => {
-          if (request.onerror) {
-            request.onerror()
-          }
+          if (request.onerror) { request.onerror() }
         }, 0)
         return request
       })

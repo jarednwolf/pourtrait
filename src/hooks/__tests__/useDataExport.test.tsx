@@ -5,7 +5,7 @@ import { useDataExport } from '../useDataExport'
 // Mock fetch
 global.fetch = vi.fn()
 
-// Mock URL and document for file download
+// Mock URL for file download
 Object.defineProperty(window, 'URL', {
   value: {
     createObjectURL: vi.fn(() => 'mock-url'),
@@ -13,22 +13,21 @@ Object.defineProperty(window, 'URL', {
   }
 })
 
+// Only mock anchor creation; preserve default for others to avoid breaking Testing Library
+const realCreateElement = document.createElement.bind(document)
 Object.defineProperty(document, 'createElement', {
-  value: vi.fn(() => ({
-    href: '',
-    download: '',
-    click: vi.fn(),
-    remove: vi.fn()
-  }))
+  value: vi.fn((tagName: string) => {
+    if (tagName.toLowerCase() === 'a') {
+      return Object.assign(realCreateElement('a'), {
+        click: vi.fn(),
+        remove: vi.fn()
+      }) as any
+    }
+    return realCreateElement(tagName)
+  })
 })
 
-Object.defineProperty(document.body, 'appendChild', {
-  value: vi.fn()
-})
-
-Object.defineProperty(document.body, 'removeChild', {
-  value: vi.fn()
-})
+// Keep real append/remove to ensure valid DOM containers for React roots
 
 describe('useDataExport', () => {
   beforeEach(() => {

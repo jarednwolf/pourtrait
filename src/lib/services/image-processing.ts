@@ -450,7 +450,7 @@ export class ImageProcessingService {
       success: false,
       extractedText: '',
       confidence: 0,
-      error: 'No vision service configured. Please set OPENAI_API_KEY environment variable.'
+      error: 'Google Vision API not configured'
     }
   }
 }

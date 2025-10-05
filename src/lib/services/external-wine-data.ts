@@ -308,7 +308,7 @@ export class ExternalWineDataService {
       source: 'vivino',
       confidence: 0.75,
       data: mockData,
-      lastUpdated: new Date()
+      lastUpdated: new Date(Math.floor(Date.now() / 1000) * 1000)
     }
   }
 
@@ -328,7 +328,7 @@ export class ExternalWineDataService {
       source: 'wine_searcher',
       confidence: 0.80,
       data: mockData,
-      lastUpdated: new Date()
+      lastUpdated: new Date(Math.floor(Date.now() / 1000) * 1000)
     }
   }
 
@@ -348,7 +348,7 @@ export class ExternalWineDataService {
       source: 'cellar_tracker',
       confidence: 0.85,
       data: mockData,
-      lastUpdated: new Date()
+      lastUpdated: new Date(Math.floor(Date.now() / 1000) * 1000)
     }
   }
 
@@ -368,7 +368,7 @@ export class ExternalWineDataService {
       source: 'wine_spectator',
       confidence: 0.90,
       data: mockData,
-      lastUpdated: new Date()
+      lastUpdated: new Date(Math.floor(Date.now() / 1000) * 1000)
     }
   }
 
@@ -476,14 +476,14 @@ export class ExternalWineDataService {
         servingTemperature: results[0].data.servingTemperature,
         decantingTime: results[0].data.decantingTime,
         agingPotential: results[0].data.agingPotential,
-        lastUpdated: new Date()
+        lastUpdated: new Date(Math.floor(Date.now() / 1000) * 1000)
       }
     }
 
     // Merge multiple results with weighted confidence
     const merged: ExternalWineData = {
       professionalRatings: [],
-      lastUpdated: new Date()
+      lastUpdated: new Date(Math.floor(Date.now() / 1000) * 1000)
     }
 
     // Collect all professional ratings

@@ -158,7 +158,7 @@ export class WineSearchService {
     // Map DB fields to domain type where necessary
     const mapDbToWine = (db: any): Wine => ({
       id: db.id,
-      userId: db.user_id,
+      userId: db.user_id ?? db.userId,
       name: db.name,
       producer: db.producer,
       vintage: db.vintage,
@@ -167,15 +167,15 @@ export class WineSearchService {
       varietal: db.varietal || [],
       type: db.type,
       quantity: db.quantity || 0,
-      purchasePrice: db.purchase_price ?? undefined,
-      purchaseDate: db.purchase_date ? new Date(db.purchase_date) : undefined,
-      personalRating: db.personal_rating ?? undefined,
-      personalNotes: db.personal_notes ?? undefined,
-      imageUrl: db.image_url ?? undefined,
-      drinkingWindow: (db.drinking_window || {}) as any,
-      externalData: db.external_data || {},
-      createdAt: new Date(db.created_at),
-      updatedAt: new Date(db.updated_at)
+      purchasePrice: db.purchase_price ?? db.purchasePrice ?? undefined,
+      purchaseDate: db.purchase_date ? new Date(db.purchase_date) : (db.purchaseDate ? new Date(db.purchaseDate) : undefined),
+      personalRating: db.personal_rating ?? db.personalRating ?? undefined,
+      personalNotes: db.personal_notes ?? db.personalNotes ?? undefined,
+      imageUrl: db.image_url ?? db.imageUrl ?? undefined,
+      drinkingWindow: (db.drinking_window ?? db.drinkingWindow ?? {}) as any,
+      externalData: db.external_data ?? db.externalData ?? {},
+      createdAt: db.created_at ? new Date(db.created_at) : (db.createdAt ? new Date(db.createdAt) : new Date()),
+      updatedAt: db.updated_at ? new Date(db.updated_at) : (db.updatedAt ? new Date(db.updatedAt) : new Date())
     })
 
     // Apply relevance scoring if searching by text
