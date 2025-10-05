@@ -1,3 +1,4 @@
+"use client"
 import { Suspense } from 'react'
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm'
 
@@ -32,7 +33,4 @@ export default function ResetPasswordPage() {
   )
 }
 
-export const metadata = {
-  title: 'Reset Password - Pourtrait',
-  description: 'Set your new Pourtrait account password',
-}
+// Metadata belongs in server components/layouts, not here.

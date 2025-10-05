@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -119,8 +120,6 @@ export default function OnboardingStep1() {
   )
 }
 
-export const metadata = {
-  title: 'Onboarding Step 1 - Pourtrait'
-}
+// Metadata must not be exported in client components. Title is set via layout.
 
 

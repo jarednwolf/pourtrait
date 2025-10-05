@@ -4,8 +4,6 @@ export default function OnboardingIndex() {
   redirect('/onboarding/step1')
 }
 
-export const metadata = {
-  title: 'Onboarding - Pourtrait'
-}
+// Metadata belongs in layout, this is a redirect utility page only.
 
 

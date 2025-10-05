@@ -2,7 +2,6 @@ import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { track } from '@/lib/utils/track'
 
 interface PromptChipsTileProps {
   className?: string
@@ -42,7 +41,7 @@ export function PromptChipsTile({ className = '' }: PromptChipsTileProps) {
         </div>
         <div className="mt-3">
           <Button asChild size="sm">
-            <a href="/chat" aria-label="Open Ask the Sommelier" onClick={() => track('cta_open_chat_click')}>
+            <a href="/chat" aria-label="Open Ask the Sommelier">
               Ask the Sommelier
               <Icon name="arrow-right" className="w-4 h-4 ml-2" aria-hidden="true" />
             </a>

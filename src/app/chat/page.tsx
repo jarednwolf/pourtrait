@@ -1,6 +1,7 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
-import React, { useEffect, useMemo } from 'react'
+import React, { Suspense, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ChatInterface } from '@/components/ai/ChatInterface'
 import { Card } from '@/components/ui/Card'
@@ -11,7 +12,7 @@ import { track } from '@/lib/utils/track'
 // Chat Page Component
 // ============================================================================
 
-export default function ChatPage() {
+function ChatContent() {
   const search = useSearchParams()
   const initialMessage = useMemo(() => search?.get('prompt') || search?.get('q') || '', [search])
   const shouldAutoSend = useMemo(() => search?.get('autoSend') === 'true' || search?.get('send') === '1', [search])
@@ -140,5 +141,13 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+      <ChatContent />
+    </Suspense>
   )
 }

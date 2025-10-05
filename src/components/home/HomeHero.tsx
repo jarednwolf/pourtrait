@@ -1,7 +1,6 @@
 import React from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { track } from '@/lib/utils/track'
 
 interface HomeHeroProps {
   className?: string
@@ -20,13 +19,13 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button asChild>
-            <a href="/chat?q=What's%20your%20top%20pick%20for%20tonight%3F" aria-label="Get your personalized Tonight’s pick" onClick={() => track('cta_tonights_pick_click')}>
+            <a href="/chat?q=What's%20your%20top%20pick%20for%20tonight%3F" aria-label="Get your personalized Tonight’s pick">
               Get your personalized Tonight’s pick
               <Icon name="arrow-right" className="w-5 h-5 ml-2" aria-hidden="true" />
             </a>
           </Button>
           <Button asChild variant="outline">
-            <a href="#how-it-works" aria-label="Learn how Pourtrait works" onClick={() => track('cta_how_it_works_click')}>How it works</a>
+            <a href="#how-it-works" aria-label="Learn how Pourtrait works">How it works</a>
           </Button>
         </div>
 

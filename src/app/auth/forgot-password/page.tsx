@@ -1,3 +1,4 @@
+"use client"
 import { Suspense } from 'react'
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm'
 import { PublicOnlyRoute } from '@/components/auth/ProtectedRoute'
@@ -35,7 +36,4 @@ export default function ForgotPasswordPage() {
   )
 }
 
-export const metadata = {
-  title: 'Forgot Password - Pourtrait',
-  description: 'Reset your Pourtrait account password',
-}
+// Metadata belongs in server components/layouts, not here.

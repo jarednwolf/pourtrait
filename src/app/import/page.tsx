@@ -330,8 +330,6 @@ export default function ImportHelperPage() {
   )
 }
 
-export const metadata = {
-  title: 'Import Helper - Pourtrait'
-}
+// Metadata must not be exported in client components. Title is set via layout or Head component.
 
 

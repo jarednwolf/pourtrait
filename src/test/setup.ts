@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
+import React from 'react'
 
 // Provide a jest alias for tests that still reference jest APIs
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,6 +24,14 @@ vi.mock('next/navigation', () => ({
   usePathname() {
     return '/'
   },
+}))
+
+// Mock Next.js Link to avoid act() warnings from internal state updates during tests
+vi.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ href, children, ...props }: any) => (
+    React.createElement('a', { href: typeof href === 'string' ? href : '#', ...props }, children)
+  )
 }))
 
 // Mock environment variables for tests

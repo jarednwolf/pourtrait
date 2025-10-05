@@ -77,9 +77,7 @@ const withPWA = require('next-pwa')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    typedRoutes: true,
-  },
+  typedRoutes: true,
   eslint: {
     // Disable ESLint during builds to prevent build failures from warnings
     ignoreDuringBuilds: true,

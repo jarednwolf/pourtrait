@@ -1,3 +1,4 @@
+'use client'
 import { Suspense } from 'react'
 import { SignUpForm } from '@/components/auth/SignUpForm'
 import { PublicOnlyRoute } from '@/components/auth/ProtectedRoute'
@@ -56,7 +57,4 @@ export default function SignUpPage() {
   )
 }
 
-export const metadata = {
-  title: 'Sign Up - Pourtrait',
-  description: 'Create your Pourtrait wine cellar account',
-}
+// Metadata belongs in server components/layouts, not here.

@@ -1,6 +1,6 @@
 'use client'
-
-import React from 'react'
+export const dynamic = 'force-dynamic'
+import React, { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
@@ -23,7 +23,7 @@ const SAMPLE_WINES: SampleWine[] = [
   { name: 'Prosecco', producer: 'Valdobbiadene', vintage: 2023, region: 'Veneto', country: 'Italy', varietal: ['Glera'], type: 'sparkling' },
 ]
 
-export default function OnboardingStep3() {
+function Step3Content() {
   const router = useRouter()
   const search = useSearchParams()
   const [selected, setSelected] = React.useState<number | null>(0)
@@ -114,8 +114,14 @@ export default function OnboardingStep3() {
   )
 }
 
-export const metadata = {
-  title: 'Onboarding Step 3 - Pourtrait'
+export default function OnboardingStep3() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+      <Step3Content />
+    </Suspense>
+  )
 }
+
+// Metadata must not be exported in client components.
 
 

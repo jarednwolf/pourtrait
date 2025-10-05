@@ -3,7 +3,6 @@ import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { track } from '@/lib/utils/track'
 
 export const metadata: Metadata = {
   title: 'Pourtrait - AI Wine Sommelier',
@@ -27,7 +26,7 @@ export default function RootLayout({
               </a>
               <nav aria-label="Primary">
                 <Button asChild size="sm">
-                  <a href="/chat" aria-label="Ask the Sommelier" onClick={() => track('nav_chat_click')}>
+                  <a href="/chat" aria-label="Ask the Sommelier">
                     Ask the Sommelier
                     <Icon name="arrow-right" className="w-4 h-4 ml-2" aria-hidden="true" />
                   </a>

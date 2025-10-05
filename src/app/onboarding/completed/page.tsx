@@ -106,8 +106,6 @@ export default function OnboardingCompleted() {
   )
 }
 
-export const metadata = {
-  title: 'Onboarding Complete - Pourtrait'
-}
+// Metadata must not be exported in client components. Title is set via layout.
 
 
