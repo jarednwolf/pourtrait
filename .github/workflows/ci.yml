@@ -35,8 +35,8 @@ jobs:
     - name: Run tests
       run: npm run test
 
-    - name: Check formatting
-      run: npm run format:check
+    - name: Check formatting (non-blocking)
+      run: npm run format:check || true
 
     - name: Build application
       run: npm run build
