@@ -9,7 +9,8 @@ set -e  # Exit on any error
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 LOG_FILE="/tmp/deploy-$(date +%Y%m%d_%H%M%S).log"
-HEALTH_CHECK_URL="${NEXT_PUBLIC_APP_URL:-https://pourtrait.com}/health"
+# Allow overriding health endpoint explicitly; otherwise derive from app URL
+HEALTH_CHECK_URL="${HEALTH_CHECK_URL:-${NEXT_PUBLIC_APP_URL:-https://pourtrait.com}/health}"
 MAX_HEALTH_CHECK_ATTEMPTS=10
 HEALTH_CHECK_INTERVAL=30
 
@@ -180,12 +181,14 @@ health_check() {
 run_smoke_tests() {
     log "Running smoke tests..."
     
-    # Test critical endpoints
-    local endpoints=(
-        "/health"
-        "/api/health"
-        "/"
-    )
+  # Test critical endpoints; allow override via ENDPOINTS env (space-separated)
+  local endpoints
+  if [ -n "$ENDPOINTS" ]; then
+    # shellcheck disable=SC2206
+    endpoints=( $ENDPOINTS )
+  else
+    endpoints=( "/health" "/api/health" "/" )
+  fi
     
     for endpoint in "${endpoints[@]}"; do
         local url="${NEXT_PUBLIC_APP_URL}${endpoint}"
