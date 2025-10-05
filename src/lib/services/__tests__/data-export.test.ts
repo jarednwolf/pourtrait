@@ -93,7 +93,7 @@ describe('DataExportService', () => {
     ;(createClient as any).mockReturnValue(mockSupabase)
     ;(globalThis as any).__TEST_SUPABASE__ = mockSupabase
     
-    dataExportService = new DataExportService()
+    dataExportService = new DataExportService(mockSupabase as any)
   })
 
   describe('exportUserData', () => {

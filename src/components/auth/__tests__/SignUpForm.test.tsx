@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import { act } from 'react'
 import userEvent from '@testing-library/user-event'
 import { SignUpForm } from '../SignUpForm'
 import { AuthService } from '@/lib/auth'
@@ -55,7 +56,9 @@ describe('SignUpForm', () => {
     await user.selectOptions(screen.getByLabelText(/wine experience level/i), 'intermediate')
     await user.type(screen.getByLabelText(/^password$/i), 'password123')
     await user.type(screen.getByLabelText(/confirm password/i), 'password123')
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /create account/i }))
+    })
 
     await waitFor(() => {
       expect(AuthService.signUp).toHaveBeenCalledWith({
@@ -81,7 +84,9 @@ describe('SignUpForm', () => {
     await user.type(screen.getByLabelText(/email address/i), 'test@example.com')
     await user.type(screen.getByLabelText(/^password$/i), 'password123')
     await user.type(screen.getByLabelText(/confirm password/i), 'password123')
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /create account/i }))
+    })
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /check your email/i })).toBeInTheDocument()
@@ -96,7 +101,9 @@ describe('SignUpForm', () => {
     await user.type(screen.getByLabelText(/email address/i), 'test@example.com')
     await user.type(screen.getByLabelText(/^password$/i), 'password123')
     await user.type(screen.getByLabelText(/confirm password/i), 'differentpassword')
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /create account/i }))
+    })
 
     await waitFor(() => {
       expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument()
@@ -112,7 +119,9 @@ describe('SignUpForm', () => {
     await user.type(screen.getByLabelText(/email address/i), 'test@example.com')
     await user.type(screen.getByLabelText(/^password$/i), '123')
     await user.type(screen.getByLabelText(/confirm password/i), '123')
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /create account/i }))
+    })
 
     await waitFor(() => {
       expect(screen.getByText(/password must be at least 6 characters/i)).toBeInTheDocument()
@@ -130,7 +139,9 @@ describe('SignUpForm', () => {
     await user.type(screen.getByLabelText(/email address/i), 'test@example.com')
     await user.type(screen.getByLabelText(/^password$/i), 'password123')
     await user.type(screen.getByLabelText(/confirm password/i), 'password123')
-    await user.click(screen.getByRole('button', { name: /create account/i }))
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /create account/i }))
+    })
 
     await waitFor(() => {
       expect(screen.getByText(/email already registered/i)).toBeInTheDocument()
@@ -176,7 +187,9 @@ describe('SignUpForm', () => {
 
     // Click resend button
     const resendButton = screen.getByRole('button', { name: /resend confirmation email/i })
-    await user.click(resendButton)
+    await act(async () => {
+      await user.click(resendButton)
+    })
 
     await waitFor(() => {
       expect(AuthService.resendConfirmation).toHaveBeenCalledWith('test@example.com')

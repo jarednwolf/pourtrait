@@ -20,7 +20,16 @@ export interface UserDataExport {
 }
 
 export class DataExportService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private readonly injectedClient?: any
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(client?: any) {
+    this.injectedClient = client
+  }
+
   private getClient() {
+    if (this.injectedClient) {return this.injectedClient}
     // Prefer explicit per-test client if provided
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const testClient = (globalThis as any).__TEST_SUPABASE__
