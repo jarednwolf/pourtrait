@@ -1,6 +1,9 @@
+"use client"
 import React from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
+import { track } from '@/lib/utils/track'
 
 interface HomeHeroProps {
   className?: string
@@ -8,39 +11,82 @@ interface HomeHeroProps {
 
 export function HomeHero({ className = '' }: HomeHeroProps) {
   return (
-    <section className={`text-center ${className}`} aria-labelledby="home-hero-heading">
-      <div className="mx-auto max-w-3xl">
-        <h1 id="home-hero-heading" className="text-4xl sm:text-6xl font-bold text-gray-900 mb-4">
-          Your AI Sommelier for everyday wine decisions
-        </h1>
-        <p className="text-lg sm:text-xl text-gray-600 mb-6">
-          Get a fast, personalized pick for tonight, pair any dish in seconds, and build a smarter cellar.
-        </p>
+    <section
+      className={`relative ${className}`}
+      aria-labelledby="home-hero-heading"
+    >
+      {/* Decorative, CSS-only background (keeps LCP lightweight) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-purple-50/40 to-white"/>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild>
-            <a href="/chat?q=What's%20your%20top%20pick%20for%20tonight%3F" aria-label="Get your personalized Tonight’s pick">
-              Get your personalized Tonight’s pick
-              <Icon name="arrow-right" className="w-5 h-5 ml-2" aria-hidden="true" />
-            </a>
-          </Button>
-          <Button asChild variant="outline">
-            <a href="#how-it-works" aria-label="Learn how Pourtrait works">How it works</a>
-          </Button>
-        </div>
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16 lg:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Copy side */}
+          <div className="lg:col-span-7">
+            <h1
+              id="home-hero-heading"
+              className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-700"
+            >
+              Every bottle a brushstroke
+            </h1>
+            <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-2xl">
+              Pourtrait learns your taste with each choice—using AI to paint a personal portrait of what you love to drink.
+            </p>
 
-        <div className="mt-6 flex flex-wrap justify-center items-center gap-4 text-sm text-gray-600">
-          <div className="flex items-center" aria-label="Fast moment of value">
-            <Icon name="zap" className="w-4 h-4 text-purple-600 mr-2" aria-hidden="true" />
-            Under 60 seconds to value
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <Button asChild onClick={() => track('cta_tonights_pick_click')}>
+                <a href="/chat?q=What's%20your%20top%20pick%20for%20tonight%3F" aria-label="Get your personalized Tonight’s pick">
+                  Get Tonight’s pick
+                  <Icon name="arrow-right" className="w-5 h-5 ml-2" aria-hidden="true" />
+                </a>
+              </Button>
+              <Button asChild variant="outline">
+                <a href="#how-it-works" aria-label="Learn how Pourtrait works">How it works</a>
+              </Button>
+            </div>
+
+            <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-700">
+              <div className="flex items-center gap-2">
+                <Icon name="zap" className="w-4 h-4 text-primary" aria-hidden="true" />
+                <div>
+                  <dt className="sr-only">Speed</dt>
+                  <dd>Under 60s to value</dd>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Icon name="users" className="w-4 h-4 text-primary" aria-hidden="true" />
+                <div>
+                  <dt className="sr-only">Ease</dt>
+                  <dd>Beginner friendly</dd>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Icon name="shield-check" className="w-4 h-4 text-primary" aria-hidden="true" />
+                <div>
+                  <dt className="sr-only">Privacy</dt>
+                  <dd>Private by design</dd>
+                </div>
+              </div>
+            </dl>
           </div>
-          <div className="flex items-center" aria-label="No expertise required">
-            <Icon name="users" className="w-4 h-4 text-purple-600 mr-2" aria-hidden="true" />
-            Beginner friendly
-          </div>
-          <div className="flex items-center" aria-label="Private and secure">
-            <Icon name="shield-check" className="w-4 h-4 text-purple-600 mr-2" aria-hidden="true" />
-            Private by design
+
+          {/* Visual side (optimized hero image with gradient overlay) */}
+          <div className="lg:col-span-5">
+            <div className="relative mx-auto w-full max-w-md h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden">
+              <Image
+                src="/images/hero.jpg"
+                alt="Wine being poured into a glass with soft lighting"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
+                quality={72}
+                priority
+                fetchPriority="high"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-purple-200/30 via-fuchsia-200/20 to-rose-100/30" aria-hidden="true" />
+              <div className="absolute inset-0 ring-1 ring-white/50" aria-hidden="true" />
+            </div>
           </div>
         </div>
       </div>

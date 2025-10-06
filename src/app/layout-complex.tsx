@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Pourtrait - AI Wine Sommelier',
-  description: 'Your personal AI-powered wine cellar and sommelier',
+  description: 'Your personal AI-powered wine cellar and sommelier. Every bottle a brushstroke.',
   keywords: ['wine', 'sommelier', 'AI', 'cellar', 'recommendations'],
   authors: [{ name: 'Pourtrait Team' }],
   manifest: '/manifest.json',
@@ -27,12 +27,16 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Pourtrait',
     title: 'Pourtrait - AI Wine Sommelier',
-    description: 'Your personal AI-powered wine cellar and sommelier',
+    description: 'Your personal AI-powered wine cellar and sommelier. Every bottle a brushstroke.',
+    images: [
+      { url: '/images/hero.jpg' }
+    ]
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'Pourtrait - AI Wine Sommelier',
-    description: 'Your personal AI-powered wine cellar and sommelier',
+    description: 'Your personal AI-powered wine cellar and sommelier. Every bottle a brushstroke.',
+    images: ['/images/hero.jpg']
   },
 }
 
