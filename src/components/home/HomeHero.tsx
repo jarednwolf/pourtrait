@@ -80,7 +80,6 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
-                quality={72}
                 priority
                 fetchPriority="high"
               />
