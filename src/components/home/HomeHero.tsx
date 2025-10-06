@@ -1,6 +1,5 @@
 "use client"
 import React from 'react'
-import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
@@ -26,7 +25,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
           <div className="lg:col-span-7">
             <h1
               id="home-hero-heading"
-              className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-700"
+              className="font-serif font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-700 text-display-2 sm:text-display-1"
             >
               Every bottle a brushstroke
             </h1>
@@ -71,17 +70,15 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
             </dl>
           </div>
 
-          {/* Visual side (optimized hero image with gradient overlay) */}
+          {/* Visual side (hero image with gradient overlay) */}
           <div className="lg:col-span-5">
             <div className="relative mx-auto w-full max-w-md h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden">
-              <Image
+              <img
                 src="/images/hero.jpg"
                 alt="Wine being poured into a glass with soft lighting"
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
-                priority
-                fetchPriority="high"
+                className="absolute inset-0 h-full w-full object-cover"
+                decoding="async"
+                loading="eager"
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-purple-200/30 via-fuchsia-200/20 to-rose-100/30" aria-hidden="true" />
               <div className="absolute inset-0 ring-1 ring-white/50" aria-hidden="true" />
