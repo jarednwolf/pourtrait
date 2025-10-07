@@ -27,8 +27,8 @@ export function OnboardingWelcome({
       {/* Main Welcome Card */}
       <Card className="text-center">
         <CardHeader className="pb-4">
-          <div className="mx-auto w-16 h-16 bg-burgundy-100 rounded-full flex items-center justify-center mb-4">
-            <Icon name="heart" size="lg" className="text-burgundy-600" />
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <Icon name="heart" size="lg" className="text-primary" />
           </div>
           <CardTitle className="text-3xl font-bold text-gray-900">
             Welcome to Pourtrait
@@ -89,9 +89,9 @@ export function OnboardingWelcome({
       </Card>
 
       {/* Benefits */}
-      <Card className="bg-burgundy-50 border-burgundy-200">
+      <Card className="bg-primary/5 border-primary/40">
         <CardHeader>
-          <CardTitle className="text-burgundy-900">
+          <CardTitle className="text-gray-900">
             Why Create a Taste Profile?
           </CardTitle>
         </CardHeader>
@@ -200,8 +200,8 @@ function ExpectationItem({
   description: string
 }) {
   return (
-    <div className="flex items-start">
-      <div className="flex-shrink-0 w-8 h-8 bg-burgundy-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-4">
+      <div className="flex items-start">
+      <div className="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium mr-4">
         {step}
       </div>
       <div>
@@ -224,8 +224,8 @@ function BenefitItem({
 }) {
   return (
     <div className="flex items-start">
-      <Icon name={icon as any} size="sm" className="text-burgundy-600 mt-0.5 mr-3 flex-shrink-0" />
-      <p className="text-burgundy-800 text-sm">{text}</p>
+      <Icon name={icon as any} size="sm" className="text-primary mt-0.5 mr-3 flex-shrink-0" />
+      <p className="text-gray-800 text-sm">{text}</p>
     </div>
   )
 }

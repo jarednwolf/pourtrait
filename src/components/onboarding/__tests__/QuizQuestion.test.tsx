@@ -82,7 +82,7 @@ describe('QuizQuestion', () => {
       )
 
       const whiteWineContainer = screen.getByText('White Wine').closest('[class*="border-"]')
-      expect(whiteWineContainer).toHaveClass('border-burgundy-500')
+    expect(whiteWineContainer).toHaveClass('border-primary')
     })
   })
 
@@ -138,8 +138,8 @@ describe('QuizQuestion', () => {
       const redWineContainer = screen.getByText('Red Wine').closest('[class*="border-"]')
       const sparklingWineContainer = screen.getByText('Sparkling Wine').closest('[class*="border-"]')
       
-      expect(redWineContainer).toHaveClass('border-burgundy-500')
-      expect(sparklingWineContainer).toHaveClass('border-burgundy-500')
+    expect(redWineContainer).toHaveClass('border-primary')
+    expect(sparklingWineContainer).toHaveClass('border-primary')
     })
   })
 
@@ -200,7 +200,7 @@ describe('QuizQuestion', () => {
       )
 
       const selectedButton = screen.getByRole('button', { name: '4' })
-      expect(selectedButton).toHaveClass('bg-burgundy-600')
+    expect(selectedButton).toHaveClass('bg-primary')
       expect(screen.getByText('Selected:')).toBeInTheDocument()
     })
   })

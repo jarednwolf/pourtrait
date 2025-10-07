@@ -155,7 +155,7 @@ describe('Onboarding Accessibility', () => {
         render(<QuizQuestion question={scaleQuestion} value={3} onChange={vi.fn()} />)
 
         const threeButton = screen.getByRole('button', { name: '3' })
-        expect(threeButton).toHaveClass('bg-burgundy-600')
+    expect(threeButton).toHaveClass('bg-primary')
       })
     })
   })

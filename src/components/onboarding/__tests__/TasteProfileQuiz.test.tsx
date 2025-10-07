@@ -151,7 +151,7 @@ describe('TasteProfileQuiz Integration', () => {
 
       // Should show the pre-selected answer
       const selectedOption = screen.getByRole('button', { name: /Casual wine drinker/i })
-      expect(selectedOption?.parentElement?.parentElement).toHaveClass('border-burgundy-500')
+    expect(selectedOption?.parentElement?.parentElement).toHaveClass('border-primary')
     })
   })
 

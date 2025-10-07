@@ -96,12 +96,12 @@ export function QuizResult({
           </CardHeader>
           <CardContent>
             <div className="text-center space-y-4">
-              <div className="text-3xl font-bold text-burgundy-600">
+              <div className="text-3xl font-bold text-primary">
                 {confidencePercentage}%
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-burgundy-600 h-2 rounded-full transition-all duration-500"
+                  className="bg-primary h-2 rounded-full transition-all duration-500"
                   style={{ width: `${confidencePercentage}%` }}
                 />
               </div>
@@ -227,7 +227,7 @@ export function QuizResult({
             <div className="space-y-3">
               {result.educationalRecommendations.map((recommendation, index) => (
                 <div key={index} className="flex items-start">
-                  <Icon name="arrow-right" size="sm" className="text-burgundy-600 mt-0.5 mr-3 flex-shrink-0" />
+                  <Icon name="arrow-right" size="sm" className="text-primary mt-0.5 mr-3 flex-shrink-0" />
                   <p className="text-gray-700">{recommendation}</p>
                 </div>
               ))}

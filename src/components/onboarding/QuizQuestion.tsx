@@ -250,7 +250,7 @@ function OptionCard({
         className={cn(
           'w-full rounded-lg border-2 transition-all duration-200',
           isSelected
-            ? 'border-burgundy-500 bg-burgundy-50 ring-2 ring-burgundy-500 ring-offset-2'
+            ? 'border-primary bg-primary/10 ring-2 ring-primary ring-offset-2'
             : 'border-gray-200 bg-white'
         )}
       >
@@ -260,7 +260,7 @@ function OptionCard({
             onClick={onClick}
             className={cn(
               'flex-1 text-left p-4 rounded-l-lg transition-all duration-200',
-              'hover:bg-burgundy-50 focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2'
+              'hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
             )}
           >
             <div className="flex items-start space-x-3">
@@ -271,7 +271,7 @@ function OptionCard({
                     className={cn(
                       'w-4 h-4 rounded-full border-2 transition-colors',
                       isSelected
-                        ? 'border-burgundy-500 bg-burgundy-500'
+                        ? 'border-primary bg-primary'
                         : 'border-gray-300'
                     )}
                   >
@@ -284,7 +284,7 @@ function OptionCard({
                     className={cn(
                       'w-4 h-4 rounded border-2 transition-colors',
                       isSelected
-                        ? 'border-burgundy-500 bg-burgundy-500'
+                        ? 'border-primary bg-primary'
                         : 'border-gray-300'
                     )}
                   >
@@ -310,7 +310,7 @@ function OptionCard({
             <button
               type="button"
               onClick={() => setShowEducation(!showEducation)}
-              className="flex-shrink-0 p-4 rounded-r-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2"
+              className="flex-shrink-0 p-4 rounded-r-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               aria-label="Show educational note"
             >
               <Icon name="info" size="sm" />

@@ -110,12 +110,12 @@ export function OnboardingComplete({
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <div className="text-3xl font-bold text-burgundy-600">
+            <div className="text-3xl font-bold text-primary">
               {confidencePercentage}%
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-burgundy-600 h-2 rounded-full transition-all duration-1000"
+                className="bg-primary h-2 rounded-full transition-all duration-1000"
                 style={{ width: `${confidencePercentage}%` }}
               />
             </div>
@@ -154,9 +154,9 @@ export function OnboardingComplete({
 
       {/* Personalized Tips */}
       {result.educationalRecommendations.length > 0 && (
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-primary/5 border-primary/40">
           <CardHeader>
-            <CardTitle className="flex items-center text-blue-900">
+            <CardTitle className="flex items-center text-primary">
               <Icon name="info" size="sm" className="mr-2" />
               Personalized Tips for You
             </CardTitle>
@@ -165,8 +165,8 @@ export function OnboardingComplete({
             <div className="space-y-3">
               {result.educationalRecommendations.slice(0, 3).map((tip, index) => (
                 <div key={index} className="flex items-start">
-                  <Icon name="arrow-right" size="sm" className="text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
-                  <p className="text-blue-800">{tip}</p>
+                  <Icon name="arrow-right" size="sm" className="text-primary mt-0.5 mr-3 flex-shrink-0" />
+                  <p className="text-gray-800">{tip}</p>
                 </div>
               ))}
             </div>
@@ -190,12 +190,12 @@ export function OnboardingComplete({
       </div>
 
       {/* Encouragement */}
-      <Card className="bg-burgundy-50 border-burgundy-200 text-center">
+      <Card className="bg-primary/5 border-primary/40 text-center">
         <CardContent className="pt-6">
-          <p className="text-burgundy-800 font-medium">
+          <p className="text-gray-800 font-medium">
             "The best wine is the one you enjoy. We're here to help you discover more wines you'll love."
           </p>
-          <p className="text-burgundy-600 text-sm mt-2">
+          <p className="text-primary text-sm mt-2">
             — Your AI Sommelier
           </p>
         </CardContent>
@@ -219,9 +219,9 @@ function NextStepCard({
   action: string
 }) {
   return (
-    <div className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-burgundy-300 hover:bg-burgundy-50 transition-colors">
+    <div className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary/10 transition-colors">
       <div className="flex-shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center border border-gray-200 mr-4">
-        <Icon name={icon as any} size="sm" className="text-burgundy-600" />
+        <Icon name={icon as any} size="sm" className="text-primary" />
       </div>
       <div className="flex-1">
         <h4 className="font-semibold text-gray-900">{title}</h4>

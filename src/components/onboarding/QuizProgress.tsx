@@ -30,7 +30,7 @@ export function QuizProgress({
           <div className="relative">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-burgundy-600 h-2 rounded-full transition-all duration-300 ease-out"
+                className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${progress}%` }}
                 role="progressbar"
                 aria-valuenow={progress}
@@ -46,7 +46,7 @@ export function QuizProgress({
             <span className="text-gray-600">
               Question {currentQuestion} of {totalQuestions}
             </span>
-            <span className="font-medium text-burgundy-600">
+            <span className="font-medium text-primary">
               {Math.round(progress)}% Complete
             </span>
           </div>
@@ -63,8 +63,8 @@ export function QuizProgress({
                   key={questionNumber}
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors',
-                    isCompleted && 'bg-burgundy-600 text-white',
-                    isCurrent && 'bg-burgundy-100 text-burgundy-600 ring-2 ring-burgundy-600',
+                    isCompleted && 'bg-primary text-white',
+                    isCurrent && 'bg-primary/10 text-primary ring-2 ring-primary',
                     !isCompleted && !isCurrent && 'bg-gray-200 text-gray-500'
                   )}
                   aria-label={
