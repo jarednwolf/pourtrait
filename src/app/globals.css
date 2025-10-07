@@ -75,9 +75,11 @@
   }
 
   /* Ensure primary buttons always have white text, even with nested anchors */
-  .btn-primary, .btn-primary a, .btn-primary span, .btn-primary svg {
-    color: white !important;
-  }
+  .btn.bg-primary { color: #ffffff !important; }
+  .btn.bg-primary a,
+  .btn.bg-primary span,
+  .btn.bg-primary svg,
+  .btn.bg-primary * { color: inherit !important; fill: currentColor !important; }
 
   .card {
     @apply rounded-[12px] bg-white p-6 shadow-brand-sm ring-1 ring-gray-200;
