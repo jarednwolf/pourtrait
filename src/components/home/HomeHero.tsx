@@ -18,7 +18,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
       {/* Decorative, CSS-only background (keeps LCP lightweight) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-primary/5 to-white dark:from-dark-surface dark:via-primary/10 dark:to-dark-surface"/>
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-primary/5 to-white dark:from-transparent dark:via-transparent dark:to-transparent"/>
 
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16 lg:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -30,7 +30,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
             >
               Every bottle a brushstroke
             </h1>
-            <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-2xl">
+            <p className="mt-4 text-lg sm:text-xl text-gray-700 dark:text-gray-300 max-w-2xl">
               Pourtrait learns your taste with each choice—using AI to paint a personal portrait of what you love to drink.
             </p>
 
@@ -82,8 +82,8 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-fuchsia-200/20 to-rose-100/30" aria-hidden="true" />
-              <div className="absolute inset-0 ring-1 ring-white/50" aria-hidden="true" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-fuchsia-200/20 to-rose-100/30 dark:from-primary/10 dark:via-transparent dark:to-transparent" aria-hidden="true" />
+              <div className="absolute inset-0 ring-1 ring-white/50 dark:ring-white/10" aria-hidden="true" />
             </div>
           </div>
         </div>
