@@ -56,23 +56,31 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="bg-surface text-gray-900 dark:bg-dark-surface dark:text-gray-100">
-        {/* Unregister old service workers on preview to avoid stale CSS/JS */}
-        {process.env.NEXT_PUBLIC_DISABLE_PWA === 'true' && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function(){
-                  if ('serviceWorker' in navigator) {
+        {/* Always remove dark class ASAP to prevent FOUC; add SW kill switch via ?sw=off */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                try {
+                  document.documentElement.classList.remove('dark');
+                  var params = new URLSearchParams(location.search);
+                  var disableSW = params.get('sw') === 'off';
+                  var isPreview = ${JSON.stringify(process.env.VERCEL_ENV === 'preview')};
+                  var disablePWA = isPreview || ${JSON.stringify(process.env.NEXT_PUBLIC_DISABLE_PWA === 'true')};
+                  if ('serviceWorker' in navigator && (disablePWA || disableSW)) {
                     navigator.serviceWorker.getRegistrations().then(function(regs){
                       regs.forEach(function(r){ r.unregister(); });
+                    }).then(function(){
+                      if (window.caches && caches.keys) {
+                        caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); });
+                      }
                     });
                   }
-                  document.documentElement.classList.remove('dark');
-                })();
-              `,
-            }}
-          />
-        )}
+                } catch(e) { /* no-op */ }
+              })();
+            `,
+          }}
+        />
         <AuthProvider>
           <a href="#main-content" className="skip-link">Skip to main content</a>
           <header className="border-b border-gray-200 bg-white text-gray-900 dark:bg-dark-surface dark:border-gray-800" role="banner">
