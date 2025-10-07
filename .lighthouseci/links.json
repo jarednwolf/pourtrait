@@ -1,0 +1,5 @@
+{
+  "http://localhost:3000/": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1759784365658-18346.report.html",
+  "http://localhost:3000/inventory": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1759784366259-51269.report.html",
+  "http://localhost:3000/chat": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1759784366858-3995.report.html"
+}

@@ -311,9 +311,34 @@ export function trackWebVitals(): void {
     });
 
     getLCP((metric: any) => {
+      // Attempt to capture the current LCP element details using PerformanceObserver if available
+      let elementSelector: string | undefined
+      try {
+        if ('PerformanceObserver' in window) {
+          const po = new PerformanceObserver((list) => {
+            const entries = list.getEntries() as any[]
+            const last = entries[entries.length - 1]
+            if (last && last.element) {
+              // Build a simple selector hint
+              const el = last.element as Element
+              const id = el.id ? `#${el.id}` : ''
+              const cls = el.className && typeof el.className === 'string' ? `.${el.className.toString().split(' ').filter(Boolean).join('.')}` : ''
+              elementSelector = `${el.tagName.toLowerCase()}${id}${cls}`
+            }
+          })
+          po.observe({ type: 'largest-contentful-paint', buffered: true } as any)
+          // Disconnect quickly; we only need the buffered last entry
+          setTimeout(() => po.disconnect(), 0)
+        }
+      } catch {}
+
       performanceMonitor.recordMetric('lcp', metric.value, 'ms', {
-        rating: metric.rating
+        rating: metric.rating,
+        element: elementSelector
       });
+      try {
+        logger.info('[web-vitals] LCP', { value: metric.value, rating: metric.rating, element: elementSelector })
+      } catch {}
     });
 
     getTTFB((metric: any) => {

@@ -55,8 +55,8 @@ export function FoodPairingPage() {
         <p className="text-gray-600 mb-4">
           Please sign in to access food pairing recommendations and contextual wine filtering.
         </p>
-        <Button onClick={() => window.location.href = '/auth/signin'}>
-          Sign In
+        <Button asChild>
+          <a href="/auth/signin" aria-label="Sign in to access food pairing">Sign In</a>
         </Button>
       </Card>
     )

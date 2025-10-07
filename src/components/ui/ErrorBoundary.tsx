@@ -138,12 +138,8 @@ export class ErrorBoundary extends Component<Props, State> {
                   Try Again
                 </Button>
                 
-                <Button
-                  onClick={() => window.location.href = '/'}
-                  className="w-full"
-                  variant="secondary"
-                >
-                  Go to Home
+                <Button asChild className="w-full" variant="secondary">
+                  <a href="/" aria-label="Go to home page">Go to Home</a>
                 </Button>
                 
                 <Button

@@ -1,5 +1,7 @@
+"use client"
 import React from 'react'
 import { Icon } from '@/components/ui/Icon'
+import { track } from '@/lib/utils/track'
 
 export function HowItWorks() {
   const steps = [
@@ -15,12 +17,23 @@ export function HowItWorks() {
         {steps.map((s, i) => (
           <div key={i} className="rounded-lg border border-gray-200 p-4 bg-white">
             <div className="flex items-center mb-2">
-              <Icon name={s.icon as any} className="w-5 h-5 text-purple-600 mr-2" aria-hidden="true" />
+              <Icon name={s.icon as any} className="w-5 h-5 text-primary mr-2" aria-hidden="true" />
               <div className="font-medium text-gray-900">{s.title}</div>
             </div>
             <p className="text-sm text-gray-600">{s.desc}</p>
           </div>
         ))}
+      </div>
+      <div className="mt-6 text-center">
+        <a
+          href={'/chat?q=' + encodeURIComponent("What should I drink tonight?")}
+          onClick={() => track('cta_tonights_pick_click', { source: 'how_it_works' })}
+          className="inline-flex items-center text-primary underline underline-offset-2"
+          aria-label="Try Tonight's pick"
+        >
+          Try Tonight's pick
+          <span aria-hidden className="ml-1">→</span>
+        </a>
       </div>
     </section>
   )

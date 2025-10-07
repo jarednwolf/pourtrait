@@ -90,12 +90,12 @@ describe('ChatInterface Integration', () => {
     render(<ChatInterface />)
     
     // Click on a suggestion
-    const suggestion = screen.getByText('What should I drink tonight?')
+    const suggestion = screen.getByText("I'm cooking steak")
     fireEvent.click(suggestion)
     
     // Verify sendMessage was called with the suggestion
     await waitFor(() => {
-      expect(mockSendMessage).toHaveBeenCalledWith('What should I drink tonight?')
+      expect(mockSendMessage).toHaveBeenCalledWith("I'm cooking steak")
     })
   })
 

@@ -1,11 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import type { WineInput } from '@/types'
+import { fromDrinkingWindow } from '@/lib/services/drinking-window-readiness'
+import { DrinkingWindowService } from '@/lib/services/drinking-window'
 
 interface WineEntryFormProps {
   onSubmit: (wineData: WineInput) => Promise<void>
@@ -47,6 +50,7 @@ export function WineEntryForm({
 
   const [varietalInput, setVarietalInput] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [imagePreview, setImagePreview] = useState<string | undefined>(formData.imageUrl)
 
   const handleInputChange = (field: keyof WineInput, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -72,6 +76,33 @@ export function WineEntryForm({
       varietal: prev.varietal.filter((_, i) => i !== index)
     }))
   }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) {return}
+    const reader = new FileReader()
+    reader.onload = () => {
+      const url = reader.result as string
+      setImagePreview(url)
+      handleInputChange('imageUrl', url)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const previewDrinkingWindow = useMemo(() => {
+    try {
+      const dw = DrinkingWindowService.calculateDrinkingWindow({
+        ...formData,
+        id: '',
+        userId: '',
+        externalData: {}
+      } as any)
+      const { score, status } = fromDrinkingWindow(dw)
+      return { dw, score, status }
+    } catch {
+      return undefined
+    }
+  }, [formData])
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -156,9 +187,11 @@ export function WineEntryForm({
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="e.g., Château Margaux"
                   state={errors.name ? 'error' : 'default'}
+                  aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? 'name-error' : undefined}
                 />
                 {errors.name && (
-                  <p className="text-sm text-red-600 mt-1">{errors.name}</p>
+                  <p id="name-error" className="text-sm text-red-600 mt-1" role="alert">{errors.name}</p>
                 )}
               </div>
 
@@ -172,9 +205,11 @@ export function WineEntryForm({
                   onChange={(e) => handleInputChange('producer', e.target.value)}
                   placeholder="e.g., Château Margaux"
                   state={errors.producer ? 'error' : 'default'}
+                  aria-invalid={!!errors.producer}
+                  aria-describedby={errors.producer ? 'producer-error' : undefined}
                 />
                 {errors.producer && (
-                  <p className="text-sm text-red-600 mt-1">{errors.producer}</p>
+                  <p id="producer-error" className="text-sm text-red-600 mt-1" role="alert">{errors.producer}</p>
                 )}
               </div>
             </div>
@@ -192,9 +227,11 @@ export function WineEntryForm({
                   min="1800"
                   max={new Date().getFullYear() + 5}
                   state={errors.vintage ? 'error' : 'default'}
+                  aria-invalid={!!errors.vintage}
+                  aria-describedby={errors.vintage ? 'vintage-error' : undefined}
                 />
                 {errors.vintage && (
-                  <p className="text-sm text-red-600 mt-1">{errors.vintage}</p>
+                  <p id="vintage-error" className="text-sm text-red-600 mt-1" role="alert">{errors.vintage}</p>
                 )}
               </div>
 
@@ -227,11 +264,34 @@ export function WineEntryForm({
                   onChange={(e) => handleInputChange('quantity', parseInt(e.target.value))}
                   min="0"
                   state={errors.quantity ? 'error' : 'default'}
+                  aria-invalid={!!errors.quantity}
+                  aria-describedby={errors.quantity ? 'quantity-error' : undefined}
                 />
                 {errors.quantity && (
-                  <p className="text-sm text-red-600 mt-1">{errors.quantity}</p>
+                  <p id="quantity-error" className="text-sm text-red-600 mt-1" role="alert">{errors.quantity}</p>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Image Upload */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-medium">Bottle Image</h3>
+            <div className="flex items-center gap-3">
+              <input type="file" accept="image/*" onChange={handleImageChange} aria-label="Upload bottle image" />
+                  {imagePreview && (
+                    <div className="relative h-16 w-12">
+                      <Image 
+                        src={imagePreview} 
+                        alt="Bottle preview" 
+                        fill 
+                        sizes="48px" 
+                        className="object-cover rounded border"
+                        placeholder="blur"
+                        blurDataURL={"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><filter id='b'><feGaussianBlur stdDeviation='2'/></filter><rect width='8' height='8' fill='%23e5e7eb' filter='url(%23b)'/></svg>"}
+                      />
+                    </div>
+                  )}
             </div>
           </div>
 
@@ -250,9 +310,11 @@ export function WineEntryForm({
                   onChange={(e) => handleInputChange('region', e.target.value)}
                   placeholder="e.g., Margaux"
                   state={errors.region ? 'error' : 'default'}
+                  aria-invalid={!!errors.region}
+                  aria-describedby={errors.region ? 'region-error' : undefined}
                 />
                 {errors.region && (
-                  <p className="text-sm text-red-600 mt-1">{errors.region}</p>
+                  <p id="region-error" className="text-sm text-red-600 mt-1" role="alert">{errors.region}</p>
                 )}
               </div>
 
@@ -266,13 +328,28 @@ export function WineEntryForm({
                   onChange={(e) => handleInputChange('country', e.target.value)}
                   placeholder="e.g., France"
                   state={errors.country ? 'error' : 'default'}
+                  aria-invalid={!!errors.country}
+                  aria-describedby={errors.country ? 'country-error' : undefined}
                 />
                 {errors.country && (
-                  <p className="text-sm text-red-600 mt-1">{errors.country}</p>
+                  <p id="country-error" className="text-sm text-red-600 mt-1" role="alert">{errors.country}</p>
                 )}
               </div>
             </div>
           </div>
+
+          {/* Readiness Preview */}
+          {previewDrinkingWindow && (
+            <div className="p-4 rounded-md border border-gray-200 bg-gray-50" aria-live="polite">
+              <div className="flex items-center justify-between">
+                <div className="font-medium text-gray-900">Readiness Preview</div>
+                <div className="text-sm text-gray-700">Score: {Math.round(previewDrinkingWindow.score * 100)}%</div>
+              </div>
+              <div className="text-sm text-gray-600">
+                Status: {previewDrinkingWindow.status.replace('_', ' ')}
+              </div>
+            </div>
+          )}
 
           {/* Varietal Information */}
           <div className="space-y-4">
@@ -289,6 +366,7 @@ export function WineEntryForm({
                     handleAddVarietal()
                   }
                 }}
+                aria-describedby={errors.varietal ? 'varietal-error' : undefined}
               />
               <Button
                 type="button"
@@ -313,6 +391,7 @@ export function WineEntryForm({
                       type="button"
                       onClick={() => handleRemoveVarietal(index)}
                       className="ml-1 hover:text-blue-600"
+                      aria-label={`Remove ${varietal}`}
                     >
                       <Icon name="x" className="h-3 w-3" />
                     </button>
@@ -322,7 +401,7 @@ export function WineEntryForm({
             )}
 
             {errors.varietal && (
-              <p className="text-sm text-red-600">{errors.varietal}</p>
+              <p id="varietal-error" className="text-sm text-red-600" role="alert">{errors.varietal}</p>
             )}
           </div>
 
@@ -344,9 +423,11 @@ export function WineEntryForm({
                     e.target.value ? parseFloat(e.target.value) : undefined)}
                   placeholder="0.00"
                   state={errors.purchasePrice ? 'error' : 'default'}
+                  aria-invalid={!!errors.purchasePrice}
+                  aria-describedby={errors.purchasePrice ? 'purchasePrice-error' : undefined}
                 />
                 {errors.purchasePrice && (
-                  <p className="text-sm text-red-600 mt-1">{errors.purchasePrice}</p>
+                  <p id="purchasePrice-error" className="text-sm text-red-600 mt-1" role="alert">{errors.purchasePrice}</p>
                 )}
               </div>
 
@@ -383,9 +464,11 @@ export function WineEntryForm({
                   e.target.value ? parseInt(e.target.value) : undefined)}
                 placeholder="Rate this wine"
                 state={errors.personalRating ? 'error' : 'default'}
+                aria-invalid={!!errors.personalRating}
+                aria-describedby={errors.personalRating ? 'personalRating-error' : undefined}
               />
               {errors.personalRating && (
-                <p className="text-sm text-red-600 mt-1">{errors.personalRating}</p>
+                <p id="personalRating-error" className="text-sm text-red-600 mt-1" role="alert">{errors.personalRating}</p>
               )}
             </div>
 

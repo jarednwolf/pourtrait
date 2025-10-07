@@ -56,10 +56,15 @@ export function OfflineIndicator({
     <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-40 ${className}`}>
       {/* Offline Status */}
       {!isOnline && (
-        <div className={`
+        <div
+          className={`
           flex items-center gap-2 px-4 py-2 bg-amber-100 border border-amber-300 rounded-lg shadow-sm
           transition-all duration-300 ${showOfflineMessage ? 'opacity-100 translate-y-0' : 'opacity-75 -translate-y-1'}
-        `}>
+        `}
+          role="status"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
           <Icon name="wifi-slash" className="h-4 w-4 text-amber-600" />
           <span className="text-sm font-medium text-amber-800">
             You're offline
@@ -72,7 +77,12 @@ export function OfflineIndicator({
 
       {/* Sync Status */}
       {isOnline && hasPendingSync && showSyncStatus && (
-        <div className="flex items-center gap-2 px-4 py-2 bg-blue-100 border border-blue-300 rounded-lg shadow-sm">
+        <div
+          className="flex items-center gap-2 px-4 py-2 bg-blue-100 border border-blue-300 rounded-lg shadow-sm"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <Icon name="arrow-path" className="h-4 w-4 text-blue-600 animate-spin" />
           <span className="text-sm font-medium text-blue-800">
             Syncing changes...

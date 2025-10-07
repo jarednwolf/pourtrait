@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import type { ExtractedWineListItem } from '@/types'
+import { track } from '@/lib/utils/track'
 
 interface ScannerDemoTileProps {
   className?: string
@@ -39,7 +40,7 @@ export function ScannerDemoTile({ className = '' }: ScannerDemoTileProps) {
     <Card className={className}>
       <CardHeader className="p-4">
         <CardTitle className="flex items-center text-base">
-          <Icon name="camera" className="w-5 h-5 mr-2 text-purple-600" aria-hidden="true" />
+          <Icon name="camera" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           Restaurant Scanner (Demo)
         </CardTitle>
       </CardHeader>
@@ -51,9 +52,9 @@ export function ScannerDemoTile({ className = '' }: ScannerDemoTileProps) {
               <pre className="whitespace-pre-wrap">{SAMPLE_MENU}</pre>
             </div>
             <div className="mt-3 flex gap-2">
-              <Button onClick={() => setShowResults(true)} aria-label="Process sample">Show sample results</Button>
+              <Button onClick={() => { setShowResults(true); track('scanner_demo_used') }} aria-label="Process sample">Show sample results</Button>
               <Button asChild variant="outline">
-                <a href="/restaurant-scanner" aria-label="Open full scanner">Open full scanner</a>
+                <a href="/restaurant-scanner" onClick={() => track('scanner_opened', { source: 'home_tile' })} aria-label="Open full scanner">Open full scanner</a>
               </Button>
             </div>
           </div>

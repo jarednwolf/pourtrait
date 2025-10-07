@@ -1,7 +1,9 @@
+"use client"
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
+import { track } from '@/lib/utils/track'
 
 interface PromptChipsTileProps {
   className?: string
@@ -19,7 +21,7 @@ export function PromptChipsTile({ className = '' }: PromptChipsTileProps) {
     <Card className={className}>
       <CardHeader className="p-4">
         <CardTitle className="flex items-center text-base">
-          <Icon name="sparkles" className="w-5 h-5 mr-2 text-purple-600" aria-hidden="true" />
+          <Icon name="sparkles" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           One‑Tap Sommelier Prompts
         </CardTitle>
       </CardHeader>
@@ -32,6 +34,7 @@ export function PromptChipsTile({ className = '' }: PromptChipsTileProps) {
               variant="outline"
               size="sm"
               className="whitespace-normal h-auto py-2"
+              onClick={() => track('prompt_chip_click', { index: idx, prompt: p })}
             >
               <a href={`/chat?q=${encodeURIComponent(p)}`} aria-label={p}>
                 {p}

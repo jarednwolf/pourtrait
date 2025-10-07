@@ -41,7 +41,9 @@
     "performance:analyze": "npm run build && npx @next/bundle-analyzer",
     "db:reset": "npx supabase db reset",
     "db:migrate": "npx supabase migration new",
-    "env:check": "node -e \"console.log('Environment check passed')\" && echo 'All required environment variables are set'"
+    "env:check": "node -e \"console.log('Environment check passed')\" && echo 'All required environment variables are set'",
+    "lighthouse:ci": "npx @lhci/cli autorun",
+    "a11y": "vitest run src/app/__tests__/home.a11y.test.tsx"
   },
   "dependencies": {
     "@google-cloud/vision": "^5.3.3",

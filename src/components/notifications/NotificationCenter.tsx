@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge'
 import { useDrinkingWindowNotifications } from '@/hooks/useDrinkingWindowNotifications'
 import { NotificationScheduler } from '@/lib/services/notification-scheduler'
 import { useAuth } from '@/hooks/useAuth'
+import { FocusTrap } from '@/components/ui/FocusTrap'
 
 interface NotificationCenterProps {
   isOpen: boolean
@@ -22,6 +23,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   const [activeTab, setActiveTab] = useState<'current' | 'history' | 'settings'>('current')
   const [notificationHistory, setNotificationHistory] = useState<any[]>([])
   const [deliveryStats, setDeliveryStats] = useState<any>(null)
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (isOpen && user?.id) {
@@ -103,14 +105,15 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   if (!isOpen) {return null}
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="notification-center-title">
+      <FocusTrap onEscape={onClose} initialFocusRef={closeBtnRef}>
       <Card className="w-full max-w-2xl max-h-[80vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center space-x-2">
             <Icon name="bell" className="h-5 w-5" />
-            <h2 className="text-lg font-semibold">Notification Center</h2>
+            <h2 id="notification-center-title" className="text-lg font-semibold">Notification Center</h2>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button ref={closeBtnRef} variant="ghost" size="sm" onClick={onClose} aria-label="Close notification center">
             <Icon name="x" className="h-4 w-4" />
           </Button>
         </div>
@@ -275,6 +278,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
           )}
         </div>
       </Card>
+      </FocusTrap>
     </div>
   )
 }

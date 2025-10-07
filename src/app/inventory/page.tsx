@@ -1,24 +1,78 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import nextDynamic from 'next/dynamic'
 // import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { WineService } from '@/lib/services/wine-service'
 import { useEnhancedWineService } from '@/lib/services/wine-service-enhanced'
-import { 
-  WineInventoryList, 
-  WineEntryForm, 
-  WineDetailPage, 
-  ConsumptionForm,
-  InventoryDashboard,
-  type ConsumptionData 
-} from '@/components/wine'
+import type { ConsumptionData } from '@/components/wine'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import type { Wine, InventoryFilters, WineInput, ConsumptionRecord } from '@/types'
+import { track } from '@/lib/utils/track'
 
 type ViewMode = 'dashboard' | 'list' | 'add' | 'edit' | 'detail' | 'consume'
 type ListViewMode = 'grid' | 'list'
+
+// Dynamically load heavy child components to reduce TBT and initial JS
+const InventoryDashboard = nextDynamic(
+  () => import('@/components/wine/InventoryDashboard').then(m => m.InventoryDashboard),
+  {
+    loading: () => (
+      <div className="space-y-4 animate-pulse" aria-hidden="true">
+        <div className="h-8 bg-gray-100 rounded w-1/3" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="h-20 bg-gray-100 rounded" />
+          <div className="h-20 bg-gray-100 rounded" />
+          <div className="h-20 bg-gray-100 rounded" />
+          <div className="h-20 bg-gray-100 rounded" />
+        </div>
+      </div>
+    ),
+  }
+)
+
+const WineInventoryList = nextDynamic(
+  () => import('@/components/wine/WineInventoryList').then(m => m.WineInventoryList),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-4" aria-hidden="true">
+        <div className="h-10 bg-gray-100 rounded animate-pulse" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="h-40 bg-gray-100 rounded animate-pulse" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+)
+
+const WineEntryForm = nextDynamic(
+  () => import('@/components/wine/WineEntryForm').then(m => m.WineEntryForm),
+  {
+    ssr: false,
+    loading: () => <div className="h-64 bg-gray-100 rounded animate-pulse" aria-hidden="true" />,
+  }
+)
+
+const WineDetailPage = nextDynamic(
+  () => import('@/components/wine/WineDetailPage').then(m => m.WineDetailPage),
+  {
+    ssr: false,
+    loading: () => <div className="h-64 bg-gray-100 rounded animate-pulse" aria-hidden="true" />,
+  }
+)
+
+const ConsumptionForm = nextDynamic(
+  () => import('@/components/wine/ConsumptionForm').then(m => m.ConsumptionForm),
+  {
+    ssr: false,
+    loading: () => <div className="h-64 bg-gray-100 rounded animate-pulse" aria-hidden="true" />,
+  }
+)
 
 export default function InventoryPage() {
   const { user } = useAuth()
@@ -110,6 +164,7 @@ export default function InventoryPage() {
   // Load initial data
   useEffect(() => {
     if (user) {
+      track('inventory_opened')
       loadInventoryData()
     }
   }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -165,6 +220,7 @@ export default function InventoryPage() {
       }
       
       setFilteredWines(filtered)
+      track('inventory_filter_changed', { filters })
     } catch (error) {
       console.error('Failed to apply filters:', error)
     }
@@ -178,6 +234,7 @@ export default function InventoryPage() {
     try {
       setIsSubmitting(true)
       await enhancedWineService.createWine(wineData)
+      track('wine_added')
       await loadInventoryData()
       setCurrentView('list')
     } catch (error) {
@@ -196,6 +253,7 @@ export default function InventoryPage() {
     try {
       setIsSubmitting(true)
       await enhancedWineService.updateWine(selectedWine.id, wineData)
+      track('wine_updated', { id: selectedWine.id })
       await loadInventoryData()
       setCurrentView('detail')
     } catch (error) {
@@ -209,6 +267,7 @@ export default function InventoryPage() {
   const handleDeleteWine = async (wine: Wine) => {
     try {
       await WineService.deleteWine(wine.id)
+      track('wine_deleted', { id: wine.id })
       await loadInventoryData()
       setCurrentView('list')
       setSelectedWine(null)
@@ -305,7 +364,7 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      <Button onClick={() => setCurrentView('add')}>
+      <Button onClick={() => { track('add_wine_clicked', { source: 'inventory_nav' }); setCurrentView('add') }}>
         <Icon name="plus" className="h-4 w-4 mr-2" />
         Add Wine
       </Button>
@@ -334,9 +393,15 @@ export default function InventoryPage() {
           stats={inventoryStats} 
           wines={allWines}
           userId={user.id}
-          isLoading={isLoading} 
+          isLoading={isLoading}
+          onAddRequest={() => { track('add_wine_clicked', { source: 'inventory_dashboard' }); setCurrentView('add') }}
         />
       )}
+      <div className="mt-6">
+        <Button asChild onClick={() => track('complete_profile_cta_clicked', { source: 'inventory' })}>
+          <a href="/onboarding/step1" aria-label="Complete your profile">Complete your profile</a>
+        </Button>
+      </div>
 
       {currentView === 'list' && (
         <WineInventoryList

@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react'
 import { DataExportPanel } from '@/components/settings/DataExportPanel'
 import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { usePushNotifications, useNotificationPreferences } from '@/hooks/usePushNotifications'
+import { track } from '@/lib/utils/track'
 
 type SettingsTab = 'profile' | 'notifications' | 'data' | 'privacy'
 
@@ -68,7 +71,7 @@ export default function SettingsPage() {
             {activeTab === 'notifications' && (
               <Card className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Notification Settings</h2>
-                <p className="text-gray-600">Notification preferences coming soon.</p>
+                <NotificationsSettingsStub />
               </Card>
             )}
 
@@ -86,3 +89,73 @@ export default function SettingsPage() {
     </div>
   )
 }
+
+function NotificationsSettingsStub() {
+  const { isSupported, permission, isSubscribed, subscribe, unsubscribe, requestPermission, loading, error } = usePushNotifications()
+  const { preferences, updatePreference } = useNotificationPreferences()
+  const enabled = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_ENABLE_NOTIFICATIONS === 'true' : false
+
+  const handleSubscribe = async () => {
+    track('notifications_settings_subscribe_clicked')
+    const ok = await subscribe()
+    if (!ok) {
+      await requestPermission()
+    }
+  }
+
+  const handleUnsubscribe = async () => {
+    track('notifications_settings_unsubscribe_clicked')
+    await unsubscribe()
+  }
+
+  return (
+    <div className="space-y-4">
+      {!enabled && (
+        <div className="p-3 rounded-md border border-gray-200 bg-gray-50 text-sm text-gray-700">
+          Notifications are disabled in this environment.
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div className="font-medium text-gray-900">Push Notifications</div>
+          <div className="text-sm text-gray-600">Status: {isSupported ? 'Supported' : 'Not supported'} • Permission: {permission}</div>
+          <div className="mt-2 flex gap-2">
+            {!isSubscribed ? (
+              <Button size="sm" onClick={handleSubscribe} disabled={!enabled || loading} aria-label="Enable push notifications">
+                Enable
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" onClick={handleUnsubscribe} disabled={loading} aria-label="Disable push notifications">
+                Disable
+              </Button>
+            )}
+            {permission === 'default' && (
+              <Button size="sm" variant="outline" onClick={requestPermission} disabled={!enabled || loading} aria-label="Request permission">
+                Request permission
+              </Button>
+            )}
+          </div>
+          {error && <div className="text-sm text-red-600 mt-1">{error}</div>}
+        </div>
+
+        <div>
+          <div className="font-medium text-gray-900">Alert Types</div>
+          <div className="mt-2 space-y-2 text-sm">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={preferences.drinkingWindowAlerts} onChange={(e) => updatePreference('drinkingWindowAlerts', e.target.checked)} />
+              Ready-to-drink alerts
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={preferences.recommendationAlerts} onChange={(e) => updatePreference('recommendationAlerts', e.target.checked)} />
+              New recommendation alerts
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={preferences.inventoryReminders} onChange={(e) => updatePreference('inventoryReminders', e.target.checked)} />
+              Inventory reminders
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}

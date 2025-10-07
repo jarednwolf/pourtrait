@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { DrinkingWindowAlerts, DrinkingWindowSummary } from './DrinkingWindowAlerts'
 import { Wine } from '@/types'
+import { fromDrinkingWindow } from '@/lib/services/drinking-window-readiness'
 
 interface InventoryStats {
   totalWines: number
@@ -22,13 +23,15 @@ interface InventoryDashboardProps {
   wines?: Wine[]
   userId?: string
   isLoading?: boolean
+  onAddRequest?: () => void
 }
 
 export function InventoryDashboard({ 
   stats, 
   wines = [], 
   userId, 
-  isLoading = false 
+  isLoading = false,
+  onAddRequest,
 }: InventoryDashboardProps) {
   if (isLoading) {
     return (
@@ -86,8 +89,28 @@ export function InventoryDashboard({
     return Math.round((stats.ratedWines / stats.totalWines) * 100)
   }
 
+  const readyCount = wines.filter(w => {
+    const { status } = fromDrinkingWindow(w.drinkingWindow)
+    return status === 'at_peak' || status === 'drink_soon'
+  }).length
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+          Inventory Overview
+          {wines.length > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700" aria-label={`${readyCount} ready to drink`}>
+              <Icon name="check-circle" className="h-3 w-3" /> {readyCount} ready
+            </span>
+          )}
+        </h2>
+        <Button onClick={onAddRequest} aria-label="Add wine">
+          <Icon name="plus" className="h-4 w-4 mr-2" />
+          Add wine
+        </Button>
+      </div>
+
       {/* Drinking Window Alerts */}
       {userId && wines.length > 0 && (
         <DrinkingWindowAlerts 
@@ -105,6 +128,17 @@ export function InventoryDashboard({
           subtitle={`${stats.totalBottles} bottles total`}
         />
         
+        <StatCard
+          title="Ready to Drink"
+          value={wines.filter(w => {
+            const { status } = fromDrinkingWindow(w.drinkingWindow)
+            return status === 'at_peak' || status === 'drink_soon'
+          }).length}
+          icon="check-circle"
+          subtitle="Based on drinking window readiness"
+          color="text-green-700"
+        />
+
         <StatCard
           title="Average Rating"
           value={formatRating(stats.averageRating)}
@@ -284,6 +318,33 @@ export function InventoryDashboard({
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Additions */}
+      {wines.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="history" className="h-5 w-5" />
+              Recent additions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-gray-200">
+              {wines.slice(0, 5).map((w) => (
+                <div key={w.id} className="py-3 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <div className="font-medium text-gray-900 truncate">{w.name} ({w.vintage})</div>
+                    <div className="text-sm text-gray-600 truncate">{w.producer} • {w.region}</div>
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    {fromDrinkingWindow(w.drinkingWindow).status.replace('_', ' ')}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Empty State */}
       {stats.totalWines === 0 && (
