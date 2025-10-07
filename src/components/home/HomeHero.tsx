@@ -25,7 +25,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
           <div className="lg:col-span-7">
             <h1
               id="home-hero-heading"
-              className="font-serif font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-700 text-display-2 sm:text-display-1"
+              className="font-serif font-bold tracking-tight text-brand-gradient text-display-2 sm:text-display-1"
             >
               Every bottle a brushstroke
             </h1>

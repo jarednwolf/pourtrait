@@ -16,3 +16,11 @@
   - Place wordmark on busy imagery without sufficient contrast layer.
   - Use SVG wordmark as social/OG image; export to PNG/JPEG/WebP for cards.
 
+### Asset Generation
+
+- Run `npm run assets:generate` to create PWA icons and the OG card.
+- Inputs: `public/images/hero.jpg`, `public/branding/wordmark.svg`.
+- Outputs:
+  - PWA icons in `public/icons/` as `icon-*.png` and `shortcut-*.png`.
+  - Social card `public/images/og-card.jpg` (1200x630) used in metadata.
+

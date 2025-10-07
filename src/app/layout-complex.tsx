@@ -29,14 +29,14 @@ export const metadata: Metadata = {
     title: 'Pourtrait - AI Wine Sommelier',
     description: 'Your personal AI-powered wine cellar and sommelier. Every bottle a brushstroke.',
     images: [
-      { url: '/images/hero.jpg' }
+      { url: '/images/og-card.jpg' }
     ]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Pourtrait - AI Wine Sommelier',
     description: 'Your personal AI-powered wine cellar and sommelier. Every bottle a brushstroke.',
-    images: ['/images/hero.jpg']
+    images: ['/images/og-card.jpg']
   },
 }
 

@@ -3,25 +3,74 @@
 @tailwind utilities;
 
 @layer base {
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #111827; /* neutral-900 */
+    color: #ffffff;
+    padding: 8px 12px;
+    z-index: 1000;
+    border-radius: 6px;
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus {
+    top: 8px;
+    outline: 2px solid #6D28D9; /* primary */
+    outline-offset: 2px;
+  }
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-inter), system-ui, sans-serif;
   }
   
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-surface text-gray-900;
+  }
+
+  a {
+    @apply text-link underline-offset-2;
+  }
+  a:hover {
+    @apply text-link-hover underline;
+  }
+  a:visited {
+    color: theme('colors.link-visited');
+  }
+
+  /* Unified focus ring using :focus-visible */
+  :focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+  :focus-visible {
+    outline: 2px solid #6D28D9; /* primary */
+    outline-offset: 2px;
+  }
+
+  /* Respect prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
 @layer components {
+  .text-brand-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-700;
+  }
   .btn-primary {
-    @apply rounded-lg bg-burgundy-600 px-4 py-2 font-medium text-white transition-colors hover:bg-burgundy-700 focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2;
+    @apply rounded-[12px] bg-primary px-4 py-2 font-medium text-white transition-colors ease-brand duration-250 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2;
   }
   
   .btn-secondary {
-    @apply rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2;
+    @apply rounded-[12px] border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition-colors ease-brand duration-250 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2;
   }
   
   .card {
-    @apply rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200;
+    @apply rounded-[12px] bg-white p-6 shadow-brand-sm ring-1 ring-gray-200;
   }
 }
