@@ -26,6 +26,9 @@
   body {
     @apply bg-surface text-gray-900;
   }
+  .dark body {
+    @apply bg-dark-surface text-gray-100;
+  }
 
   a {
     @apply text-link underline-offset-2;
@@ -35,6 +38,9 @@
   }
   a:visited {
     color: theme('colors.link-visited');
+  }
+  .dark a {
+    @apply text-primary-300;
   }
 
   /* Unified focus ring using :focus-visible */

@@ -72,7 +72,7 @@ export default function OnboardingCompleted() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-4 rounded-md border border-purple-200 bg-purple-50">
+              <div className="p-4 rounded-md border border-primary/30 bg-primary/5">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="text-lg font-semibold text-gray-900">{picks.top.title}</div>
@@ -80,7 +80,7 @@ export default function OnboardingCompleted() {
                       <div className="text-sm text-gray-600">{picks.top.subtitle}</div>
                     )}
                   </div>
-                  <Icon name="star" className="w-5 h-5 text-purple-600" />
+                  <Icon name="star" className="w-5 h-5 text-primary" />
                 </div>
                 <p className="text-sm text-gray-700 mt-2">{picks.top.rationale}</p>
               </div>

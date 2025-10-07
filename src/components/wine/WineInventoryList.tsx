@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { track } from '@/lib/utils/track'
 import type { Wine } from '@/types'
 import type { InventoryFilters } from '@/types'
 
@@ -172,11 +173,14 @@ export function WineInventoryList({
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
+                <label htmlFor="inventory-search" className="sr-only">Search inventory</label>
                 <Icon name="search" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
+                  id="inventory-search"
                   placeholder="Search wines, producers, regions..."
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
+                  aria-label="Search wines, producers, or regions"
                   className="pl-10"
                 />
               </div>
@@ -184,7 +188,9 @@ export function WineInventoryList({
 
             {/* Sort */}
             <div className="flex gap-2">
+              <label htmlFor="sort-by" className="sr-only">Sort by</label>
               <select
+                id="sort-by"
                 value={filters.sortBy}
                 onChange={(e) => handleFilterChange('sortBy', e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -201,6 +207,7 @@ export function WineInventoryList({
                 size="sm"
                 onClick={() => handleFilterChange('sortOrder', 
                   filters.sortOrder === 'asc' ? 'desc' : 'asc')}
+                aria-label="Toggle sort order"
               >
                 <Icon 
                   name={filters.sortOrder === 'asc' ? 'arrow-up' : 'arrow-down'} 
@@ -217,6 +224,8 @@ export function WineInventoryList({
                   size="sm"
                   onClick={() => onViewModeChange('grid')}
                   className="rounded-none border-0"
+                  aria-label="Grid view"
+                  aria-pressed={viewMode === 'grid'}
                 >
                   <Icon name="grid" className="h-4 w-4" />
                 </Button>
@@ -225,6 +234,8 @@ export function WineInventoryList({
                   size="sm"
                   onClick={() => onViewModeChange('list')}
                   className="rounded-none border-0 border-l border-gray-300"
+                  aria-label="List view"
+                  aria-pressed={viewMode === 'list'}
                 >
                   <Icon name="list" className="h-4 w-4" />
                 </Button>
@@ -236,6 +247,8 @@ export function WineInventoryList({
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
+              aria-expanded={showFilters}
+              aria-controls="advanced-filters"
             >
               <Icon name="filter" className="h-4 w-4 mr-2" />
               Filters
@@ -247,7 +260,7 @@ export function WineInventoryList({
 
           {/* Advanced Filters */}
           {showFilters && (
-            <div className="mt-4 pt-4 border-t space-y-4">
+            <div id="advanced-filters" className="mt-4 pt-4 border-t space-y-4" aria-hidden={!showFilters}>
               {/* Wine Types */}
               <div>
                 <label className="block text-sm font-medium mb-2">Wine Types</label>
@@ -358,7 +371,7 @@ export function WineInventoryList({
 
       {/* Results Summary */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600" aria-live="polite">
           {wines.length} {wines.length === 1 ? 'wine' : 'wines'} found
         </p>
       </div>
@@ -384,22 +397,31 @@ export function WineInventoryList({
                 try {
                   const event = new CustomEvent('sample_wine_add_request')
                   window.dispatchEvent(event)
+                  track('add_sample_wine_clicked', { source: 'inventory_empty_state' })
                 } catch {}
               }
             }}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary"
             aria-label="Add sample wine"
           >
             Add sample
           </button>
+          <a
+            href="/import?source=inventory_empty_state"
+            onClick={() => track('csv_import_cta_clicked', { source: 'inventory_empty_state' })}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Open CSV import helper"
+          >
+            CSV import helper
+          </a>
         </EmptyState>
       ) : (
-        <div className={
+        <div id="inventory-results" className={
           viewMode === 'grid' 
             ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
             : 'space-y-4'
         }>
-          {wines.map(wine => (
+          {wines.map((wine, index) => (
             <WineCard
               key={wine.id}
               wine={wine}
@@ -408,6 +430,7 @@ export function WineInventoryList({
               onConsume={onWineConsume}
               onDelete={onWineDelete}
               compact={viewMode === 'list'}
+              priority={index < (viewMode === 'grid' ? 4 : 1)}
             />
           ))}
         </div>

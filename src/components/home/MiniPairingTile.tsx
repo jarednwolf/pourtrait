@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Icon } from '@/components/ui/Icon'
+import { track } from '@/lib/utils/track'
 
 interface MiniPairingTileProps {
   className?: string
@@ -69,7 +70,7 @@ export function MiniPairingTile({ className = '' }: MiniPairingTileProps) {
     <Card className={className}>
       <CardHeader className="p-4">
         <CardTitle className="flex items-center text-base">
-          <Icon name="clipboard-list" className="w-5 h-5 mr-2 text-purple-600" aria-hidden="true" />
+          <Icon name="clipboard-list" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           Mini Pairing
         </CardTitle>
       </CardHeader>
@@ -85,7 +86,7 @@ export function MiniPairingTile({ className = '' }: MiniPairingTileProps) {
           />
           <Button
             type="button"
-            onClick={() => setDish(dish.trim())}
+            onClick={() => { setDish(dish.trim()); track('mini_pairing_try', { dish }) }}
             aria-label="Get pairing"
           >
             Try
@@ -111,7 +112,7 @@ export function MiniPairingTile({ className = '' }: MiniPairingTileProps) {
 
         <div className="mt-4 flex gap-2">
           <Button asChild variant="outline" size="sm">
-            <a href="/chat" aria-label="Ask the Sommelier">Ask the Sommelier</a>
+            <a href="/chat" onClick={() => track('chat_opened', { source: 'mini_pairing' })} aria-label="Ask the Sommelier">Ask the Sommelier</a>
           </Button>
         </div>
       </CardContent>

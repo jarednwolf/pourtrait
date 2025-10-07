@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 // Removed unused imports
 import { track } from '@/lib/utils/track'
+import { AssistantCard, type AssistantPick } from './AssistantCard'
 
 // ============================================================================
 // Types
@@ -38,6 +39,7 @@ export function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const hasAutoSentRef = useRef(false)
+  const [hintIndex, setHintIndex] = useState(0)
 
   const {
     messages,
@@ -47,6 +49,20 @@ export function ChatInterface({
     clearChat,
     isAuthenticated
   } = useAIChat({ maxMessages: 50 })
+
+  // Derive last assistant message to render AssistantCard-like summary if structured
+  const lastAssistant: AssistantPick | null = (() => {
+    const last = [...messages].reverse().find(m => m.role === 'assistant')
+    if (!last) {return null}
+    // Heuristic: if message contains a clear pick header, synthesize a card
+    if (/Top Pick:/i.test(last.content)) {
+      const lines = last.content.split('\n')
+      const title = lines.find(l => l.startsWith('Top Pick:'))?.replace('Top Pick:', '').trim() || 'Recommended wine'
+      const rationale = lines.find(l => l.startsWith('Why:'))?.replace('Why:', '').trim() || last.content
+      return { title, rationale, confidence: last.confidence }
+    }
+    return null
+  })()
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -59,6 +75,28 @@ export function ChatInterface({
       inputRef.current.focus()
     }
   }, [isExpanded])
+
+  // Rotating input hints (disable for reduced motion)
+  useEffect(() => {
+    const reduce = (() => {
+      if (typeof window === 'undefined') {return false}
+      const mm = (window as any).matchMedia
+      if (typeof mm !== 'function') {return false}
+      try {
+        return mm('(prefers-reduced-motion: reduce)')?.matches ?? false
+      } catch {
+        return false
+      }
+    })()
+    const hints = [
+      'Ask for Tonight\'s pick',
+      'Try “Pair with grilled salmon”',
+      'Ask “Wine under $25 for pizza”',
+    ]
+    if (reduce) {return}
+    const id = setInterval(() => setHintIndex((i) => (i + 1) % hints.length), 4000)
+    return () => clearInterval(id)
+  }, [])
 
   // Auto-send prefilled prompt once on mount if requested
   useEffect(() => {
@@ -91,6 +129,7 @@ export function ChatInterface({
     try {
       track('chat_prompt_sent', { source: 'input' })
       await sendMessage(message)
+      track('chat_message_sent', { length: message.length })
     } catch (error) {
       console.error('Failed to send message:', error)
     }
@@ -102,6 +141,7 @@ export function ChatInterface({
     // Always send the message when a suggestion is selected
     track('chat_prompt_sent', { source: 'suggestion' })
     await sendMessage(suggestion)
+    track('chat_message_sent', { source: 'suggestion' })
   }
 
   // Handle keyboard shortcuts
@@ -122,8 +162,8 @@ export function ChatInterface({
         <p className="text-gray-600 mb-4">
           Get personalized wine recommendations and expert advice tailored to your taste profile.
         </p>
-        <Button variant="primary" onClick={() => window.location.href = '/auth/signin'}>
-          Sign In
+        <Button variant="primary" asChild>
+          <a href="/auth/signin" aria-label="Sign in to Pourtrait">Sign In</a>
         </Button>
       </Card>
     )
@@ -134,7 +174,7 @@ export function ChatInterface({
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <Icon name="star" className="w-6 h-6 text-purple-600" />
+          <Icon name="star" className="w-6 h-6 text-primary" />
           <div>
             <h3 className="font-semibold text-gray-900">AI Sommelier</h3>
             <p className="text-sm text-gray-500">
@@ -192,16 +232,16 @@ export function ChatInterface({
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
-                    "What should I drink tonight?",
-                    "Recommend a wine for dinner",
-                    "What pairs with salmon?",
-                    "Suggest a wine under $30"
+                    'I\'m cooking steak',
+                    'Wine <$25',
+                    'Ready to drink?',
+                    'Burgundy vs Bordeaux',
                   ].map((suggestion, index) => (
                     <Button
                       key={index}
                       variant="outline"
                       onClick={() => handleSuggestionSelect(suggestion)}
-                      className="justify-start text-left h-auto p-3 hover:bg-purple-50 hover:border-purple-200 transition-colors text-sm"
+                      className="justify-start text-left h-auto p-3 hover:bg-primary/10 hover:border-primary/20 transition-colors text-sm"
                     >
                       {suggestion}
                     </Button>
@@ -228,12 +268,18 @@ export function ChatInterface({
                 </div>
               </div>
             ))}
+
+            {lastAssistant && (
+              <div className="flex justify-start">
+                <AssistantCard pick={lastAssistant} />
+              </div>
+            )}
             
             {loading && (
-              <div className="flex justify-start mb-4">
+              <div className="flex justify-start mb-4" aria-live="polite">
                 <div className="bg-gray-100 rounded-lg px-4 py-3">
                   <div className="flex items-center space-x-2">
-                    <Icon name="loader" className="w-4 h-4 animate-spin" />
+                    <Icon name="loader" className="w-4 h-4 animate-spin" aria-hidden />
                     <span className="text-sm text-gray-600">AI Sommelier is thinking...</span>
                   </div>
                 </div>
@@ -256,7 +302,7 @@ export function ChatInterface({
       )}
 
       {/* Chat Input */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
+      <div className="p-4 border-t border-gray-200 bg-gray-50 sticky bottom-0">
         <form onSubmit={handleSubmit} className="flex space-x-2">
           <div className="flex-1">
             <input
@@ -264,9 +310,13 @@ export function ChatInterface({
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask me about wine recommendations, pairings, or anything wine-related..."
+              placeholder={['Ask me about wine recommendations, pairings, or anything wine-related...',
+                'Ask for Tonight\'s pick',
+                'Try “Pair with grilled salmon”',
+                'Ask “Wine under $25 for pizza”',
+              ][hintIndex]}
               disabled={loading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           

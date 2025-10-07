@@ -13,7 +13,7 @@ export function TypingIndicator({ className = '' }: { className?: string }) {
       <div className="flex max-w-[80%]">
         {/* Avatar */}
         <div className="flex-shrink-0 mr-3">
-          <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
             <Icon name="sparkles" className="w-4 h-4" />
           </div>
         </div>
@@ -50,20 +50,20 @@ export function ProcessingIndicator({
       <div className="flex max-w-[80%]">
         {/* Avatar */}
         <div className="flex-shrink-0 mr-3">
-          <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
             <Icon name="sparkles" className="w-4 h-4 animate-pulse" />
           </div>
         </div>
 
         {/* Processing Message */}
-        <div className="bg-purple-50 border border-purple-200 rounded-lg px-4 py-3">
+        <div className="bg-primary/5 border border-primary/30 rounded-lg px-4 py-3">
           <div className="flex items-center space-x-3">
             <div className="flex space-x-1">
-              <div className="w-1 h-4 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
-              <div className="w-1 h-4 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '200ms' }} />
-              <div className="w-1 h-4 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '400ms' }} />
+              <div className="w-1 h-4 bg-primary/70 rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
+              <div className="w-1 h-4 bg-primary/70 rounded-full animate-pulse" style={{ animationDelay: '200ms' }} />
+              <div className="w-1 h-4 bg-primary/70 rounded-full animate-pulse" style={{ animationDelay: '400ms' }} />
             </div>
-            <span className="text-sm text-purple-700">{message}</span>
+            <span className="text-sm text-primary">{message}</span>
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@ export function StreamingIndicator({
       <div className="flex max-w-[80%]">
         {/* Avatar */}
         <div className="flex-shrink-0 mr-3">
-          <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
             <Icon name="sparkles" className="w-4 h-4" />
           </div>
         </div>
@@ -191,19 +191,19 @@ export function EnhancedTypingIndicator({
       <div className="flex max-w-[80%]">
         {/* Avatar */}
         <div className="flex-shrink-0 mr-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 text-white flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/70 to-primary text-white flex items-center justify-center">
             <Icon name="sparkles" className="w-4 h-4 animate-pulse" />
           </div>
         </div>
 
         {/* Enhanced Typing Content */}
-        <div className="bg-gradient-to-r from-gray-50 to-purple-50 border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
+        <div className="bg-gradient-to-r from-gray-50 to-primary/10 border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
           <div className="flex items-center space-x-3">
             {/* Custom Typing Dots */}
             <div className="flex space-x-1">
-              <div className="w-2 h-2 bg-purple-400 rounded-full typing-dot-1" />
-              <div className="w-2 h-2 bg-purple-400 rounded-full typing-dot-2" />
-              <div className="w-2 h-2 bg-purple-400 rounded-full typing-dot-3" />
+              <div className="w-2 h-2 bg-primary/70 rounded-full typing-dot-1" />
+              <div className="w-2 h-2 bg-primary/70 rounded-full typing-dot-2" />
+              <div className="w-2 h-2 bg-primary/70 rounded-full typing-dot-3" />
             </div>
             
             <div className="flex-1">
@@ -214,7 +214,7 @@ export function EnhancedTypingIndicator({
                 <div className="mt-2">
                   <div className="w-full bg-gray-200 rounded-full h-1">
                     <div 
-                      className="bg-purple-500 h-1 rounded-full transition-all duration-300 ease-out"
+                      className="bg-primary h-1 rounded-full transition-all duration-300 ease-out"
                       style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                     />
                   </div>

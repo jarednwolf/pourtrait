@@ -193,8 +193,8 @@ export function QuizResult({
 
             {/* General Preferences */}
             <div className="space-y-3">
-              <h4 className="font-semibold text-purple-600 flex items-center">
-                <div className="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
+              <h4 className="font-semibold text-primary flex items-center">
+                <div className="w-3 h-3 bg-primary rounded-full mr-2"></div>
                 General
               </h4>
               <div className="space-y-2 text-sm">

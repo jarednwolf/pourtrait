@@ -17,7 +17,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
       {/* Decorative, CSS-only background (keeps LCP lightweight) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-purple-50/40 to-white"/>
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-primary/5 to-white dark:from-dark-surface dark:via-primary/10 dark:to-dark-surface"/>
 
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16 lg:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -80,7 +80,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
                 decoding="async"
                 loading="eager"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-purple-200/30 via-fuchsia-200/20 to-rose-100/30" aria-hidden="true" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-fuchsia-200/20 to-rose-100/30" aria-hidden="true" />
               <div className="absolute inset-0 ring-1 ring-white/50" aria-hidden="true" />
             </div>
           </div>
