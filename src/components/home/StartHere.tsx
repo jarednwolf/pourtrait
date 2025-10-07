@@ -12,9 +12,9 @@ export function StartHere() {
   ] as const
 
   return (
-    <section aria-labelledby="start-here-heading" className="py-8">
-      <h2 id="start-here-heading" className="text-xl font-semibold text-gray-900 text-center mb-6">Start here</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <section aria-labelledby="start-here-heading" className="py-12">
+      <h2 id="start-here-heading" className="text-heading-2 text-gray-900 text-center mb-8">Start here</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {items.map((it, i) => (
           <Card key={i}>
             <CardHeader className="pb-2">
@@ -27,7 +27,7 @@ export function StartHere() {
               <a
                 href={it.href}
                 onClick={() => track(it.event, { source: 'start_here' })}
-                className="inline-flex items-center text-primary underline underline-offset-2"
+                className="inline-flex items-center text-primary underline underline-offset-4"
                 aria-label={it.title}
               >
                 Go

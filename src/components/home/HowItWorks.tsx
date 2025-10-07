@@ -11,11 +11,11 @@ export function HowItWorks() {
   ] as const
 
   return (
-    <section id="how-it-works" aria-labelledby="how-heading" className="py-8">
-      <h2 id="how-heading" className="text-xl font-semibold text-gray-900 text-center mb-6">How it works</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <section id="how-it-works" aria-labelledby="how-heading" className="py-12">
+      <h2 id="how-heading" className="text-heading-2 text-gray-900 text-center mb-8">How it works</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {steps.map((s, i) => (
-          <div key={i} className="rounded-lg border border-gray-200 p-4 bg-white">
+          <div key={i} className="rounded-lg border border-gray-200 p-5 bg-white">
             <div className="flex items-center mb-2">
               <Icon name={s.icon as any} className="w-5 h-5 text-primary mr-2" aria-hidden="true" />
               <div className="font-medium text-gray-900">{s.title}</div>
@@ -24,11 +24,11 @@ export function HowItWorks() {
           </div>
         ))}
       </div>
-      <div className="mt-6 text-center">
+      <div className="mt-8 text-center">
         <a
           href={'/chat?q=' + encodeURIComponent("What should I drink tonight?")}
           onClick={() => track('cta_tonights_pick_click', { source: 'how_it_works' })}
-          className="inline-flex items-center text-primary underline underline-offset-2"
+          className="inline-flex items-center text-primary underline underline-offset-4"
           aria-label="Try Tonight's pick"
         >
           Try Tonight's pick
