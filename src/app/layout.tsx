@@ -56,7 +56,23 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="bg-surface text-gray-900 dark:bg-dark-surface dark:text-gray-100">
-        <script dangerouslySetInnerHTML={{__html: `document.documentElement.classList.remove('dark');`}} />
+        {/* Unregister old service workers on preview to avoid stale CSS/JS */}
+        {process.env.NEXT_PUBLIC_DISABLE_PWA === 'true' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(){
+                  if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(function(regs){
+                      regs.forEach(function(r){ r.unregister(); });
+                    });
+                  }
+                  document.documentElement.classList.remove('dark');
+                })();
+              `,
+            }}
+          />
+        )}
         <AuthProvider>
           <a href="#main-content" className="skip-link">Skip to main content</a>
           <header className="border-b border-gray-200 bg-white text-gray-900 dark:bg-dark-surface dark:border-gray-800" role="banner">
