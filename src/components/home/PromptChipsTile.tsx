@@ -18,7 +18,7 @@ const PROMPTS = [
 
 export function PromptChipsTile({ className = '' }: PromptChipsTileProps) {
   return (
-    <Card className={className}>
+    <Card className={[className, 'h-full'].filter(Boolean).join(' ')}>
       <CardHeader className="p-4">
         <CardTitle className="flex items-center text-base">
           <Icon name="sparkles" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />

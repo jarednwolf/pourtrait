@@ -68,7 +68,7 @@
   .btn {
     @apply text-white; /* ensure white text for primary by default */
   }
-  .btn a, .btn span, .btn svg { color: inherit; }
+  .btn a, .btn span, .btn svg { color: inherit !important; }
   .text-brand-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300;
   }
