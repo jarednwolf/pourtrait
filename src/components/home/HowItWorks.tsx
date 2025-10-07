@@ -11,8 +11,8 @@ export function HowItWorks() {
   ] as const
 
   return (
-    <section id="how-it-works" aria-labelledby="how-heading" className="py-12">
-      <h2 id="how-heading" className="text-heading-2 text-gray-900 text-center mb-8">How it works</h2>
+    <section id="how-it-works" aria-labelledby="how-heading" className="py-8">
+      <h2 id="how-heading" className="text-heading-2 text-gray-900 text-center mb-6">How it works</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {steps.map((s, i) => (
           <div key={i} className="rounded-lg border border-gray-200 p-5 bg-white">
@@ -24,7 +24,7 @@ export function HowItWorks() {
           </div>
         ))}
       </div>
-      <div className="mt-8 text-center">
+      <div className="mt-6 text-center">
         <a
           href={'/onboarding/step1'}
           onClick={() => track('cta_start_profile', { source: 'how_it_works' })}

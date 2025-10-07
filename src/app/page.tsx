@@ -36,10 +36,10 @@ export default function Home() {
   }
   return (
     <div className="min-h-screen bg-surface">
-      <div className="max-w-6xl mx-auto px-4 py-12 sm:py-16">
+      <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
         <HomeHero />
 
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
           <MiniPairingTile />
           <PromptChipsTile />
           <ScannerDemoTile />
