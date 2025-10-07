@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
+import { cn } from '@/lib/design-system/utils'
 
 interface MiniPairingTileProps {
   className?: string
@@ -67,14 +68,14 @@ export function MiniPairingTile({ className = '' }: MiniPairingTileProps) {
   const suggestions = useMemo(() => getMiniPairing(dish).slice(0, 2), [dish])
 
   return (
-    <Card className={className}>
+    <Card className={cn('h-full', className)}>
       <CardHeader className="p-4">
         <CardTitle className="flex items-center text-base">
           <Icon name="clipboard-list" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           Mini Pairing
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-4 pt-0 flex flex-col">
         <label htmlFor="dish" className="sr-only">Describe your dish</label>
         <div className="flex gap-2">
           <Input
@@ -88,6 +89,7 @@ export function MiniPairingTile({ className = '' }: MiniPairingTileProps) {
             type="button"
             onClick={() => { setDish(dish.trim()); track('mini_pairing_try', { dish }) }}
             aria-label="Get pairing"
+            size="sm"
           >
             Try
           </Button>

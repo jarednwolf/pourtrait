@@ -25,7 +25,7 @@ export function PromptChipsTile({ className = '' }: PromptChipsTileProps) {
           One‑Tap Sommelier Prompts
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-4 pt-0 flex flex-col">
         <div className="flex flex-wrap gap-2">
           {PROMPTS.map((p, idx) => (
             <Button

@@ -44,7 +44,7 @@ export function ScannerDemoTile({ className = '' }: ScannerDemoTileProps) {
           Restaurant Scanner (Demo)
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-4 pt-0 flex flex-col">
         {!showResults ? (
           <div>
             <p className="text-sm text-gray-600 mb-3">Paste or try a sample wine list to see top picks.</p>
@@ -52,8 +52,8 @@ export function ScannerDemoTile({ className = '' }: ScannerDemoTileProps) {
               <pre className="whitespace-pre-wrap">{SAMPLE_MENU}</pre>
             </div>
             <div className="mt-3 flex gap-2">
-              <Button onClick={() => { setShowResults(true); track('scanner_demo_used') }} aria-label="Process sample">Show sample results</Button>
-              <Button asChild variant="outline">
+              <Button size="sm" onClick={() => { setShowResults(true); track('scanner_demo_used') }} aria-label="Process sample">Show sample results</Button>
+              <Button asChild variant="outline" size="sm">
                 <a href="/restaurant-scanner" onClick={() => track('scanner_opened', { source: 'home_tile' })} aria-label="Open full scanner">Open full scanner</a>
               </Button>
             </div>
