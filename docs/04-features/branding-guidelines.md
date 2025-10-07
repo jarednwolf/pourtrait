@@ -17,6 +17,12 @@
   - Use SVG wordmark as social/OG image; export to PNG/JPEG/WebP for cards.
 
 ### Asset Generation
+- **Type Scale and Spacing Rhythm**
+
+- Headings: `text-display-1` (hero), `text-display-2` (section hero), `text-heading-1/2/3` (page sections and tiles).
+- Body: `text-body-lg` for prominent paragraphs; default `text-body` for content; `text-caption` for annotations.
+- Spacing rhythm follows 4px base with key spacings: `mt-4`, `mt-6`, `mt-8`, `py-6`, `py-10`, `py-16`. Prefer these steps to maintain vertical rhythm with the type scale.
+- Buttons: default `size=md`; primary actions use `variant=primary`, secondary/tertiary use `outline` or `secondary`.
 
 - Run `npm run assets:generate` to create PWA icons and the OG card.
 - Inputs: `public/images/hero.jpg`, `public/branding/wordmark.svg`.

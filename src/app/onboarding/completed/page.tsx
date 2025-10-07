@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
+import { AuthService } from '@/lib/auth'
 // import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card'
@@ -41,6 +42,17 @@ export default function OnboardingCompleted() {
 
   useEffect(() => {
     track('tonights_pick_viewed')
+    // Try to mark onboarding completed (best-effort)
+    ;(async () => {
+      try {
+        const session = await AuthService.getSession()
+        const user = await AuthService.getCurrentUser()
+        if (session && user) {
+          await AuthService.updateUserProfile(user.id, { onboardingCompleted: true })
+          track('onboarding_marked_completed')
+        }
+      } catch {}
+    })()
   }, [])
 
   const handleSave = () => {
@@ -89,16 +101,22 @@ export default function OnboardingCompleted() {
               <Icon name="save" className="w-4 h-4 mr-2" />
               Save to cellar
             </Button>
-            <a href={`/chat?q=${encodeURIComponent(`What should I drink tonight? ${picks.top.title}`)}&send=1`} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500" aria-label="Ask the Sommelier">
-              <Icon name="sparkles" className="w-4 h-4 mr-2" />
-              Ask the Sommelier
-            </a>
-            <a href="/inventory" className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500" aria-label="Explore recommendations">
-              Explore recommendations
-            </a>
-            <a href="/import" className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 ml-auto" aria-label="Import helper">
-              Import helper
-            </a>
+            <Button asChild variant="outline">
+              <a href={`/chat?q=${encodeURIComponent(`What should I drink tonight? ${picks.top.title}`)}&send=1`} aria-label="Ask the Sommelier">
+                <Icon name="sparkles" className="w-4 h-4 mr-2" />
+                Ask the Sommelier
+              </a>
+            </Button>
+            <Button asChild variant="outline">
+              <a href="/inventory" aria-label="Explore recommendations">
+                Explore recommendations
+              </a>
+            </Button>
+            <Button asChild variant="secondary" className="ml-auto">
+              <a href="/import" aria-label="Import helper">
+                Import helper
+              </a>
+            </Button>
           </CardFooter>
         </Card>
       </div>
