@@ -9,6 +9,7 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import React from 'react'
 import { PushOptInBanner } from '@/components/notifications/PushOptInBanner'
 import { WebVitalsProvider } from '@/components/providers/WebVitalsProvider'
+import { ThemeToggle } from '@/components/layout/ThemeToggle'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], display: 'swap', variable: '--font-playfair' })
@@ -51,7 +52,8 @@ export default function RootLayout({
               <a href="/" className="flex items-center" aria-label="Pourtrait home">
                 <BrandLogo />
               </a>
-              <nav aria-label="Primary navigation">
+              <nav aria-label="Primary navigation" className="flex items-center gap-2">
+                <ThemeToggle />
                 <Button asChild size="sm">
                   <a href="/chat" aria-label="Ask the Sommelier">
                     Ask the Sommelier

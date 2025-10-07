@@ -46,6 +46,7 @@ import {
   HandThumbDownIcon,
   MapIcon,
   SunIcon,
+  MoonIcon,
   ScaleIcon,
   BuildingOfficeIcon,
   // No Thermometer icon in outline set; skip
@@ -187,6 +188,7 @@ export const iconRegistry = {
   'hand-thumb-down': HandThumbDownIcon,
   map: MapIcon,
   sun: SunIcon,
+  moon: MoonIcon,
   scale: ScaleIcon,
   building: BuildingOfficeIcon,
   // thermometer and crown are not available in our set; remove
@@ -241,7 +243,7 @@ const iconSizes = {
  * Enforces design system guidelines with no custom emoji support
  * Updated with demo icons
  */
-export function Icon({ name, size = 'md', className, ...props }: IconProps) {
+export function Icon({ name, size = 'md', className, 'aria-label': ariaLabel, 'aria-hidden': ariaHidden, ...props }: IconProps) {
   const IconComponent = iconRegistry[name]
   
   if (!IconComponent) {
@@ -253,6 +255,9 @@ export function Icon({ name, size = 'md', className, ...props }: IconProps) {
     <IconComponent
       className={cn(iconSizes[size], className)}
       data-testid={`icon-${name}`}
+      aria-hidden={ariaLabel ? undefined : (ariaHidden ?? true)}
+      aria-label={ariaLabel}
+      focusable="false"
       {...props}
     />
   )
