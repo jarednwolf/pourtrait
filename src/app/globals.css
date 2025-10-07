@@ -40,7 +40,7 @@
     color: theme('colors.link-visited');
   }
   .dark a {
-    @apply text-primary-300;
+    @apply text-primary;
   }
 
   /* Unified focus ring using :focus-visible */

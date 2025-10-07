@@ -219,7 +219,7 @@ function NextStepCard({
   action: string
 }) {
   return (
-    <div className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary/10 transition-colors">
+    <div className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary hover:bg-primary/10 transition-colors">
       <div className="flex-shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center border border-gray-200 mr-4">
         <Icon name={icon as any} size="sm" className="text-primary" />
       </div>
