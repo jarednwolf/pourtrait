@@ -12,10 +12,6 @@ const HowItWorks = nextDynamic(
   () => import('@/components/home/HowItWorks').then(m => m.HowItWorks),
   { loading: () => <div className="h-24 bg-gray-100 rounded animate-pulse" aria-hidden="true" /> }
 )
-const StartHere = nextDynamic(
-  () => import('@/components/home/StartHere').then(m => m.StartHere),
-  { loading: () => <div className="h-24 bg-gray-100 rounded animate-pulse" aria-hidden="true" /> }
-)
 const TrustBadges = nextDynamic(
   () => import('@/components/home/TrustBadges').then(m => m.TrustBadges),
   { loading: () => <div className="h-16 bg-gray-100 rounded animate-pulse" aria-hidden="true" /> }
