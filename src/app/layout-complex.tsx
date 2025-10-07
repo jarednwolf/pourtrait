@@ -20,9 +20,23 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Pourtrait',
   },
+  icons: {
+    icon: [
+      { url: '/icons/icon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icons/icon-32x32.png', sizes: '32x32', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/icons/icon-180x180.png', sizes: '180x180', type: 'image/png' }
+    ],
+    shortcut: ['/icons/icon-32x32.png']
+  },
   formatDetection: {
     telephone: false,
   },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#6D28D9' },
+    { media: '(prefers-color-scheme: dark)', color: '#0B0B0E' }
+  ],
   openGraph: {
     type: 'website',
     siteName: 'Pourtrait',

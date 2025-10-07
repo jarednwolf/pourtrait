@@ -18,8 +18,19 @@ export const metadata: Metadata = {
   title: 'Pourtrait - AI Wine Sommelier',
   description: 'Your personal AI-powered wine cellar and sommelier. Each bottle a brushstroke.',
   icons: {
-    icon: '/favicon.svg'
+    icon: [
+      { url: '/icons/icon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icons/icon-32x32.png', sizes: '32x32', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/icons/icon-180x180.png', sizes: '180x180', type: 'image/png' }
+    ],
+    shortcut: ['/icons/icon-32x32.png']
   },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#6D28D9' },
+    { media: '(prefers-color-scheme: dark)', color: '#0B0B0E' }
+  ],
   openGraph: {
     type: 'website',
     siteName: 'Pourtrait',
