@@ -34,7 +34,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
               Pourtrait learns your taste with each choice—using AI to paint a personal portrait of what you love to drink.
             </p>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <Button asChild size="lg" onClick={() => track('cta_tonights_pick_click')}>
                 <a href="/chat?q=What's%20your%20top%20pick%20for%20tonight%3F" aria-label="Get your personalized Tonight’s pick">
                   Get Tonight’s pick

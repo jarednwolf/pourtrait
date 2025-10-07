@@ -52,7 +52,9 @@ export function ScannerDemoTile({ className = '' }: ScannerDemoTileProps) {
               <pre className="whitespace-pre-wrap">{SAMPLE_MENU}</pre>
             </div>
             <div className="mt-3 flex gap-2">
-              <Button size="sm" onClick={() => { setShowResults(true); track('scanner_demo_used') }} aria-label="Process sample">Show sample results</Button>
+              <Button size="sm" onClick={() => { setShowResults(true); track('scanner_demo_used') }} aria-label="Process sample">
+                Show sample results
+              </Button>
               <Button asChild variant="outline" size="sm">
                 <a href="/restaurant-scanner" onClick={() => track('scanner_opened', { source: 'home_tile' })} aria-label="Open full scanner">Open full scanner</a>
               </Button>
