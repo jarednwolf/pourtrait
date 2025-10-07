@@ -74,6 +74,11 @@ export default function RootLayout({
                       if (window.caches && caches.keys) {
                         caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); });
                       }
+                      // Force a one-time reload to pick up fresh assets
+                      if (!sessionStorage.getItem('reloadedAfterSWKill')) {
+                        sessionStorage.setItem('reloadedAfterSWKill', '1');
+                        location.replace(location.pathname + location.search + location.hash);
+                      }
                     });
                   }
                 } catch(e) { /* no-op */ }

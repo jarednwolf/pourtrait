@@ -82,6 +82,10 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Used to conditionally tweak behavior on preview deployments
+  // Note: evaluated at build time on Vercel
+  // eslint-disable-next-line no-undef
+  __isPreview: process.env.VERCEL_ENV === 'preview',
   typedRoutes: true,
   eslint: {
     // Disable ESLint during builds to prevent build failures from warnings
@@ -102,25 +106,23 @@ const nextConfig = {
   },
   // Optimize for Vercel deployment
   // Enable PWA capabilities
-  headers: async () => [
-    {
-      source: '/(.*)',
-      headers: [
-        {
-          key: 'X-Content-Type-Options',
-          value: 'nosniff',
-        },
-        {
-          key: 'X-Frame-Options',
-          value: 'DENY',
-        },
-        {
-          key: 'X-XSS-Protection',
-          value: '1; mode=block',
-        },
-      ],
-    },
-  ],
+  headers: async () => {
+    const securityHeaders = [
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'X-Frame-Options', value: 'DENY' },
+      { key: 'X-XSS-Protection', value: '1; mode=block' },
+    ]
+    // Add no-store on preview to avoid CDN/browser caching surprises
+    if (process.env.VERCEL_ENV === 'preview') {
+      securityHeaders.push({ key: 'Cache-Control', value: 'no-store' })
+    }
+    return [
+      {
+        source: '/(.*)',
+        headers: securityHeaders,
+      },
+    ]
+  },
 }
 
 module.exports = withBundleAnalyzer(withPWA(nextConfig))
