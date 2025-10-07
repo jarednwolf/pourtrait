@@ -20,7 +20,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-primary/5 to-white dark:from-transparent dark:via-transparent dark:to-transparent"/>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16 lg:py-20">
+      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:py-12 lg:py-14">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Copy side */}
           <div className="lg:col-span-7">

@@ -5,9 +5,9 @@ import { track } from '@/lib/utils/track'
 
 export function HowItWorks() {
   const steps = [
-    { icon: 'sparkles', title: "Tell us tonight's context", desc: 'Dish, budget, or vibe.' },
-    { icon: 'brain', title: 'AI sommelier picks', desc: 'Clear pick with rationale and alternatives.' },
-    { icon: 'save', title: 'Save and learn', desc: 'Track what you like; get smarter over time.' },
+    { icon: 'user', title: 'Create your taste profile', desc: 'Answer quick questions to set your baseline.' },
+    { icon: 'save', title: 'Add your cellar', desc: 'Track bottles and unlock drinking window insights.' },
+    { icon: 'sparkles', title: 'Leverage the AI sommelier', desc: 'Optimize drinking and purchases with clear rationale.' },
   ] as const
 
   return (
@@ -26,12 +26,12 @@ export function HowItWorks() {
       </div>
       <div className="mt-8 text-center">
         <a
-          href={'/chat?q=' + encodeURIComponent("What should I drink tonight?")}
-          onClick={() => track('cta_tonights_pick_click', { source: 'how_it_works' })}
+          href={'/onboarding/step1'}
+          onClick={() => track('cta_start_profile', { source: 'how_it_works' })}
           className="inline-flex items-center text-primary underline underline-offset-4"
-          aria-label="Try Tonight's pick"
+          aria-label="Start your profile"
         >
-          Try Tonight's pick
+          Start your profile
           <span aria-hidden className="ml-1">→</span>
         </a>
       </div>

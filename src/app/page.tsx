@@ -51,7 +51,7 @@ export default function Home() {
 
         <SocialProof />
         <HowItWorks />
-        <StartHere />
+        {/* StartHere removed; HowItWorks now covers the flow */}
         <div className="mt-10">
           <CompleteProfileCTA source="home" />
         </div>
