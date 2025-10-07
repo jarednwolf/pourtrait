@@ -33,7 +33,7 @@ export function PromptChipsTile({ className = '' }: PromptChipsTileProps) {
               asChild
               variant="outline"
               size="sm"
-              className="whitespace-normal h-auto py-2"
+              className="whitespace-normal h-auto py-2 leading-snug"
               onClick={() => track('prompt_chip_click', { index: idx, prompt: p })}
             >
               <a href={`/chat?q=${encodeURIComponent(p)}`} aria-label={p}>

@@ -39,7 +39,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
         <HomeHero />
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch [grid-auto-rows:1fr]">
           <MiniPairingTile />
           <PromptChipsTile />
           <ScannerDemoTile />
