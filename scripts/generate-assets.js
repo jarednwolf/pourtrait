@@ -78,9 +78,38 @@ async function generateOgCard() {
   return composed
 }
 
+async function generateSocialSquare() {
+  const heroSrc = path.resolve('public/images/hero.jpg')
+  const wordmarkSrc = path.resolve('public/branding/wordmark.svg')
+  const out = path.resolve('public/images/social-square.jpg')
+  await ensureDir(path.dirname(out))
+
+  let base = sharp(heroSrc).resize(1080, 1080, { fit: 'cover', position: 'attention' })
+
+  const panel = await sharp({
+    create: {
+      width: 840,
+      height: 240,
+      channels: 4,
+      background: { r: 255, g: 255, b: 255, alpha: 0.88 },
+    },
+  }).png().toBuffer()
+
+  const wordmark = await sharp(wordmarkSrc).resize({ width: 800 }).png().toBuffer()
+
+  await base
+    .composite([
+      { input: panel, left: 120, top: 80 },
+      { input: wordmark, left: 140, top: 100 },
+    ])
+    .jpeg({ quality: 85 })
+    .toFile(out)
+}
+
 async function run() {
   await generatePwaIcons()
   await generateOgCard()
+  await generateSocialSquare()
   // eslint-disable-next-line no-console
   console.log('✔ Generated PWA icons and OG card')
 }

@@ -1,5 +1,6 @@
 "use client"
 import React from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
@@ -73,12 +74,13 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
           {/* Visual side (hero image with gradient overlay) */}
           <div className="lg:col-span-5">
             <div className="relative mx-auto w-full max-w-md h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden">
-              <img
+              <Image
                 src="/images/hero.jpg"
                 alt="Wine being poured into a glass with soft lighting"
-                className="absolute inset-0 h-full w-full object-cover"
-                decoding="async"
-                loading="eager"
+                fill
+                priority
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
+                className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-fuchsia-200/20 to-rose-100/30" aria-hidden="true" />
               <div className="absolute inset-0 ring-1 ring-white/50" aria-hidden="true" />
