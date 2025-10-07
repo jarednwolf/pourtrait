@@ -1,4 +1,6 @@
 import { HomeHero } from '@/components/home/HomeHero'
+export const revalidate = 0
+export const dynamic = 'force-dynamic'
 import { MiniPairingTile } from '@/components/home/MiniPairingTile'
 import { PromptChipsTile } from '@/components/home/PromptChipsTile'
 import nextDynamic from 'next/dynamic'
