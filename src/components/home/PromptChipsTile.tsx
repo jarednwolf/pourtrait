@@ -18,32 +18,34 @@ const PROMPTS = [
 
 export function PromptChipsTile({ className = '' }: PromptChipsTileProps) {
   return (
-    <Card className={[className, 'h-full'].filter(Boolean).join(' ')}>
+    <Card className={[className, 'h-full flex flex-col'].filter(Boolean).join(' ')}>
       <CardHeader className="p-4">
         <CardTitle className="flex items-center text-base">
           <Icon name="sparkles" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           One‑Tap Sommelier Prompts
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0 flex flex-col">
-        <div className="flex flex-wrap gap-2">
-          {PROMPTS.map((p, idx) => (
-            <Button
-              key={idx}
-              asChild
-              variant="outline"
-              size="sm"
-              className="whitespace-normal h-auto py-2 leading-snug"
-              onClick={() => track('prompt_chip_click', { index: idx, prompt: p })}
-            >
-              <a href={`/chat?q=${encodeURIComponent(p)}`} aria-label={p}>
-                {p}
-              </a>
-            </Button>
-          ))}
+      <CardContent className="p-4 pt-0 flex-1 flex flex-col">
+        <div className="flex-1">
+          <div className="flex flex-wrap gap-2">
+            {PROMPTS.map((p, idx) => (
+              <Button
+                key={idx}
+                asChild
+                variant="outline"
+                size="sm"
+                className="whitespace-normal h-auto py-2 leading-snug"
+                onClick={() => track('prompt_chip_click', { index: idx, prompt: p })}
+              >
+                <a href={`/chat?q=${encodeURIComponent(p)}`} aria-label={p}>
+                  {p}
+                </a>
+              </Button>
+            ))}
+          </div>
         </div>
-        <div className="mt-3">
-          <Button asChild size="sm">
+        <div className="mt-3 pt-3 border-t">
+          <Button asChild size="sm" className="w-full">
             <a href="/chat" aria-label="Open Ask the Sommelier">
               Ask the Sommelier
               <Icon name="arrow-right" className="w-4 h-4 ml-2" aria-hidden="true" />

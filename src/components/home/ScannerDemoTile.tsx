@@ -37,21 +37,21 @@ export function ScannerDemoTile({ className = '' }: ScannerDemoTileProps) {
   const wines = useMemo(() => parseSampleMenu(SAMPLE_MENU), [])
 
   return (
-    <Card className={className}>
+    <Card className={[className, 'h-full flex flex-col'].filter(Boolean).join(' ')}>
       <CardHeader className="p-4">
         <CardTitle className="flex items-center text-base">
           <Icon name="camera" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           Restaurant Scanner (Demo)
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0 flex flex-col">
+      <CardContent className="p-4 pt-0 flex-1 flex flex-col">
         {!showResults ? (
-          <div>
+          <div className="flex-1 flex flex-col">
             <p className="text-sm text-gray-600 mb-3">Paste or try a sample wine list to see top picks.</p>
-            <div className="rounded-md border border-gray-200 p-3 bg-white text-sm max-h-32 overflow-auto" aria-label="Sample menu text">
+            <div className="flex-1 rounded-md border border-gray-200 p-3 bg-white text-sm overflow-auto" aria-label="Sample menu text">
               <pre className="whitespace-pre-wrap">{SAMPLE_MENU}</pre>
             </div>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 pt-3 border-t flex gap-2">
               <Button size="sm" onClick={() => { setShowResults(true); track('scanner_demo_used') }} aria-label="Process sample">
                 Show sample results
               </Button>
@@ -61,9 +61,9 @@ export function ScannerDemoTile({ className = '' }: ScannerDemoTileProps) {
             </div>
           </div>
         ) : (
-          <div>
+          <div className="flex-1 flex flex-col">
             <div className="text-sm text-gray-700 mb-2">Top 3 picks</div>
-            <div className="space-y-2">
+            <div className="flex-1 space-y-2 overflow-auto">
               {wines.slice(0, 3).map((w, i) => (
                 <div key={i} className="rounded-md border border-gray-200 p-3 bg-white">
                   <div className="flex items-center justify-between">

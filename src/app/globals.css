@@ -65,21 +65,15 @@
 }
 
 @layer components {
-  .btn {
-    @apply text-white; /* ensure white text for primary by default */
-  }
-  .btn a, .btn span, .btn svg { color: inherit !important; }
   .text-brand-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300;
   }
-  .btn-primary {
-    @apply rounded-[12px] bg-primary px-4 py-2 font-medium text-white transition-colors ease-brand duration-250 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2;
+
+  /* Ensure primary buttons always have white text, even with nested anchors */
+  .btn-primary, .btn-primary a, .btn-primary span, .btn-primary svg {
+    color: white !important;
   }
-  
-  .btn-secondary {
-    @apply rounded-[12px] border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition-colors ease-brand duration-250 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2;
-  }
-  
+
   .card {
     @apply rounded-[12px] bg-white p-6 shadow-brand-sm ring-1 ring-gray-200;
   }

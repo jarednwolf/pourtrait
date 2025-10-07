@@ -36,10 +36,10 @@ export default function Home() {
   }
   return (
     <div className="min-h-screen bg-surface">
-      <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
+      <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8">
         <HomeHero />
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch [grid-auto-rows:1fr]">
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch [grid-auto-rows:1fr]">
           <MiniPairingTile />
           <PromptChipsTile />
           <ScannerDemoTile />
@@ -48,12 +48,12 @@ export default function Home() {
         <SocialProof />
         <HowItWorks />
         {/* StartHere removed; HowItWorks now covers the flow */}
-        <div className="mt-10">
+        <div className="mt-6">
           <CompleteProfileCTA source="home" />
         </div>
         <TrustBadges />
 
-        <section aria-label="Secondary actions" className="py-10">
+        <section aria-label="Secondary actions" className="py-6">
           <div className="flex flex-wrap gap-2">
             <a href="/restaurant-scanner" className="text-primary underline" aria-label="Scan a label or menu">Scan a label or menu</a>
             <a href="/import?source=home_secondary" className="text-primary underline" aria-label="CSV import helper">CSV import helper</a>

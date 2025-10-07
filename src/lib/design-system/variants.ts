@@ -6,11 +6,11 @@ import { cva, type VariantProps } from 'class-variance-authority'
  */
 export const buttonVariants = cva(
   // Base styles applied to all buttons
-  'btn inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_a]:text-inherit [&_a]:no-underline',
+  'btn inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_a]:no-underline',
   {
     variants: {
       variant: {
-        primary: 'bg-primary !text-white hover:bg-primary-600 focus-visible:ring-primary-600',
+        primary: 'bg-primary hover:bg-primary-600 focus-visible:ring-primary-600',
         secondary: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus-visible:ring-primary-600',
         outline: 'border border-primary text-primary hover:bg-primary/10 focus-visible:ring-primary-600',
         ghost: 'text-gray-700 hover:bg-gray-100 focus-visible:ring-gray-500',
