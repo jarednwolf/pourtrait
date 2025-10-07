@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import type { Wine } from '@/types'
 import type { ConsumptionRecord } from '@/types'
+import { FocusTrap } from '@/components/ui/FocusTrap'
 
 interface WineDetailPageProps {
   wine: Wine
@@ -24,7 +25,7 @@ const WINE_TYPE_COLORS = {
   white: 'bg-yellow-100 text-yellow-800',
   rosé: 'bg-pink-100 text-pink-800',
   sparkling: 'bg-blue-100 text-blue-800',
-  dessert: 'bg-purple-100 text-purple-800',
+  dessert: 'bg-primary/10 text-primary',
   fortified: 'bg-orange-100 text-orange-800'
 } as const
 
@@ -66,6 +67,7 @@ export function WineDetailPage({
   isLoading = false
 }: WineDetailPageProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const cancelBtnRef = useRef<HTMLButtonElement>(null)
 
   const drinkingWindowStatus = wine.drinkingWindow as any
   const currentStatus = drinkingWindowStatus?.currentStatus || 'ready'
@@ -179,12 +181,15 @@ export function WineDetailPage({
             <Card>
               <CardContent className="p-6">
                 <div className="relative w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
-                  <Image
-                    src={wine.imageUrl}
-                    alt={`${wine.name} bottle`}
-                    fill
-                    className="object-contain"
-                  />
+                      <Image
+                        src={wine.imageUrl}
+                        alt={`${wine.name} bottle`}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 66vw"
+                        className="object-contain"
+                        fetchPriority="high"
+                        priority
+                      />
                 </div>
               </CardContent>
             </Card>
@@ -373,10 +378,11 @@ export function WineDetailPage({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" role="dialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+          <FocusTrap onEscape={() => setShowDeleteConfirm(false)} initialFocusRef={cancelBtnRef}>
           <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle className="text-red-600">Delete Wine</CardTitle>
+              <CardTitle id="delete-dialog-title" className="text-red-600">Delete Wine</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-700 mb-4">
@@ -386,18 +392,22 @@ export function WineDetailPage({
                 <Button
                   variant="outline"
                   onClick={() => setShowDeleteConfirm(false)}
+                  aria-label="Cancel delete"
+                  ref={cancelBtnRef}
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleDelete}
                   className="bg-red-600 hover:bg-red-700 text-white"
+                  aria-label="Confirm delete wine"
                 >
                   Delete Wine
                 </Button>
               </div>
             </CardContent>
           </Card>
+          </FocusTrap>
         </div>
       )}
     </div>

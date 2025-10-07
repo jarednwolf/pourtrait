@@ -36,7 +36,7 @@ export const buttonVariants = cva(
  * Card component variants for consistent container styling
  */
 export const cardVariants = cva(
-  'rounded-lg bg-white shadow-sm ring-1 ring-gray-200',
+  'rounded-lg bg-white shadow-sm ring-1 ring-gray-200 dark:bg-dark-surface dark:ring-gray-800',
   {
     variants: {
       padding: {

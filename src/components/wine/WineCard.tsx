@@ -17,15 +17,16 @@ interface WineCardProps {
   onConsume?: (wine: Wine) => void
   onDelete?: (wine: Wine) => void
   compact?: boolean
+  priority?: boolean
 }
 
 const WINE_TYPE_COLORS = {
-  red: 'bg-red-100 text-red-800',
-  white: 'bg-yellow-100 text-yellow-800',
-  rosé: 'bg-pink-100 text-pink-800',
-  sparkling: 'bg-blue-100 text-blue-800',
-  dessert: 'bg-purple-100 text-purple-800',
-  fortified: 'bg-orange-100 text-orange-800'
+  red: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200',
+  white: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
+  rosé: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-200',
+  sparkling: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
+  dessert: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-200',
+  fortified: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200'
 } as const
 
 export function WineCard({ 
@@ -34,7 +35,8 @@ export function WineCard({
   onEdit, 
   onConsume, 
   onDelete, 
-  compact = false 
+  compact = false,
+  priority = false
 }: WineCardProps) {
   const urgencyScore = DrinkingWindowService.getDrinkingUrgencyScore(wine)
 
@@ -77,6 +79,11 @@ export function WineCard({
                   alt={`${wine.name} bottle`}
                   fill
                   className="object-cover rounded"
+                  sizes="48px"
+                  priority={priority}
+                  fetchPriority={priority ? 'high' : undefined}
+                  placeholder="blur"
+                  blurDataURL={"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><filter id='b'><feGaussianBlur stdDeviation='2'/></filter><rect width='8' height='8' fill='%23e5e7eb' filter='url(%23b)'/></svg>"}
                 />
               </div>
             )}
@@ -185,10 +192,15 @@ export function WineCard({
             {wine.imageUrl && (
             <div className="relative w-full h-48 mb-4 bg-gray-100 rounded-lg overflow-hidden">
               <Image
-                  src={wine.imageUrl}
+                src={wine.imageUrl}
                 alt={`${wine.name} bottle`}
                 fill
                 className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 33vw"
+                priority={priority}
+                fetchPriority={priority ? 'high' : undefined}
+                placeholder="blur"
+                blurDataURL={"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><filter id='b'><feGaussianBlur stdDeviation='2'/></filter><rect width='8' height='8' fill='%23e5e7eb' filter='url(%23b)'/></svg>"}
               />
             </div>
           )}
