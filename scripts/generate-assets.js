@@ -19,7 +19,7 @@ async function generatePwaIcons() {
   const outDir = path.resolve('public/icons')
   await ensureDir(outDir)
 
-  const sizes = [72, 96, 128, 144, 152, 192, 384, 512]
+  const sizes = [16, 32, 64, 72, 96, 128, 144, 152, 180, 192, 384, 512]
   for (const size of sizes) {
     const out = path.join(outDir, `icon-${size}x${size}.png`)
     await sharp(src)

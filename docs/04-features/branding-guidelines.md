@@ -1,4 +1,13 @@
 ### Branding Guidelines
+- **Color usage map**
+  - Primary actions: `bg-primary` with hover `bg-primary-600`.
+  - Accents and links: `text-primary` with hover `text-primary-600`.
+  - Surfaces: `bg-surface` (light), `dark:bg-dark-surface`.
+  - Status: green/yellow/red/blue tokens; avoid custom purples.
+
+- **CTA guidance**
+  - Use `Button` with variants: `primary` for main action, `outline` for secondary, `secondary` for neutral.
+  - Maintain consistent spacing: buttons stack with `gap-3` and align to type rhythm.
 
 - **Wordmark usage**: Use `public/branding/wordmark.svg` for headers and large brand placement. Maintain clear space equal to the height of the letter P. Do not distort or recolor.
 - **Tagline**: “Every bottle a brushstroke”. Use in meta descriptions and marketing copy, not as part of the lockup.

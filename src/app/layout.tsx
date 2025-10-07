@@ -47,7 +47,7 @@ export default function RootLayout({
       <body className="bg-surface text-gray-900 dark:bg-dark-surface dark:text-gray-100">
         <AuthProvider>
           <a href="#main-content" className="skip-link">Skip to main content</a>
-          <header className="border-b border-gray-200 bg-white text-gray-900" role="banner">
+          <header className="border-b border-gray-200 bg-white text-gray-900 dark:bg-dark-surface dark:border-gray-800" role="banner">
             <div className="max-w-6xl mx-auto px-4 h-18 flex items-center justify-between">
               <a href="/" className="flex items-center" aria-label="Pourtrait home">
                 <BrandLogo />
