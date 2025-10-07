@@ -56,6 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="bg-surface text-gray-900 dark:bg-dark-surface dark:text-gray-100">
+        <script dangerouslySetInnerHTML={{__html: `document.documentElement.classList.remove('dark');`}} />
         <AuthProvider>
           <a href="#main-content" className="skip-link">Skip to main content</a>
           <header className="border-b border-gray-200 bg-white text-gray-900 dark:bg-dark-surface dark:border-gray-800" role="banner">

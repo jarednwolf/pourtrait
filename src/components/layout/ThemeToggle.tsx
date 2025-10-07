@@ -6,14 +6,17 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
   const [dark, setDark] = useState<boolean>(false)
 
   useEffect(() => {
+    // Always default to light mode on first load
     const stored = typeof window !== 'undefined' ? localStorage.getItem('theme') : null
-    // Default to light unless the user previously chose dark
-    const shouldDark = stored ? stored === 'dark' : false
+    const shouldDark = stored === 'dark' // Only dark if explicitly set
     setDark(shouldDark)
+    
+    // Remove dark class immediately on mount
+    document.documentElement.classList.remove('dark')
+    
+    // Then apply if needed
     if (shouldDark) {
       document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
     }
   }, [])
 
