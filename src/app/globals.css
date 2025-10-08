@@ -42,6 +42,9 @@
   .dark a {
     @apply text-primary;
   }
+  /* Ensure outline buttons meet contrast in light/dark */
+  .btn.border { @apply text-primary; }
+  .dark .btn.border { @apply text-primary; }
   
   /* Force primary buttons to always have white text */
   button.bg-primary, button.bg-primary a, button.bg-primary span {
