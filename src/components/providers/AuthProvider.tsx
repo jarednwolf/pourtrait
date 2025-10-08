@@ -1,7 +1,9 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode, useEffect } from 'react'
 import { useAuth, type UseAuthReturn } from '@/hooks/useAuth'
+import { consumePostAuthIntent, navigateForIntent } from '@/lib/auth/intent'
+import { events } from '@/lib/utils/track'
 
 const AuthContext = createContext<UseAuthReturn | undefined>(undefined)
 
@@ -15,6 +17,17 @@ interface AuthProviderProps {
  */
 export function AuthProvider({ children }: AuthProviderProps) {
   const auth = useAuth()
+
+  // Consume any stored post-auth intent once the user becomes authenticated
+  useEffect(() => {
+    if (!auth.initialized || auth.loading) {return}
+    if (!auth.user) {return}
+    const intent = consumePostAuthIntent()
+    if (intent) {
+      events.postAuthResume(intent.type)
+      navigateForIntent(intent)
+    }
+  }, [auth.initialized, auth.loading, auth.user])
 
   return (
     <AuthContext.Provider value={auth}>
