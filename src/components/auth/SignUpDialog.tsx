@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
 import { consumePostAuthIntent, navigateForIntent } from '@/lib/auth/intent'
+import { events } from '@/lib/utils/track'
 
 interface SignUpDialogProps {
 	openExternally?: boolean
@@ -12,13 +13,13 @@ interface SignUpDialogProps {
 export function SignUpDialog({ openExternally = false }: SignUpDialogProps) {
 	const [open, setOpen] = useState<boolean>(openExternally)
 
-	useEffect(() => {
-		const onOpen = () => setOpen(true)
+  useEffect(() => {
+    const onOpen = () => { setOpen(true); events.signupView() }
 		window.addEventListener('open-signup-dialog', onOpen as any)
 		return () => window.removeEventListener('open-signup-dialog', onOpen as any)
 	}, [])
 
-	useEffect(() => {
+  useEffect(() => {
 		if (!open) {return}
 		document.body.style.overflow = 'hidden'
 		return () => { document.body.style.overflow = '' }
@@ -39,11 +40,12 @@ export function SignUpDialog({ openExternally = false }: SignUpDialogProps) {
 	}
 
 	// Handle post-auth intent when returning from auth
-	useEffect(() => {
+  useEffect(() => {
 		const hash = typeof window !== 'undefined' ? window.location.hash : ''
 		if (hash.includes('access_token') || hash.includes('type=recovery')) {
-			const intent = consumePostAuthIntent()
-			if (intent) { navigateForIntent(intent) }
+      const intent = consumePostAuthIntent()
+      events.signupComplete()
+      if (intent) { events.postAuthResume(intent.type); navigateForIntent(intent) }
 		}
 	}, [])
 

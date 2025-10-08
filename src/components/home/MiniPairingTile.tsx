@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
 import { cn } from '@/lib/design-system/utils'
+import { AuthGate } from '@/components/auth/AuthGate'
 
 interface MiniPairingTileProps {
   className?: string
@@ -114,9 +115,11 @@ export function MiniPairingTile({ className = '' }: MiniPairingTileProps) {
         )}
 
         <div className="mt-3 pt-3 border-t">
-          <Button asChild variant="outline" size="sm" className="w-full">
-            <a href="/chat" onClick={() => track('chat_opened', { source: 'mini_pairing' })} aria-label="Ask the Sommelier">Ask the Sommelier</a>
-          </Button>
+          <AuthGate action={{ type: 'pairing', params: { food: dish } }}>
+            <Button asChild size="sm" className="w-full">
+              <a href="/auth/signup" onClick={() => track('cta_tile_click', { tile: 'mini_pairing' })} aria-label="Create your free account">Create your free account</a>
+            </Button>
+          </AuthGate>
         </div>
       </CardContent>
     </Card>

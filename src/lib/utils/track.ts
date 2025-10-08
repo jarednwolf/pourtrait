@@ -9,4 +9,12 @@ export function track(eventName: string, properties?: Record<string, any>) {
   }
 }
 
+export const events = {
+  ctaHeroClick: (action?: string) => track('cta_home_hero_click', { action }),
+  ctaTileClick: (tile: string) => track('cta_tile_click', { tile }),
+  signupView: () => track('signup_view'),
+  signupComplete: () => track('signup_complete'),
+  postAuthResume: (type: string) => track('post_auth_resume_intent', { type }),
+}
+
 

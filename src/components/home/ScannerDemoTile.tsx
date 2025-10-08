@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import type { ExtractedWineListItem } from '@/types'
 import { track } from '@/lib/utils/track'
+import { AuthGate } from '@/components/auth/AuthGate'
 
 interface ScannerDemoTileProps {
   className?: string
@@ -55,9 +56,11 @@ export function ScannerDemoTile({ className = '' }: ScannerDemoTileProps) {
               <Button size="sm" onClick={() => { setShowResults(true); track('scanner_demo_used') }} aria-label="Process sample">
                 Show sample results
               </Button>
-              <Button asChild variant="outline" size="sm">
-                <a href="/restaurant-scanner" onClick={() => track('scanner_opened', { source: 'home_tile' })} aria-label="Open full scanner">Open full scanner</a>
-              </Button>
+              <AuthGate action={{ type: 'scanner', params: { demo: '1' } }}>
+                <Button asChild size="sm">
+                  <a href="/auth/signup" onClick={() => track('cta_tile_click', { tile: 'scanner' })} aria-label="Create your free account">Create your free account</a>
+                </Button>
+              </AuthGate>
             </div>
           </div>
         ) : (

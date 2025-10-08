@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
+import { AuthGate } from '@/components/auth/AuthGate'
 
 interface PromptChipsTileProps {
   className?: string
@@ -29,28 +30,31 @@ export function PromptChipsTile({ className = '' }: PromptChipsTileProps) {
         <div className="flex-1">
           <div className="flex flex-wrap gap-2">
             {PROMPTS.map((p, idx) => (
-              <Button
-                key={idx}
-                asChild
-                variant="outline"
-                size="sm"
-                className="whitespace-normal h-auto py-2 leading-snug"
-                onClick={() => track('prompt_chip_click', { index: idx, prompt: p })}
-              >
-                <a href={`/chat?q=${encodeURIComponent(p)}`} aria-label={p}>
-                  {p}
-                </a>
-              </Button>
+              <AuthGate key={idx} action={{ type: 'chat', params: { q: p } }}>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="whitespace-normal h-auto py-2 leading-snug"
+                  onClick={() => track('prompt_chip_click', { index: idx, prompt: p })}
+                >
+                  <a href="/auth/signup" aria-label={p}>
+                    {p}
+                  </a>
+                </Button>
+              </AuthGate>
             ))}
           </div>
         </div>
         <div className="mt-3 pt-3 border-t">
-          <Button asChild size="sm" className="w-full">
-            <a href="/chat" aria-label="Open Ask the Sommelier">
-              Ask the Sommelier
-              <Icon name="arrow-right" className="w-4 h-4 ml-2" aria-hidden="true" />
-            </a>
-          </Button>
+          <AuthGate action={{ type: 'chat', params: { q: 'What should I drink tonight?' } }}>
+            <Button asChild size="sm" className="w-full">
+              <a href="/auth/signup" aria-label="Create your free account">
+                Create your free account
+                <Icon name="arrow-right" className="w-4 h-4 ml-2" aria-hidden="true" />
+              </a>
+            </Button>
+          </AuthGate>
         </div>
       </CardContent>
     </Card>
