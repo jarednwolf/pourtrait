@@ -10,6 +10,7 @@ import React from 'react'
 import { PushOptInBanner } from '@/components/notifications/PushOptInBanner'
 import { WebVitalsProvider } from '@/components/providers/WebVitalsProvider'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { SignUpDialog } from '@/components/auth/SignUpDialog'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], display: 'swap', variable: '--font-playfair' })
@@ -117,6 +118,7 @@ export default function RootLayout({
             {children}
           </main>
           <WebVitalsProvider />
+          <SignUpDialog />
         </AuthProvider>
       </body>
     </html>

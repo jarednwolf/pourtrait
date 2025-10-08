@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
+import { AuthGate } from '@/components/auth/AuthGate'
 
 interface HomeHeroProps {
   className?: string
@@ -35,12 +36,14 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Button asChild size="lg" onClick={() => track('cta_tonights_pick_click')}>
-                <a href="/chat?q=What's%20your%20top%20pick%20for%20tonight%3F" aria-label="Get your personalized Tonight’s pick">
-                  Get Tonight’s pick
-                  <Icon name="arrow-right" className="w-5 h-5 ml-2" aria-hidden="true" />
-                </a>
-              </Button>
+              <AuthGate action={{ type: 'chat', params: { q: "What's your top pick for tonight?" } }}>
+                <Button asChild size="lg" onClick={() => track('cta_home_signup_click')}>
+                  <a href="/auth/signup" aria-label="Create your free account">
+                    Create your free account
+                    <Icon name="arrow-right" className="w-5 h-5 ml-2" aria-hidden="true" />
+                  </a>
+                </Button>
+              </AuthGate>
               <Button asChild variant="outline" size="lg">
                 <a href="#how-it-works" aria-label="Learn how Pourtrait works">How it works</a>
               </Button>
