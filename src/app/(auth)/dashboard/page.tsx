@@ -28,7 +28,7 @@ export default function DashboardPage() {
           <Card className="h-full">
             <CardHeader className="p-4">
               <CardTitle className="flex items-center text-base">
-                <Icon name="archive" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
+                <Icon name="grid" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
                 Your Cellar
               </CardTitle>
             </CardHeader>
@@ -44,7 +44,7 @@ export default function DashboardPage() {
           <Card className="h-full">
             <CardHeader className="p-4">
               <CardTitle className="flex items-center text-base">
-                <Icon name="list-bullet" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
+                <Icon name="list" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
                 Tasks
               </CardTitle>
             </CardHeader>
