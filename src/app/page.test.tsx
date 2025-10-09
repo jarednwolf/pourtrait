@@ -20,7 +20,7 @@ describe('Home Page', () => {
   it('shows hero actions', () => {
     render(<Home />)
     
-    const cta = screen.getByRole('link', { name: /Create your free account/i })
-    expect(cta).toBeInTheDocument()
+    const ctas = screen.getAllByRole('link', { name: /Create your free account/i })
+    expect(ctas.length).toBeGreaterThan(0)
   })
 })

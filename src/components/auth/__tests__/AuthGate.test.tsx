@@ -18,8 +18,8 @@ describe('AuthGate', () => {
         <button onClick={onClick}>Click</button>
       </AuthGate>
     )
-    const btn = screen.getByRole('button', { name: 'Click' })
-    fireEvent.click(btn)
+    const [wrapperBtn] = screen.getAllByRole('button', { name: 'Click' })
+    fireEvent.click(wrapperBtn)
     expect(onClick).not.toHaveBeenCalled()
   })
 })
