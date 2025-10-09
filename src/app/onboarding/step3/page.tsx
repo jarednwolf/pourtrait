@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
@@ -24,6 +24,7 @@ const SAMPLE_WINES: SampleWine[] = [
 ]
 
 function Step3Content() {
+  useEffect(() => { track('onboarding_step_viewed', { step: 3 }) }, [])
   const router = useRouter()
   const search = useSearchParams()
   const [selected, setSelected] = React.useState<number | null>(0)

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Pourtrait app icon">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="1" y2="0">
+      <stop offset="0" stop-color="#6D28D9"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" ry="14" fill="url(#g)"/>
+  <!-- Wine glass stem and bowl -->
+  <path fill="#FFFFFF" fill-opacity="0.95" d="M24 8c0 8.284 6.716 15 15 15h1c-.5 5.5-3.9 9.5-8 11v8h6a2 2 0 1 1 0 4H26a2 2 0 1 1 0-4h6v-8c-4.1-1.5-7.5-5.5-8-11h1c8.284 0 15-6.716 15-15H24z"/>
+  <!-- Wine fill -->
+  <path fill="#B91C1C" fill-opacity="0.85" d="M25 14c2 5 8 8 13 8 3 0 5-1 6-2-1 6-5 10-10 10s-9-4-10-10c0-2 0-4 1-6z"/>
+  <!-- Sparkle -->
+  <path fill="#FDE68A" d="M44 10l1.5 3 3 1.5-3 1.5L44 19l-1.5-3-3-1.5 3-1.5L44 10z"/>
+</svg>
+

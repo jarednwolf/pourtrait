@@ -1,9 +1,10 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
+import { track } from '@/lib/utils/track'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 
 type Goal = 'learn' | 'organize' | 'pairing' | 'discover'
@@ -13,10 +14,13 @@ function Step2Content() {
   const search = useSearchParams()
   const [goal, setGoal] = React.useState<Goal>('discover')
 
+  useEffect(() => { track('onboarding_step_viewed', { step: 2 }) }, [])
+
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault()
     const params = new URLSearchParams(search?.toString())
     params.set('goal', goal)
+    track('onboarding_step_completed', { step: 2, goal })
     router.push(`/onboarding/step3?${params.toString()}`)
   }
 
@@ -30,9 +34,9 @@ function Step2Content() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleNext} className="space-y-6">
-              <fieldset>
-                <legend className="sr-only">Primary goal</legend>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-label="Primary goal">
+              <fieldset role="radiogroup" aria-labelledby="goal-legend">
+                <legend id="goal-legend" className="text-sm font-medium text-gray-700 mb-1">Primary goal</legend>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {(
                     [
                       { key: 'discover', label: "Find what to drink tonight" },
@@ -46,10 +50,11 @@ function Step2Content() {
                       type="button"
                       role="radio"
                       aria-checked={goal === opt.key}
+                      aria-labelledby={`goal-${opt.key}`}
                       onClick={() => setGoal(opt.key)}
                       className={`border rounded-md p-3 text-left focus:outline-none focus:ring-2 focus:ring-purple-500 ${goal === opt.key ? 'border-purple-600 ring-1 ring-purple-600' : 'border-gray-300'}`}
                     >
-                      <div className="font-medium text-gray-900">{opt.label}</div>
+                      <div id={`goal-${opt.key}`} className="font-medium text-gray-900">{opt.label}</div>
                       {goal === opt.key && (
                         <div className="text-xs text-purple-700 mt-1">Selected</div>
                       )}

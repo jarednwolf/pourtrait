@@ -14,6 +14,8 @@ export const brand = {
     primary600: '#5B21B6',
     primary700: '#4C1D95',
     accent: '#7C3AED',
+    grape: '#5B2A86',
+    blush: '#F3E8FF',
     success: '#16A34A',
     warning: '#F59E0B',
     error: '#DC2626',
@@ -23,6 +25,7 @@ export const brand = {
     surfaceAlt: '#F8F7FB',
     darkSurface: '#0B0B0E',
     darkSurfaceAlt: '#121218',
+    outline: '#E5E7EB',
   },
   type: {
     heading: 'Playfair Display, Georgia, serif',

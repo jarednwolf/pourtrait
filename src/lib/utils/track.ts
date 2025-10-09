@@ -15,6 +15,11 @@ export const events = {
   signupView: () => track('signup_view'),
   signupComplete: () => track('signup_complete'),
   postAuthResume: (type: string) => track('post_auth_resume_intent', { type }),
-}
+  // Added dashboard and onboarding analytics helpers
+  dashboardViewed: () => track('dashboard_viewed'),
+  panelImpression: (panel: string) => track('panel_impression', { panel }),
+  onboardingStepViewed: (step: number) => track('onboarding_step_viewed', { step }),
+  onboardingStepCompleted: (step: number) => track('onboarding_step_completed', { step }),
+} as const
 
 

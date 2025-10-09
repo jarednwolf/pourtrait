@@ -1,15 +1,12 @@
 import { HomeHero } from '@/components/home/HomeHero'
 export const revalidate = 0
 export const dynamic = 'force-dynamic'
-import { MiniPairingTile } from '@/components/home/MiniPairingTile'
-import { PromptChipsTile } from '@/components/home/PromptChipsTile'
+import { HomeBenefitsWrapper } from '@/components/home/HomeBenefitsWrapper'
 import nextDynamic from 'next/dynamic'
+import { Testimonials } from '@/components/home/Testimonials'
 import { track } from '@/lib/utils/track'
 import { CompleteProfileCTA } from '@/components/home/CompleteProfileCTA'
-const SocialProof = nextDynamic(
-  () => import('@/components/home/SocialProof').then(m => m.SocialProof),
-  { loading: () => <div className="h-24 bg-gray-100 rounded animate-pulse" aria-hidden="true" /> }
-)
+// SocialProof removed from MVP landing to focus on funnel
 const HowItWorks = nextDynamic(
   () => import('@/components/home/HowItWorks').then(m => m.HowItWorks),
   { loading: () => <div className="h-24 bg-gray-100 rounded animate-pulse" aria-hidden="true" /> }
@@ -23,14 +20,7 @@ const SEOSection = nextDynamic(
   { loading: () => <div className="h-16 bg-gray-100 rounded animate-pulse" aria-hidden="true" /> }
 )
 
-const ScannerDemoTile = nextDynamic(
-  () => import('@/components/home/ScannerDemoTile').then(m => m.ScannerDemoTile),
-  {
-    loading: () => (
-      <div className="h-40 bg-gray-100 rounded animate-pulse" aria-hidden="true" />
-    ),
-  }
-)
+// Scanner demo tile removed from hero area; replaced by focused benefits + demo modal
 
 export default function Home() {
   if (typeof window !== 'undefined') {
@@ -41,13 +31,9 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8">
         <HomeHero />
 
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch [grid-auto-rows:1fr]">
-          <MiniPairingTile />
-          <PromptChipsTile />
-          <ScannerDemoTile />
-        </div>
+        <HomeBenefitsWrapper />
 
-        <SocialProof />
+        <Testimonials />
         <HowItWorks />
         {/* StartHere removed; HowItWorks now covers the flow */}
         <div className="mt-6">
@@ -55,20 +41,11 @@ export default function Home() {
         </div>
         <TrustBadges />
 
-        <section aria-label="Secondary actions" className="py-6">
+        <section aria-label="Footer links" className="py-6">
           <div className="flex flex-wrap gap-2">
-            <a href="/restaurant-scanner" className="text-primary underline" aria-label="Scan a label or menu">Scan a label or menu</a>
-            <a href="/import?source=home_secondary" className="text-primary underline" aria-label="CSV import helper">CSV import helper</a>
-            <a href="/onboarding/step1?source=home_secondary" className="text-primary underline" aria-label="Quick onboarding">Quick onboarding</a>
-            <a href="/inventory" className="text-primary underline" aria-label="View inventory">View inventory</a>
-            <a
-              href={'/chat?q=' + encodeURIComponent('What should I drink tonight?') + '&send=1'}
-              className="text-primary underline"
-              aria-label="Explore recommendations with AI"
-            >
-              Explore recommendations
-            </a>
-            <a href="/settings?tab=notifications" className="text-primary underline" aria-label="Enable notifications">Enable notifications</a>
+            <a href="/privacy" className="text-primary underline" aria-label="Privacy policy">Privacy</a>
+            <a href="/terms" className="text-primary underline" aria-label="Terms of service">Terms</a>
+            <a href="/contact" className="text-primary underline" aria-label="Contact support">Contact</a>
           </div>
         </section>
 

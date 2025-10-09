@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /*
-  Generates PWA icons and an OG card from existing assets.
-  - Inputs: public/favicon.svg, public/images/hero.jpg, public/branding/wordmark.svg
-  - Outputs: public/icons/icon-*.png, public/icons/shortcut-*.png, public/images/og-card.jpg
+  Generates PWA icons and OG/social images from existing assets.
+  - Inputs: public/branding/app-icon.svg (preferred) or public/branding/wordmark.svg, public/images/hero.jpg
+  - Outputs: public/icons/icon-*.png, public/icons/shortcut-*.png, public/images/og-card.jpg, public/images/social-square.jpg
 */
 
 const fs = require('fs')
@@ -14,8 +14,10 @@ async function ensureDir(dirPath) {
 }
 
 async function generatePwaIcons() {
-  // Prefer wordmark for icon generation to avoid malformed favicon.svg
-  const src = path.resolve('public/branding/wordmark.svg')
+  // Prefer app icon; fall back to wordmark
+  const appIcon = path.resolve('public/branding/app-icon.svg')
+  const wordmark = path.resolve('public/branding/wordmark.svg')
+  const src = fs.existsSync(appIcon) ? appIcon : wordmark
   const outDir = path.resolve('public/icons')
   await ensureDir(outDir)
 

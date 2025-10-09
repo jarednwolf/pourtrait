@@ -11,6 +11,8 @@ import { PushOptInBanner } from '@/components/notifications/PushOptInBanner'
 import { WebVitalsProvider } from '@/components/providers/WebVitalsProvider'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { SignUpDialog } from '@/components/auth/SignUpDialog'
+import dynamic from 'next/dynamic'
+const AuthBottomNav = dynamic(() => import('@/components/layout/AuthBottomNav').then(m => m.AuthBottomNav), { ssr: false })
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], display: 'swap', variable: '--font-playfair' })
@@ -119,6 +121,7 @@ export default function RootLayout({
           </main>
           <WebVitalsProvider />
           <SignUpDialog />
+          <div className="md:hidden"><AuthBottomNav /></div>
         </AuthProvider>
       </body>
     </html>
