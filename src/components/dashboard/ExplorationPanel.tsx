@@ -18,7 +18,7 @@ export function ExplorationPanel() {
     <Card className="h-full" ref={ref as any} role="region" aria-labelledby="exploration-heading">
       <CardHeader className="p-4">
         <CardTitle id="exploration-heading" className="flex items-center text-base">
-          <Icon name="magnifying-glass" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
+          <Icon name="search" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           Exploration
         </CardTitle>
       </CardHeader>

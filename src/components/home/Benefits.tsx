@@ -14,7 +14,7 @@ interface BenefitItem {
 const BENEFITS: BenefitItem[] = [
   { icon: 'sparkles', title: 'Taste Profile', desc: 'Teach Pourtrait what you like with quick sliders.', demoId: 'taste' },
   { icon: 'clock', title: 'Drink‑Window Alerts', desc: 'Know when bottles are at their peak—never miss the moment.', demoId: 'alerts' },
-  { icon: 'chat-bubble-left-right', title: 'AI Sommelier Chat', desc: 'Ask anything—from pairings to purchases—with rationale.', demoId: 'chat' }
+  { icon: 'chat-bubble-left', title: 'AI Sommelier Chat', desc: 'Ask anything—from pairings to purchases—with rationale.', demoId: 'chat' }
 ]
 
 export function Benefits({ onOpenDemo }: { onOpenDemo: (demoId: BenefitItem['demoId']) => void }) {

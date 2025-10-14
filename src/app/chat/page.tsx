@@ -14,7 +14,6 @@ const ChatSidebar = nextDynamic(() => import('@/components/ai/ChatSidebar').then
 })
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
-import { useMemo } from 'react'
 import Image from 'next/image'
 
 // ============================================================================

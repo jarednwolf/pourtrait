@@ -13,7 +13,7 @@ export function SommelierPreview() {
     <Card className="h-full" ref={ref as any} role="region" aria-labelledby="sommelier-heading">
       <CardHeader className="p-4">
         <CardTitle id="sommelier-heading" className="flex items-center text-base">
-          <Icon name="chat-bubble-left-right" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
+          <Icon name="chat-bubble-left" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           Sommelier Chat
         </CardTitle>
       </CardHeader>
