@@ -31,10 +31,10 @@ export function Benefits({ onOpenDemo }: { onOpenDemo: (demoId: BenefitItem['dem
                 <p className="text-sm text-gray-600 mt-1">{b.desc}</p>
                 <button
                   className="mt-3 inline-flex text-primary underline underline-offset-4"
-                  onClick={() => { track('home_benefit_demo_open', { demo: b.demoId }); onOpenDemo(b.demoId) }}
-                  aria-label={`Learn more about ${b.title}`}
+                  onClick={() => { track('cta_start_profile', { source: `benefit_${b.demoId}` }); onOpenDemo(b.demoId) }}
+                  aria-label={`Start your profile from ${b.title}`}
                 >
-                  Learn more
+                  Start profile
                 </button>
               </div>
             </div>

@@ -20,6 +20,20 @@ export const events = {
   panelImpression: (panel: string) => track('panel_impression', { panel }),
   onboardingStepViewed: (step: number) => track('onboarding_step_viewed', { step }),
   onboardingStepCompleted: (step: number) => track('onboarding_step_completed', { step }),
+  // Funnel instrumentation additions
+  quizStarted: () => track('quiz_started'),
+  quizAnswered: (id: string) => track('quiz_answered', { id }),
+  quizCompleted: () => track('quiz_completed'),
+  tasteProfileSaved: () => track('taste_profile_saved'),
+  recRequested: (type: string) => track('rec_requested', { type }),
+  recShown: (type: string) => track('rec_shown', { type }),
+  recFeedback: (type: 'accepted' | 'rejected' | 'modified') => track(`rec_feedback_${type}`),
+  consumptionLogged: () => track('consumption_logged'),
+  ratingSubmitted: (rating: number) => track('rating_submitted', { rating }),
+  cellarImportStarted: () => track('cellar_import_started'),
+  cellarImportCompleted: () => track('cellar_import_completed'),
+  guestCellarPreviewViewed: () => track('guest_cellar_preview_viewed'),
+  chatPromptClicked: (prompt: string) => track('chat_prompt_clicked', { prompt }),
 } as const
 
 

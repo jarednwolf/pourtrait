@@ -48,6 +48,16 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
       if (result.needsEmailConfirmation) {
         setSuccess(true)
       } else {
+        // If quiz responses exist locally, upsert taste profile
+        try {
+          if (typeof window !== 'undefined') {
+            const raw = window.localStorage.getItem('pourtrait_quiz_responses_v1')
+            if (raw && result.session?.user?.id) {
+              await AuthService.upsertTasteProfileFromQuiz(result.session.user.id, raw)
+              window.localStorage.removeItem('pourtrait_quiz_responses_v1')
+            }
+          }
+        } catch {}
         if (onSuccess) {
           onSuccess()
         } else {

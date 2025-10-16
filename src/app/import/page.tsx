@@ -205,8 +205,8 @@ export default function ImportHelperPage() {
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>CSV Import Helper</CardTitle>
-            <CardDescription>Prepare a CSV to quickly import your cellar.</CardDescription>
+            <CardTitle>Import your cellar (fast start)</CardTitle>
+            <CardDescription>Get to value quickly: add at least 5 bottles to unlock stronger recommendations and drink-window insights.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -215,8 +215,11 @@ export default function ImportHelperPage() {
                 <div className="mt-1 text-sm text-gray-600">
                   name, producer, vintage, region, country, varietal (comma-separated), type (red/white/rosé/sparkling/dessert/fortified), quantity, purchase_price, purchase_date (YYYY-MM-DD), personal_rating (1-10), personal_notes
                 </div>
-                <div className="mt-3">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <Button onClick={handleDownload} aria-label="Download sample CSV">Download sample CSV</Button>
+                  <Button asChild variant="outline" onClick={() => track('cta_start_profile', { source: 'import_helper' })}>
+                    <a href="/onboarding/step1" aria-label="Start your taste profile">Start your taste profile</a>
+                  </Button>
                 </div>
               </div>
 
@@ -267,7 +270,7 @@ export default function ImportHelperPage() {
               {headers.length > 0 && (
                 <div className="space-y-2" aria-label="Validate import">
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" onClick={() => { runValidation(); setPreviewed(true); }} aria-label="Validate and preview">
+                    <Button variant="outline" onClick={() => { runValidation(); setPreviewed(true); track('cellar_import_started') }} aria-label="Validate and preview">
                       Validate & Preview
                     </Button>
                     {validated && validationErrors.length === 0 && (
@@ -317,8 +320,8 @@ export default function ImportHelperPage() {
                     </table>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button onClick={handleImport} aria-label="Start import">{enableWrite ? 'Import' : 'Simulate Import'}</Button>
-                    <span className="text-xs text-gray-500">{mappedRecords.length} rows detected</span>
+                    <Button onClick={() => { handleImport(); track('cellar_import_completed') }} aria-label="Start import">{enableWrite ? 'Import' : 'Simulate Import'}</Button>
+                    <span className="text-xs text-gray-500">{mappedRecords.length} rows detected • Aim for 5+ to power better recs</span>
                   </div>
                 </div>
               )}

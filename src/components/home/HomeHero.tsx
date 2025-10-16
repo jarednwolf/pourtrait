@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
-import { AuthGate } from '@/components/auth/AuthGate'
 
 interface HomeHeroProps {
   className?: string
@@ -32,18 +31,16 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
               Every bottle a brushstroke
             </h1>
             <p className="mt-4 text-lg sm:text-xl text-gray-700 dark:text-gray-300 max-w-2xl">
-              Pourtrait learns your taste with each choice—using AI to paint a personal portrait of what you love to drink.
+              Get a personalized wine pick in 60 seconds. Start your taste profile now and see tonight’s recommendation.
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <AuthGate action={{ type: 'chat', params: { q: "What's your top pick for tonight?" } }}>
-                <Button asChild size="lg" onClick={() => track('cta_home_signup_click')}>
-                  <a href="/auth/signup" aria-label="Create your free account">
-                    Create your free account
-                    <Icon name="arrow-right" className="w-5 h-5 ml-2" aria-hidden="true" />
-                  </a>
-                </Button>
-              </AuthGate>
+              <Button asChild size="lg" onClick={() => track('cta_home_start_profile')}>
+                <a href="/onboarding/step1" aria-label="Start your taste profile and see tonight’s pick">
+                  Start your taste profile
+                  <Icon name="arrow-right" className="w-5 h-5 ml-2" aria-hidden="true" />
+                </a>
+              </Button>
               <Button asChild variant="outline" size="lg">
                 <a href="#how-it-works" aria-label="Learn how Pourtrait works">How it works</a>
               </Button>

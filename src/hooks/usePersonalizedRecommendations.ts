@@ -1,6 +1,7 @@
 // Personalized Recommendations Hook - Client-side interface
 
 import { useState, useCallback } from 'react'
+import { track } from '@/lib/utils/track'
 import { useAuth } from './useAuth'
 import { 
   PersonalizedRecommendationResponse, 
@@ -34,6 +35,7 @@ export function usePersonalizedRecommendations() {
   const getTonightRecommendations = useCallback(async (
     context?: RecommendationContext
   ): Promise<PersonalizedRecommendationResponse | null> => {
+    track('rec_requested', { type: 'tonight' })
     if (!user) {
       setState(prev => ({ ...prev, error: 'User not authenticated' }))
       return null
@@ -86,6 +88,8 @@ export function usePersonalizedRecommendations() {
         loading: false
       }))
 
+      track('rec_shown', { type: 'tonight', count: recommendations?.recommendations?.length || 0 })
+
       return recommendations
 
     } catch (error) {
@@ -105,6 +109,7 @@ export function usePersonalizedRecommendations() {
   const getPurchaseRecommendations = useCallback(async (
     context?: RecommendationContext
   ): Promise<PersonalizedRecommendationResponse | null> => {
+    track('rec_requested', { type: 'purchase' })
     if (!user) {
       setState(prev => ({ ...prev, error: 'User not authenticated' }))
       return null
@@ -144,6 +149,8 @@ export function usePersonalizedRecommendations() {
         loading: false
       }))
 
+      track('rec_shown', { type: 'purchase', count: recommendations?.recommendations?.length || 0 })
+
       return recommendations
 
     } catch (error) {
@@ -163,6 +170,7 @@ export function usePersonalizedRecommendations() {
   const getContextualRecommendations = useCallback(async (
     context: RecommendationContext
   ): Promise<PersonalizedRecommendationResponse | null> => {
+    track('rec_requested', { type: 'contextual' })
     if (!user) {
       setState(prev => ({ ...prev, error: 'User not authenticated' }))
       return null
@@ -201,6 +209,8 @@ export function usePersonalizedRecommendations() {
         recommendations,
         loading: false
       }))
+
+      track('rec_shown', { type: 'contextual', count: recommendations?.recommendations?.length || 0 })
 
       return recommendations
 
