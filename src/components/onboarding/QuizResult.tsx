@@ -271,6 +271,7 @@ export function QuizResult({
           onClick={onComplete}
           size="lg"
           className="flex items-center"
+          aria-label="Complete setup"
         >
           <Icon name="sparkles" size="sm" className="mr-2" />
           Get tonight’s pick

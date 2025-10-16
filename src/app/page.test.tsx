@@ -13,14 +13,14 @@ describe('Home Page', () => {
   it('displays the tagline', () => {
     render(<Home />)
     
-    const tagline = screen.getByText(/Pourtrait learns your taste/i)
+    const tagline = screen.getByText(/Get a personalized wine pick/i)
     expect(tagline).toBeInTheDocument()
   })
 
   it('shows hero actions', () => {
     render(<Home />)
     
-    const ctas = screen.getAllByRole('link', { name: /Create your free account/i })
-    expect(ctas.length).toBeGreaterThan(0)
+    const cta = screen.getByRole('link', { name: /Start your taste profile/i })
+    expect(cta).toBeInTheDocument()
   })
 })

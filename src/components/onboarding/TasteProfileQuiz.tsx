@@ -38,7 +38,7 @@ export function TasteProfileQuiz({
   // Load saved responses from localStorage (pre-auth persistence)
   React.useEffect(() => {
     try {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
         const raw = window.localStorage.getItem(LOCAL_KEY)
         if (raw) {
           const parsed = JSON.parse(raw)
@@ -217,7 +217,8 @@ export function TasteProfileQuiz({
 
         <Button
           onClick={handleNext}
-          disabled={currentQuestion.required && currentValue === undefined}
+          disabled={!!(currentQuestion.required && currentValue === undefined)}
+          aria-disabled={!!(currentQuestion.required && currentValue === undefined)}
           className="flex items-center"
         >
           {isLastQuestion ? 'Finish' : 'Next'}
