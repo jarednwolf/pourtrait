@@ -264,6 +264,70 @@ export class WineService {
   }
 
   /**
+   * Create a minimal wine and immediately log consumption for users who rate wines not in inventory
+   */
+  static async createWineAndMarkConsumed(
+    userId: string,
+    minimal: { name: string; producer?: string; vintage?: number; region?: string; country?: string; type: 'red'|'white'|'rosé'|'sparkling'|'dessert'|'fortified' },
+    consumedAt: Date,
+    rating?: number,
+    notes?: string,
+    occasion?: string,
+    companions?: string[],
+    foodPairing?: string
+  ): Promise<void> {
+    // Create minimal wine
+    const wineInsert: WineInsert = {
+      user_id: userId,
+      name: minimal.name,
+      producer: minimal.producer || 'Unknown Producer',
+      vintage: minimal.vintage || new Date().getFullYear(),
+      region: minimal.region || 'Unknown',
+      country: minimal.country || 'Unknown',
+      varietal: [],
+      type: minimal.type,
+      quantity: 0,
+      drinking_window: {
+        earliestDate: null,
+        peakStartDate: null,
+        peakEndDate: null,
+        latestDate: null,
+        currentStatus: 'ready',
+      },
+    }
+
+    const { data: wine, error: addError } = await supabase
+      .from('wines')
+      .insert(wineInsert)
+      .select()
+      .single()
+
+    if (addError) {
+      throw new Error(`Failed to create minimal wine: ${addError.message}`)
+    }
+
+    // Log consumption
+    const consumptionRecord: ConsumptionHistoryInsert = {
+      user_id: userId,
+      wine_id: wine.id,
+      consumed_at: consumedAt.toISOString(),
+      rating,
+      notes,
+      occasion,
+      companions: companions || [],
+      food_pairing: foodPairing,
+    }
+
+    const { error: consError } = await supabase
+      .from('consumption_history')
+      .insert(consumptionRecord)
+
+    if (consError) {
+      throw new Error(`Failed to record consumption: ${consError.message}`)
+    }
+  }
+
+  /**
    * Get consumption history for a user
    */
   static async getConsumptionHistory(userId: string): Promise<ConsumptionRecord[]> {

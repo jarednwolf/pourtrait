@@ -1,6 +1,8 @@
 import { supabase } from './supabase'
 import type { User, AuthError } from '@supabase/supabase-js'
 import type { UserProfile } from './supabase'
+import { calculateTasteProfile } from '@/lib/onboarding/quiz-calculator'
+import type { QuizResponse } from '@/lib/onboarding/quiz-data'
 
 export interface AuthUser extends User {
   profile?: UserProfile
@@ -87,6 +89,42 @@ export class AuthService {
     } catch (error) {
       console.error('Sign up error:', error)
       throw error
+    }
+  }
+
+  /**
+   * Upsert taste profile from pre-auth quiz responses
+   * rawResponses: JSON stringified QuizResponse[] stored in localStorage
+   */
+  static async upsertTasteProfileFromQuiz(userId: string, rawResponses: string) {
+    try {
+      const parsed = JSON.parse(rawResponses)
+      if (!Array.isArray(parsed)) { return }
+      const responses: QuizResponse[] = parsed.map((r: any) => ({
+        questionId: r.questionId,
+        value: r.value,
+        timestamp: new Date(r.timestamp || Date.now())
+      }))
+
+      // Compute a full taste profile from quiz responses
+      const result = calculateTasteProfile(responses)
+
+      const { error } = await supabase
+        .from('taste_profiles')
+        .upsert({
+          user_id: userId,
+          red_wine_preferences: result.redWinePreferences as any,
+          white_wine_preferences: result.whiteWinePreferences as any,
+          sparkling_preferences: result.sparklingPreferences as any,
+          general_preferences: result.generalPreferences as any,
+          learning_history: responses as any,
+          confidence_score: result.confidenceScore as any,
+          last_updated: new Date().toISOString() as any,
+        }, { onConflict: 'user_id' } as any)
+
+      if (error) { throw error }
+    } catch (error) {
+      console.error('Upsert taste profile from quiz error:', error)
     }
   }
 

@@ -34,6 +34,21 @@ export function TasteProfileQuiz({
   const [showResult, setShowResult] = React.useState(false)
   const [quizResult, setQuizResult] = React.useState<any>(null)
   const [errors, setErrors] = React.useState<string[]>([])
+  const LOCAL_KEY = 'pourtrait_quiz_responses_v1'
+  // Load saved responses from localStorage (pre-auth persistence)
+  React.useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const raw = window.localStorage.getItem(LOCAL_KEY)
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          if (Array.isArray(parsed)) {
+            setResponses(parsed.map((r: any) => ({ ...r, timestamp: new Date(r.timestamp) })))
+          }
+        }
+      }
+    } catch {}
+  }, [])
 
   const currentQuestion = quizQuestions[currentQuestionIndex]
   const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1
@@ -45,6 +60,12 @@ export function TasteProfileQuiz({
     if (onSave && responses.length > 0) {
       onSave(responses)
     }
+    // persist locally pre-auth
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(LOCAL_KEY, JSON.stringify(responses))
+      }
+    } catch {}
   }, [responses, onSave])
 
   const handleResponseChange = (value: any) => {

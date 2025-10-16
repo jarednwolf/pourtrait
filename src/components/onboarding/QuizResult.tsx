@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { educationalContent } from '@/lib/onboarding/quiz-data'
+import { PalatePortrait } from './PalatePortrait'
 import { cn } from '@/lib/design-system/utils'
 
 interface QuizResultProps {
@@ -131,6 +132,14 @@ export function QuizResult({
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
+            {/* Palate Portrait Radar */}
+            <div className="md:col-span-3">
+              <PalatePortrait
+                red={result.redWinePreferences}
+                white={result.whiteWinePreferences}
+                sparkling={result.sparklingPreferences}
+              />
+            </div>
             {/* Red Wine Preferences */}
             <div className="space-y-3">
               <h4 className="font-semibold text-red-600 flex items-center">
@@ -263,8 +272,8 @@ export function QuizResult({
           size="lg"
           className="flex items-center"
         >
-          <Icon name="arrow-right" size="sm" className="mr-2" />
-          Complete Setup
+          <Icon name="sparkles" size="sm" className="mr-2" />
+          Get tonight’s pick
         </Button>
         <Button
           variant="outline"

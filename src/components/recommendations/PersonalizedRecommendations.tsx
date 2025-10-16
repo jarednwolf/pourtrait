@@ -9,6 +9,7 @@ import { RecommendationContext } from '@/types'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
+import { WineService } from '@/lib/services/wine-service'
 
 // ============================================================================
 // Tonight's Recommendations Component
@@ -313,11 +314,57 @@ function RecommendationCard({
 }: RecommendationCardProps) {
   const { submitFeedback } = useRecommendationFeedback()
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
+  const [showRatePrompt, setShowRatePrompt] = useState(false)
+  const [rating, setRating] = useState<number | null>(null)
+  const [rateSubmitting, setRateSubmitting] = useState(false)
+  const [rateSuccess, setRateSuccess] = useState(false)
 
   const handleFeedback = async (feedback: 'accepted' | 'rejected') => {
     const success = await submitFeedback(recommendation.id, feedback)
     if (success) {
       setFeedbackSubmitted(true)
+      if (feedback === 'accepted' && recommendation.wineId) {
+        setShowRatePrompt(true)
+      }
+    }
+  }
+
+  const handleModify = async () => {
+    const reason = typeof window !== 'undefined' ? window.prompt('How would you like to adjust this recommendation? (e.g., prefer white under $30, pairing with chicken)') : null
+    if (!reason) {return}
+    await submitFeedback(recommendation.id, 'modified', reason)
+    setFeedbackSubmitted(true)
+  }
+
+  const handleLogConsumption = async () => {
+    if (rating === null) {return}
+    try {
+      setRateSubmitting(true)
+      if (recommendation.wineId) {
+        await WineService.markConsumed(recommendation.wineId, new Date(), rating)
+      } else if (recommendation.suggestedWine) {
+        const sw = recommendation.suggestedWine
+        await WineService.createWineAndMarkConsumed(
+          recommendation.userId,
+          {
+            name: sw.name,
+            producer: sw.producer,
+            vintage: sw.vintage,
+            region: sw.region,
+            country: undefined,
+            type: sw.type,
+          },
+          new Date(),
+          rating
+        )
+      }
+      setRateSuccess(true)
+      setShowRatePrompt(false)
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to log consumption', e)
+    } finally {
+      setRateSubmitting(false)
     }
   }
 
@@ -414,9 +461,40 @@ function RecommendationCard({
               >
                 <Icon name="x-circle" className="w-4 h-4" />
               </Button>
+              <Button
+                onClick={handleModify}
+                variant="outline"
+                size="sm"
+                className="px-2"
+              >
+                <Icon name="edit" className="w-4 h-4" />
+              </Button>
             </div>
           )}
         </div>
+
+        {/* Inline rating prompt after accept */}
+        {showRatePrompt && recommendation.wineId && (
+          <div className="mt-3 p-2 border rounded-lg">
+            <div className="text-sm font-medium mb-2">Rate this wine (1–10)</div>
+            <div className="flex flex-wrap gap-1 mb-2">
+              {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
+                <Button key={n} size="sm" variant={rating === n ? 'primary' : 'outline'} onClick={() => setRating(n)} className="px-2">
+                  {n}
+                </Button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={handleLogConsumption} disabled={rating === null || rateSubmitting}>
+                {rateSubmitting ? 'Saving…' : 'Log consumption'}
+              </Button>
+              {rateSuccess && (
+                <span className="text-xs text-green-700 flex items-center"><Icon name="success" className="w-3 h-3 mr-1" /> Saved</span>
+              )}
+              <a href="/inventory" className="text-xs underline text-gray-600 ml-2">View in cellar</a>
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   )

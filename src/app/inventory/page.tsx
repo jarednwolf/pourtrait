@@ -372,13 +372,36 @@ export default function InventoryPage() {
   )
 
   if (!user) {
+    // Guest preview: show empty state with sample-add and CTA to import/signup
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Icon name="wine" className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Please sign in to access your wine inventory
-          </h2>
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-3xl mx-auto">
+          <div className="mb-6 flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">Wine Inventory</h1>
+            <Button asChild onClick={() => track('cta_signup_clicked', { source: 'inventory_guest' })}>
+              <a href="/auth/signup" aria-label="Create your free account">Create your free account</a>
+            </Button>
+          </div>
+          <InventoryDashboard
+            stats={{ totalWines: 0, totalBottles: 0, ratedWines: 0, averageRating: 0, redWines: 0, whiteWines: 0, sparklingWines: 0 }}
+            wines={[]}
+            isLoading={false}
+            onAddRequest={() => {}}
+          />
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Button
+              variant="outline"
+              onClick={() => { try { window.dispatchEvent(new CustomEvent('sample_wine_add_request')) } catch {} track('sample_wine_requested', { source: 'inventory_guest' }) }}
+            >
+              Preview with a sample wine
+            </Button>
+            <Button asChild variant="outline" onClick={() => track('import_helper_viewed', { source: 'inventory_guest' })}>
+              <a href="/import" aria-label="Open CSV import helper">CSV import helper</a>
+            </Button>
+            <Button asChild onClick={() => track('cta_start_profile', { source: 'inventory_guest' })}>
+              <a href="/onboarding/step1" aria-label="Start your taste profile">Start your taste profile</a>
+            </Button>
+          </div>
         </div>
       </div>
     )
