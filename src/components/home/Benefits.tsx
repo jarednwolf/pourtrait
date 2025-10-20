@@ -23,7 +23,14 @@ export function Benefits({ onOpenDemo }: { onOpenDemo: (demoId: BenefitItem['dem
       <h2 id="benefits-heading" className="text-heading-2 text-gray-900 text-center">Why Pourtrait</h2>
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         {BENEFITS.map((b) => (
-          <Card key={b.demoId} className="p-5">
+          <Card
+            key={b.demoId}
+            className="p-5 cursor-pointer"
+            onClick={() => {
+              track('cta_tile_click', { tile: b.demoId })
+              onOpenDemo(b.demoId)
+            }}
+          >
             <div className="flex items-start">
               <div className="mr-3 mt-0.5 rounded-md bg-primary/10 p-2"><Icon name={b.icon} className="w-5 h-5 text-primary" aria-hidden="true" /></div>
               <div>
