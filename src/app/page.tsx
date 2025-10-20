@@ -3,14 +3,10 @@ export const revalidate = 0
 export const dynamic = 'force-dynamic'
 import { HomeBenefitsWrapper } from '@/components/home/HomeBenefitsWrapper'
 import nextDynamic from 'next/dynamic'
-import { Testimonials } from '@/components/home/Testimonials'
 import { track } from '@/lib/utils/track'
 import { CompleteProfileCTA } from '@/components/home/CompleteProfileCTA'
 // SocialProof removed from MVP landing to focus on funnel
-const HowItWorks = nextDynamic(
-  () => import('@/components/home/HowItWorks').then(m => m.HowItWorks),
-  { loading: () => <div className="h-24 bg-gray-100 rounded animate-pulse" aria-hidden="true" /> }
-)
+// HowItWorks removed from landing to reduce redundancy
 const TrustBadges = nextDynamic(
   () => import('@/components/home/TrustBadges').then(m => m.TrustBadges),
   { loading: () => <div className="h-16 bg-gray-100 rounded animate-pulse" aria-hidden="true" /> }
@@ -32,10 +28,7 @@ export default function Home() {
         <HomeHero />
 
         <HomeBenefitsWrapper />
-
-        <Testimonials />
-        <HowItWorks />
-        {/* StartHere removed; HowItWorks now covers the flow */}
+        {/* Testimonials and HowItWorks removed for simplicity */}
         <div className="mt-6">
           <CompleteProfileCTA source="home" />
         </div>

@@ -12,14 +12,9 @@ interface HomeHeroProps {
 export function HomeHero({ className = '' }: HomeHeroProps) {
   return (
     <section
-      className={`relative ${className}`}
+      className={`relative bg-gradient-to-b from-white via-primary/5 to-white dark:from-transparent dark:via-transparent dark:to-transparent ${className}`}
       aria-labelledby="home-hero-heading"
     >
-      {/* Decorative, CSS-only background (keeps LCP lightweight) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-primary/5 to-white dark:from-transparent dark:via-transparent dark:to-transparent"/>
-
       <div className="relative mx-auto max-w-6xl px-4 pt-8 pb-6 sm:pt-10 sm:pb-8 lg:pt-12 lg:pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Copy side */}
@@ -41,9 +36,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
                   <Icon name="arrow-right" className="w-5 h-5 ml-2" aria-hidden="true" />
                 </a>
               </Button>
-              <Button asChild variant="outline" size="lg">
-                <a href="#how-it-works" aria-label="Learn how Pourtrait works">How it works</a>
-              </Button>
+              {/* Secondary CTA removed for focus */}
             </div>
 
             <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-700">

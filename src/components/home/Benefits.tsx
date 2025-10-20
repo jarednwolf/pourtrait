@@ -29,13 +29,7 @@ export function Benefits({ onOpenDemo }: { onOpenDemo: (demoId: BenefitItem['dem
               <div>
                 <div className="font-medium text-gray-900">{b.title}</div>
                 <p className="text-sm text-gray-600 mt-1">{b.desc}</p>
-                <button
-                  className="mt-3 inline-flex text-primary underline underline-offset-4"
-                  onClick={() => { track('cta_start_profile', { source: `benefit_${b.demoId}` }); onOpenDemo(b.demoId) }}
-                  aria-label={`Start your profile from ${b.title}`}
-                >
-                  Start profile
-                </button>
+                {/* Per-card CTA removed to reduce redundancy */}
               </div>
             </div>
           </Card>

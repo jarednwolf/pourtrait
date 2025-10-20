@@ -23,4 +23,10 @@ describe('Home Page', () => {
     const ctas = screen.getAllByRole('link', { name: /Start your taste profile/i })
     expect(ctas.length).toBeGreaterThan(0)
   })
+
+  it('does not render testimonials or how it works', () => {
+    render(<Home />)
+    expect(screen.queryByText(/Loved by curious drinkers/i)).toBeNull()
+    expect(screen.queryByText(/How it works/i)).toBeNull()
+  })
 })
