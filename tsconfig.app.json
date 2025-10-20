@@ -12,6 +12,7 @@
     "src/hooks/**/*.ts",
     "src/hooks/**/*.tsx",
     "src/types/**/*.ts",
+    "src/types/**/*.d.ts",
     "src/lib/utils/track.ts"
   ],
   "exclude": [

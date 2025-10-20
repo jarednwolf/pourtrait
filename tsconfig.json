@@ -25,7 +25,8 @@
       "@/types/*": ["./src/types/*"],
       "@/utils/*": ["./src/utils/*"],
       "@/hooks/*": ["./src/hooks/*"],
-      "@/styles/*": ["./src/styles/*"]
+      "@/styles/*": ["./src/styles/*"],
+      "public/*": ["./public/*"]
     },
     "target": "es2017",
     "forceConsistentCasingInFileNames": true,
