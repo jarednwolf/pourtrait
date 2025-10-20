@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import Image from 'next/image'
-import heroImg from '@/../public/images/hero.jpg'
+import heroImg from '../../../public/images/hero.jpg'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
