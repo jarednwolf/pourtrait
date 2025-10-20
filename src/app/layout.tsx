@@ -2,9 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { OnboardingRedirect } from '@/components/providers/OnboardingRedirect'
-import { Button } from '@/components/ui/Button'
-import { Icon } from '@/components/ui/Icon'
-import { BrandLogo } from '@/components/layout/BrandLogo'
+import { BrandHomeLink } from '@/components/layout/BrandHomeLink'
+import { HeaderCta } from '@/components/layout/HeaderCta'
 import { Inter, Playfair_Display } from 'next/font/google'
 import React from 'react'
 import { PushOptInBanner } from '@/components/notifications/PushOptInBanner'
@@ -92,17 +91,10 @@ export default function RootLayout({
           <a href="#main-content" className="skip-link">Skip to main content</a>
           <header className="border-b border-gray-200 bg-white text-gray-900 dark:bg-dark-surface dark:border-gray-800" role="banner">
             <div className="max-w-6xl mx-auto px-4 h-18 flex items-center justify-between">
-              <a href="/" className="flex items-center" aria-label="Pourtrait home">
-                <BrandLogo className="h-8 sm:h-9" />
-              </a>
+              <BrandHomeLink />
               <nav aria-label="Primary navigation" className="flex items-center gap-2">
                 <ThemeToggle />
-                <Button asChild size="sm">
-                  <a href="/chat" aria-label="Ask the Sommelier">
-                    Ask the Sommelier
-                    <Icon name="arrow-right" className="w-4 h-4 ml-2" aria-hidden="true" />
-                  </a>
-                </Button>
+                <HeaderCta />
               </nav>
             </div>
               </header>

@@ -1,6 +1,7 @@
 "use client"
 import React from 'react'
 import Image from 'next/image'
+import heroImg from '@/../public/images/hero.jpg'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { track } from '@/lib/utils/track'
@@ -12,9 +13,11 @@ interface HomeHeroProps {
 export function HomeHero({ className = '' }: HomeHeroProps) {
   return (
     <section
-      className={`relative bg-gradient-to-b from-white via-primary/5 to-white dark:from-transparent dark:via-transparent dark:to-transparent ${className}`}
+      className={`relative bg-white dark:bg-transparent ${className}`}
       aria-labelledby="home-hero-heading"
     >
+      {/* subtle radial highlight */}
+      <div className="pointer-events-none absolute inset-0 [background:radial-gradient(1200px_500px_at_10%_0%,rgba(124,58,237,0.08),transparent_60%)]" aria-hidden="true" />
       <div className="relative mx-auto max-w-6xl px-4 pt-8 pb-6 sm:pt-10 sm:pb-8 lg:pt-12 lg:pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Copy side */}
@@ -68,14 +71,14 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
           <div className="lg:col-span-5">
             <div className="relative mx-auto w-full max-w-md h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden">
               <Image
-                src="/images/hero.jpg"
+                src={heroImg}
                 alt="Wine being poured into a glass with soft lighting"
                 fill
                 priority
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-fuchsia-200/20 to-rose-100/30 dark:from-primary/10 dark:via-transparent dark:to-transparent" aria-hidden="true" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-fuchsia-200/10 to-rose-100/15 dark:from-primary/10 dark:via-transparent dark:to-transparent" aria-hidden="true" />
               <div className="absolute inset-0 ring-1 ring-white/50 dark:ring-white/10" aria-hidden="true" />
             </div>
           </div>
