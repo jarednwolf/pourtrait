@@ -16,8 +16,6 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
       className={`relative bg-white dark:bg-transparent ${className}`}
       aria-labelledby="home-hero-heading"
     >
-      {/* subtle radial highlight */}
-      <div className="pointer-events-none absolute inset-0 [background:radial-gradient(1200px_500px_at_10%_0%,rgba(124,58,237,0.08),transparent_60%)]" aria-hidden="true" />
       <div className="relative mx-auto max-w-6xl px-4 pt-8 pb-6 sm:pt-10 sm:pb-8 lg:pt-12 lg:pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Copy side */}

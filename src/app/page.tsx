@@ -29,7 +29,7 @@ export default function Home() {
 
         <HomeBenefitsWrapper />
         {/* Testimonials and HowItWorks removed for simplicity */}
-        <div className="mt-6">
+        <div className="mt-10">
           <CompleteProfileCTA source="home" />
         </div>
         <TrustBadges />

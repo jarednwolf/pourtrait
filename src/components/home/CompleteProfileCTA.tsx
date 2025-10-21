@@ -14,7 +14,7 @@ export function CompleteProfileCTA({ source = 'home' }: CompleteProfileCTAProps)
   }
 
   return (
-    <Button asChild onClick={handleClick}>
+    <Button asChild variant="outline" onClick={handleClick}>
       <a href="/onboarding/step1" aria-label="Start your taste profile and see tonight’s pick">Start your taste profile</a>
     </Button>
   )

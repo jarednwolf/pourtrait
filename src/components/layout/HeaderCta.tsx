@@ -9,7 +9,7 @@ export function HeaderCta() {
   const label = user ? 'Account' : 'Sign in'
 
   return (
-    <Button asChild size="sm">
+    <Button asChild size="sm" variant="outline">
       <a href={href} aria-label={label}>{label}</a>
     </Button>
   )

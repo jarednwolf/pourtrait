@@ -92,7 +92,7 @@ export default function RootLayout({
           <header className="border-b border-gray-200 bg-white text-gray-900 dark:bg-dark-surface dark:border-gray-800" role="banner">
             <div className="max-w-6xl mx-auto px-4 h-18 flex items-center justify-between">
               <BrandHomeLink />
-              <nav aria-label="Primary navigation" className="flex items-center gap-2">
+              <nav aria-label="Primary navigation" className="flex items-center gap-4">
                 <ThemeToggle />
                 <HeaderCta />
               </nav>
