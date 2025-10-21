@@ -27,7 +27,8 @@ export default function OnboardingStep1() {
           }
         }} />
         <div className="mt-6 text-center">
-          <a href="/auth/signup" className="text-primary underline" aria-label="Save my profile on signup" onClick={() => track('signup_from_quiz_started')}>Save my profile on signup</a>
+          <p className="text-sm text-gray-600 mb-2">Create an account to save these answers to your profile.</p>
+          <a href="/auth/signup" className="text-primary underline" aria-label="Create account to save your quiz answers" onClick={() => track('signup_from_quiz_started')}>Create account to save your quiz answers</a>
         </div>
       </div>
     </div>

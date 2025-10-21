@@ -91,27 +91,27 @@ export const quizQuestions: QuizQuestion[] = [
       {
         id: 'beginner',
         label: 'New to wine',
-        description: 'I&apos;m just starting to explore wine and want to learn',
+        description: "I'm just starting to explore wine and want to learn",
         value: 'beginner',
-        educationalNote: 'Perfect! We&apos;ll focus on approachable wines and educational content.'
+        educationalNote: "Perfect! We'll focus on approachable wines and educational content."
       },
       {
         id: 'casual',
         label: 'Casual wine drinker',
         description: 'I enjoy wine occasionally but want to learn more',
         value: 'intermediate',
-        educationalNote: 'Great! We&apos;ll help you discover new styles and deepen your knowledge.'
+        educationalNote: "Great! We'll help you discover new styles and deepen your knowledge."
       },
       {
         id: 'enthusiast',
         label: 'Wine enthusiast',
         description: 'I have experience with different wines and regions',
         value: 'advanced',
-        educationalNote: 'Excellent! We&apos;ll provide detailed recommendations and advanced insights.'
+        educationalNote: "Excellent! We'll provide detailed recommendations and advanced insights."
       }
     ],
     required: true,
-    educationalNote: 'There&apos;s no wrong answer here - everyone starts somewhere, and wine is meant to be enjoyed at any level!'
+    educationalNote: "There's no wrong answer here - everyone starts somewhere, and wine is meant to be enjoyed at any level!"
   },
 
   // Wine Frequency and Context

@@ -226,29 +226,7 @@ export function TasteProfileQuiz({
         </Button>
       </div>
 
-      {/* Question Categories Legend */}
-      <Card className="bg-gray-50">
-        <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-4 justify-center text-sm">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-              <span className="text-gray-600">Experience</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-              <span className="text-gray-600">Preferences</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
-              <span className="text-gray-600">Lifestyle</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
-              <span className="text-gray-600">Food Pairing</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Legend removed to reduce redundancy with step indicators */}
     </div>
   )
 }

@@ -184,13 +184,10 @@ describe('TasteProfileQuiz Integration', () => {
       expect(infoButtons.length).toBeGreaterThan(0)
     })
 
-    it('should show question categories legend', () => {
+    it('should not render the old legend (redundant categories)', () => {
       render(<TasteProfileQuiz onComplete={mockOnComplete} />)
-
-      expect(screen.getByText('Experience')).toBeInTheDocument()
-      expect(screen.getByText('Preferences')).toBeInTheDocument()
-      expect(screen.getByText('Lifestyle')).toBeInTheDocument()
-      expect(screen.getByText('Food Pairing')).toBeInTheDocument()
+      expect(screen.queryByText('Experience')).not.toBeInTheDocument()
+      expect(screen.queryByText('Food Pairing')).not.toBeInTheDocument()
     })
   })
 
