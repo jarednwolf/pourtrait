@@ -189,6 +189,7 @@ describe('Quiz Calculator', () => {
         { questionId: 'sweetness', value: 5, timestamp: new Date() },
         { questionId: 'acidity', value: 5, timestamp: new Date() },
         { questionId: 'tannin', value: 5, timestamp: new Date() },
+        { questionId: 'bitterness', value: 5, timestamp: new Date() },
         { questionId: 'body', value: 5, timestamp: new Date() },
         { questionId: 'oak_and_butter', value: 'neutral', timestamp: new Date() },
         { questionId: 'exploration_budget', value: { novelty: 0.5, budgetTier: 'weekend' }, timestamp: new Date() }

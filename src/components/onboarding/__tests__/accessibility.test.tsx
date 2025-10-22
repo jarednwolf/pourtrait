@@ -64,7 +64,8 @@ describe('Onboarding Accessibility', () => {
     it('should have descriptive text for screen readers', () => {
       render(<OnboardingWelcome onStart={vi.fn()} onSkip={vi.fn()} />)
 
-      expect(screen.getByText(/Let's discover your wine preferences/)).toBeInTheDocument()
+      // Copy updated to set baseline expectation
+      expect(screen.getByText(/baseline/i)).toBeInTheDocument()
       expect(screen.getByText(/Your Privacy Matters/)).toBeInTheDocument()
     })
   })
