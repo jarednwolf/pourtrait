@@ -25,17 +25,25 @@ export function SignUpDialog({ openExternally = false }: SignUpDialogProps) {
 		return () => { document.body.style.overflow = '' }
 	}, [open])
 
-	async function signInWithProvider(provider: 'google'|'apple') {
-		await supabase.auth.signInWithOAuth({ provider, options: { redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined } })
-	}
+  async function signInWithProvider(provider: 'google'|'apple') {
+    const origin = typeof window !== 'undefined' ? window.location.origin : undefined
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: origin ? `${origin}/auth/callback?next=%2Fdashboard` : undefined }
+    })
+  }
 
-	async function signInWithEmail(e: React.FormEvent<HTMLFormElement>) {
+  async function signInWithEmail(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault()
 		const form = e.currentTarget
 		const data = new FormData(form)
 		const email = String(data.get('email') || '')
 		if (!email) { return }
-		await supabase.auth.signInWithOtp({ email })
+    const origin = typeof window !== 'undefined' ? window.location.origin : undefined
+    await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: origin ? `${origin}/auth/callback?next=%2Fdashboard` : undefined }
+    })
 		setOpen(false)
 	}
 

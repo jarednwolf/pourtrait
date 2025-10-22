@@ -44,6 +44,10 @@ export class AuthService {
    */
   static async signUp(data: SignUpData) {
     try {
+      const emailRedirectTo = typeof window !== 'undefined'
+        ? `${window.location.origin}/auth/callback?next=%2Fdashboard`
+        : undefined
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -52,6 +56,7 @@ export class AuthService {
             name: data.name,
             experience_level: data.experienceLevel,
           },
+          emailRedirectTo,
         },
       })
 

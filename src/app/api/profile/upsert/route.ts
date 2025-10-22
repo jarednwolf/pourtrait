@@ -89,6 +89,19 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Mark onboarding as completed and sync experience level on user profile
+    try {
+      const mappedExperience = profile.wineKnowledge === 'novice'
+        ? 'beginner'
+        : profile.wineKnowledge === 'expert'
+          ? 'advanced'
+          : profile.wineKnowledge
+      await supabase
+        .from('user_profiles')
+        .update({ onboarding_completed: true, experience_level: mappedExperience })
+        .eq('id', userId)
+    } catch {}
+
     return NextResponse.json({ success: true })
 
   } catch (error) {

@@ -22,10 +22,10 @@ function SignUpContent() {
           <a
             href="/onboarding"
             className="text-purple-700 underline"
-            aria-label="Start quick onboarding"
+            aria-label="Start your palate profile"
             onClick={() => track('onboarding_started', { source: 'auth_signup' })}
           >
-            Start quick onboarding
+            Start your palate profile
           </a>
         </div>
       </div>

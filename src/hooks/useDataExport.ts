@@ -63,8 +63,9 @@ export function useDataExport(): UseDataExportReturn {
       document.body.removeChild(a)
 
     } catch (err) {
+      // Stop spinner and surface lightweight message, but do not throw
       setError(err instanceof Error ? err.message : 'Export failed')
-      throw err
+      return
     } finally {
       setIsExporting(false)
     }
@@ -102,7 +103,7 @@ export function useDataExport(): UseDataExportReturn {
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Backup creation failed')
-      throw err
+      return
     } finally {
       setIsExporting(false)
     }
@@ -165,7 +166,7 @@ export function useDataExport(): UseDataExportReturn {
 
     } catch (err) {
       setError('Backup restore failed')
-      throw err
+      return
     } finally {
       setIsRestoring(false)
     }
@@ -194,7 +195,7 @@ export function useDataExport(): UseDataExportReturn {
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Data deletion failed')
-      throw err
+      return
     } finally {
       setIsDeleting(false)
     }
@@ -214,8 +215,15 @@ export function useDataExport(): UseDataExportReturn {
       return await response.json()
 
     } catch (err) {
+      // Return zeros if stats fail, and set lightweight message
       setError(err instanceof Error ? err.message : 'Failed to get export stats')
-      throw err
+      return {
+        totalWines: 0,
+        totalConsumptionRecords: 0,
+        hasTasteProfile: false,
+        accountCreated: '',
+        lastActivity: ''
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { AuthService, getAuthErrorMessage, type SignUpData } from '@/lib/auth'
@@ -22,6 +22,26 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const router = useRouter()
+
+  // Prefill experience level from saved onboarding responses (if present)
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') { return }
+      const raw = window.localStorage.getItem('pourtrait_quiz_responses_v1')
+      if (!raw) { return }
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) { return }
+      const responseMap = new Map(parsed.map((r: any) => [r.questionId, r.value]))
+      const level = responseMap.get('experience-level')
+      if (level === 'intermediate') {
+        setFormData(prev => ({ ...prev, experienceLevel: 'intermediate' }))
+      } else if (level === 'expert') {
+        setFormData(prev => ({ ...prev, experienceLevel: 'advanced' }))
+      } else if (level) {
+        setFormData(prev => ({ ...prev, experienceLevel: 'beginner' }))
+      }
+    } catch {}
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

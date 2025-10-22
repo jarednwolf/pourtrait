@@ -41,8 +41,9 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Redirect to the intended destination
-      return NextResponse.redirect(new URL(next, request.url))
+      // Redirect to finish page to complete onboarding/profile resume
+      const finishUrl = `/auth/callback/finish?next=${encodeURIComponent(next)}`
+      return NextResponse.redirect(new URL(finishUrl, request.url))
     } catch (error) {
       console.error('Session exchange error:', error)
       return NextResponse.redirect(new URL('/auth/signin?error=session_error', request.url))
