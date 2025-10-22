@@ -25,7 +25,7 @@ describe('TasteProfileQuiz Integration', () => {
 
       expect(screen.getByText('Discover Your Wine Preferences')).toBeInTheDocument()
       expect(screen.getByText(/Question \d+ of/)).toBeInTheDocument()
-      expect(screen.getByText('How would you describe your wine experience?')).toBeInTheDocument()
+      expect(screen.getByText('What best describes your wine experience?')).toBeInTheDocument()
     })
 
     it('should navigate to next question when answered', async () => {
@@ -126,7 +126,7 @@ describe('TasteProfileQuiz Integration', () => {
           expect.arrayContaining([
             expect.objectContaining({
               questionId: 'experience-level',
-              value: 'beginner'
+              value: 'novice'
             })
           ])
         )
@@ -150,7 +150,7 @@ describe('TasteProfileQuiz Integration', () => {
       )
 
       // Should show the pre-selected answer
-      const selectedOption = screen.getByRole('button', { name: /Casual wine drinker/i })
+      const selectedOption = screen.getByRole('button', { name: /Comfortable exploring/i })
     expect(selectedOption?.parentElement?.parentElement).toHaveClass('border-primary')
     })
   })
@@ -176,12 +176,9 @@ describe('TasteProfileQuiz Integration', () => {
   })
 
   describe('Educational Features', () => {
-    it('should show educational notes when available', () => {
+    it('should render clean UI without redundant tooltips', () => {
       render(<TasteProfileQuiz onComplete={mockOnComplete} />)
-
-      // Look for info buttons that show educational content
-      const infoButtons = screen.getAllByLabelText(/educational note/i)
-      expect(infoButtons.length).toBeGreaterThan(0)
+      expect(screen.queryByLabelText(/educational note/i)).toBeNull()
     })
 
     it('should not render the old legend (redundant categories)', () => {

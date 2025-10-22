@@ -32,7 +32,6 @@ interface QuizResultProps {
 export function QuizResult({
   result,
   onComplete,
-  onRetake,
   className
 }: QuizResultProps) {
   const experienceLevelLabels = {
@@ -223,67 +222,41 @@ export function QuizResult({
         </CardContent>
       </Card>
 
-      {/* Educational Recommendations */}
-      {result.educationalRecommendations.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Icon name="info" size="sm" className="mr-2" />
-              Personalized Tips for Your Wine Journey
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {result.educationalRecommendations.map((recommendation, index) => (
-                <div key={index} className="flex items-start">
-                  <Icon name="arrow-right" size="sm" className="text-primary mt-0.5 mr-3 flex-shrink-0" />
-                  <p className="text-gray-700">{recommendation}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Experience Level Tips */}
+      {/* Single concise tips block */}
       <Card className="bg-blue-50 border-blue-200">
         <CardHeader>
           <CardTitle className="flex items-center text-blue-900">
             <Icon name="info" size="sm" className="mr-2" />
             Tips for {experienceLevelLabels[result.experienceLevel]}
           </CardTitle>
+          <CardDescription className="text-blue-800">
+            Practical next steps based on your profile
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {educationalInfo.tips.map((tip, index) => (
-              <div key={index} className="flex items-start">
-                <Icon name="success" size="sm" className="text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
-                <p className="text-blue-800">{tip}</p>
-              </div>
-            ))}
+            {[...result.educationalRecommendations, ...educationalInfo.tips]
+              .slice(0, 4)
+              .map((tip, index) => (
+                <div key={index} className="flex items-start">
+                  <Icon name="arrow-right" size="sm" className="text-blue-700 mt-0.5 mr-3 flex-shrink-0" />
+                  <p className="text-blue-900">{tip}</p>
+                </div>
+              ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      {/* Single CTA to save profile */}
+      <div className="flex justify-center">
         <Button
           onClick={onComplete}
           size="lg"
           className="flex items-center"
-          aria-label="Complete setup"
+          aria-label="Create account to save your profile"
         >
           <Icon name="sparkles" size="sm" className="mr-2" />
-          Get tonight’s pick
-        </Button>
-        <Button
-          variant="outline"
-          onClick={onRetake}
-          size="lg"
-          className="flex items-center"
-        >
-          <Icon name="arrow-left" size="sm" className="mr-2" />
-          Retake Quiz
+          Create account to save your profile
         </Button>
       </div>
     </div>

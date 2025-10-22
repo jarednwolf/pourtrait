@@ -395,9 +395,7 @@ export default function InventoryPage() {
             >
               Preview with a sample wine
             </Button>
-            <Button asChild variant="outline" onClick={() => track('import_helper_viewed', { source: 'inventory_guest' })}>
-              <a href="/import" aria-label="Open CSV import helper">CSV import helper</a>
-            </Button>
+            {/* CSV import helper removed */}
             <Button asChild onClick={() => track('cta_start_profile', { source: 'inventory_guest' })}>
               <a href="/onboarding/step1" aria-label="Start your taste profile">Start your taste profile</a>
             </Button>

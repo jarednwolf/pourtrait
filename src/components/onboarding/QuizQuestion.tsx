@@ -24,10 +24,8 @@ export function QuizQuestion({
   question,
   value,
   onChange,
-  showEducationalNote = false,
   className
 }: QuizQuestionProps) {
-  const [showEducation, setShowEducation] = React.useState(showEducationalNote)
 
   const renderQuestionContent = () => {
     switch (question.type) {
@@ -77,20 +75,10 @@ export function QuizQuestion({
               </CardDescription>
             )}
           </div>
-          {question.educationalNote && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowEducation(!showEducation)}
-              className="ml-4 flex-shrink-0"
-              aria-label={showEducation ? 'Hide educational note' : 'Show educational note'}
-            >
-              <Icon name="info" size="sm" />
-            </Button>
-          )}
+          {/* Educational toggle removed for cleaner UI */}
         </div>
         
-        {showEducation && question.educationalNote && (
+        {false && question.educationalNote && (
           <div className="mt-4 rounded-lg bg-blue-50 p-4 border border-blue-200">
             <div className="flex items-start">
               <Icon name="info" size="sm" className="text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
@@ -242,7 +230,7 @@ function OptionCard({
   onClick: () => void
   selectionType: 'single' | 'multiple'
 }) {
-  const [showEducation, setShowEducation] = React.useState(false)
+  // Per-option educational toggles removed
 
   return (
     <div className="space-y-2">
@@ -305,29 +293,11 @@ function OptionCard({
             </div>
           </button>
           
-          {/* Educational Note Button - Separate from main button */}
-          {option.educationalNote && (
-            <button
-              type="button"
-              onClick={() => setShowEducation(!showEducation)}
-              className="flex-shrink-0 p-4 rounded-r-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              aria-label="Show educational note"
-            >
-              <Icon name="info" size="sm" />
-            </button>
-          )}
+          {/* Option-level info button removed */}
         </div>
       </div>
       
-      {/* Educational Note */}
-      {showEducation && option.educationalNote && (
-        <div className="ml-7 rounded-lg bg-blue-50 p-3 border border-blue-200">
-          <div className="flex items-start">
-            <Icon name="info" size="sm" className="text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
-            <p className="text-sm text-blue-800">{option.educationalNote}</p>
-          </div>
-        </div>
-      )}
+      {/* Option-level educational note removed */}
     </div>
   )
 }

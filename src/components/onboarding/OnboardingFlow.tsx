@@ -10,6 +10,8 @@ import { TasteProfileQuiz } from './TasteProfileQuiz'
 import { OnboardingWelcome } from './OnboardingWelcome'
 import { OnboardingComplete } from './OnboardingComplete'
 import { QuizResponse } from '@/lib/onboarding/quiz-data'
+import { calculateStructuredUserProfile } from '@/lib/onboarding/quiz-calculator'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/design-system/utils'
 
 type OnboardingStep = 'welcome' | 'quiz' | 'complete'
@@ -30,6 +32,7 @@ export function OnboardingFlow({
   const [currentStep, setCurrentStep] = React.useState<OnboardingStep>(initialStep)
   const [quizResponses, setQuizResponses] = React.useState<QuizResponse[]>([])
   const [quizResult, setQuizResult] = React.useState<any>(null)
+  const { user, getAccessToken } = useAuth()
 
   const handleStartQuiz = () => {
     setCurrentStep('quiz')
@@ -40,7 +43,20 @@ export function OnboardingFlow({
     setCurrentStep('complete')
   }
 
-  const handleOnboardingComplete = () => {
+  const handleOnboardingComplete = async () => {
+    // Persist structured profile if user is available
+    if (user && quizResponses.length > 0) {
+      const structured = calculateStructuredUserProfile(user.id, quizResponses)
+      // Send via secure API route
+      try {
+        const token = await getAccessToken()
+        await fetch('/api/profile/upsert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
+          body: JSON.stringify(structured)
+        })
+      } catch {}
+    }
     onComplete(quizResult)
   }
 

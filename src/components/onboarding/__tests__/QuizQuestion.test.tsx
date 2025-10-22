@@ -223,52 +223,14 @@ describe('QuizQuestion', () => {
       educationalNote: 'This is general educational content'
     }
 
-    it('should show educational note button when available', () => {
+    it('should render without legacy educational note buttons', () => {
       render(
         <QuizQuestion
           question={questionWithEducation}
           onChange={mockOnChange}
         />
       )
-
-      expect(screen.getAllByLabelText(/educational note/i)).toHaveLength(2) // Question and option both have educational notes
-    })
-
-    it('should toggle educational content visibility', async () => {
-      render(
-        <QuizQuestion
-          question={questionWithEducation}
-          onChange={mockOnChange}
-        />
-      )
-
-      // Educational content should not be visible initially
-      expect(screen.queryByText('This is general educational content')).not.toBeInTheDocument()
-
-      // Click to show educational content
-      const educationButton = screen.getAllByLabelText(/Show educational note/i)[0]
-      fireEvent.click(educationButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('This is general educational content')).toBeInTheDocument()
-      })
-    })
-
-    it('should show option educational content when toggled', async () => {
-      render(
-        <QuizQuestion
-          question={questionWithEducation}
-          onChange={mockOnChange}
-        />
-      )
-
-      // Click the option education button (second one)
-      const optionEducationButtons = screen.getAllByLabelText(/Show educational note/i)
-      fireEvent.click(optionEducationButtons[1])
-
-      await waitFor(() => {
-        expect(screen.getByText('This is educational content for option 1')).toBeInTheDocument()
-      })
+      expect(screen.queryByLabelText(/educational note/i)).toBeNull()
     })
   })
 

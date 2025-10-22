@@ -5,6 +5,8 @@ import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { track } from '@/lib/utils/track'
 import { TasteProfileQuiz } from '@/components/onboarding/TasteProfileQuiz'
+import { calculateStructuredUserProfile } from '@/lib/onboarding/quiz-calculator'
+import { upsertUserProfile } from '@/lib/profile/persist'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function OnboardingStep1() {
@@ -17,9 +19,13 @@ export default function OnboardingStep1() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <TasteProfileQuiz onComplete={() => {
+        <TasteProfileQuiz onComplete={(result) => {
           track('quiz_completed')
           if (user) {
+            try {
+              const structured = calculateStructuredUserProfile(user.id, result?.responses || [])
+              upsertUserProfile(user.id, structured)
+            } catch {}
             router.push('/onboarding/completed')
           } else {
             track('signup_from_quiz_started')

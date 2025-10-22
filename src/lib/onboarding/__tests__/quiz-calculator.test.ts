@@ -185,13 +185,13 @@ describe('Quiz Calculator', () => {
   describe('validateQuizResponses', () => {
     it('should validate complete required responses', () => {
       const responses: QuizResponse[] = [
-        { questionId: 'experience-level', value: 'beginner', timestamp: new Date() },
-        { questionId: 'drinking-frequency', value: 'monthly', timestamp: new Date() },
-        { questionId: 'price-range', value: { min: 15, max: 30 }, timestamp: new Date() },
-        { questionId: 'sweetness-preference', value: 5, timestamp: new Date() },
-        { questionId: 'body-preference', value: 'medium', timestamp: new Date() },
-        { questionId: 'food-pairing-importance', value: 6, timestamp: new Date() },
-        { questionId: 'flavor-intensity', value: 'moderate', timestamp: new Date() }
+        { questionId: 'experience-level', value: 'novice', timestamp: new Date() },
+        { questionId: 'sweetness', value: 5, timestamp: new Date() },
+        { questionId: 'acidity', value: 5, timestamp: new Date() },
+        { questionId: 'tannin', value: 5, timestamp: new Date() },
+        { questionId: 'body', value: 5, timestamp: new Date() },
+        { questionId: 'oak_and_butter', value: 'neutral', timestamp: new Date() },
+        { questionId: 'exploration_budget', value: { novelty: 0.5, budgetTier: 'weekend' }, timestamp: new Date() }
       ]
 
       const validation = validateQuizResponses(responses)
@@ -205,7 +205,7 @@ describe('Quiz Calculator', () => {
 
     it('should identify missing required responses', () => {
       const responses: QuizResponse[] = [
-        { questionId: 'experience-level', value: 'beginner', timestamp: new Date() }
+        { questionId: 'experience-level', value: 'novice', timestamp: new Date() }
         // Missing other required questions
       ]
 
@@ -213,26 +213,26 @@ describe('Quiz Calculator', () => {
 
       expect(validation.isValid).toBe(false)
       expect(validation.missingRequired.length).toBeGreaterThan(0)
-      expect(validation.missingRequired).toContain('drinking-frequency')
+      expect(validation.missingRequired).toContain('sweetness')
     })
 
     it('should validate scale question values', () => {
       const responses: QuizResponse[] = [
-        { questionId: 'experience-level', value: 'beginner', timestamp: new Date() },
-        { questionId: 'sweetness-preference', value: 15, timestamp: new Date() } // Invalid: max is 10
+        { questionId: 'experience-level', value: 'novice', timestamp: new Date() },
+        { questionId: 'sweetness', value: 15, timestamp: new Date() } // Invalid: max is 10
       ]
 
       const validation = validateQuizResponses(responses)
 
       expect(validation.isValid).toBe(false)
       expect(validation.errors.some(error => 
-        error.includes('sweetness-preference')
+        error.includes('sweetness')
       )).toBe(true)
     })
 
     it('should validate single-choice question values', () => {
       const responses: QuizResponse[] = [
-        { questionId: 'experience-level', value: 'expert', timestamp: new Date() } // Invalid option
+        { questionId: 'experience-level', value: 'advanced', timestamp: new Date() } // Invalid for new schema
       ]
 
       const validation = validateQuizResponses(responses)

@@ -406,14 +406,7 @@ export function WineInventoryList({
           >
             Add sample
           </button>
-          <a
-            href="/import?source=inventory_empty_state"
-            onClick={() => track('csv_import_cta_clicked', { source: 'inventory_empty_state' })}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary"
-            aria-label="Open CSV import helper"
-          >
-            CSV import helper
-          </a>
+          {/* CSV import helper removed to simplify onboarding */}
         </EmptyState>
       ) : (
         <div id="inventory-results" className={

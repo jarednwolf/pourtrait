@@ -7,6 +7,7 @@
 
 import { QuizResponse, QuizResult, quizQuestions } from './quiz-data'
 import type { FlavorProfile, GeneralPreferences } from '@/types'
+import type { UserProfile, AromaAffinity, FlavorMaps, StablePalate, StyleLevers } from '@/types/profile'
 
 export interface CalculationWeights {
   experienceWeight: number
@@ -52,6 +53,149 @@ export function calculateTasteProfile(responses: QuizResponse[]): QuizResult {
 }
 
 /**
+ * New structured profile calculator for long-term palate modeling
+ */
+export function calculateStructuredUserProfile(
+  userId: string,
+  responses: QuizResponse[]
+): UserProfile {
+  const get = (id: string) => responses.find(r => r.questionId === id)?.value
+  const scale01 = (v: number | undefined, max = 10) => {
+    if (v === undefined || v === null || isNaN(v as any)) return 0.5
+    return Math.max(0, Math.min(1, Number(v) / max))
+  }
+
+  // Stable palate
+  const stablePalate: StablePalate = {
+    sweetness: scale01(get('sweetness')),
+    acidity: scale01(get('acidity')),
+    tannin: scale01(get('tannin')),
+    bitterness: scale01(get('bitterness')),
+    body: scale01(get('body')),
+    alcoholWarmth: 0.5, // not directly asked yet; inferred later
+    sparkleIntensity: scale01(get('sparkle_intensity'))
+  }
+
+  // Style levers from oak/butter
+  const oakChoice = get('oak_and_butter') as string | undefined
+  const styleLevers: StyleLevers = {
+    oak: oakChoice === 'oaky_buttery' ? 0.8 : oakChoice === 'neutral' ? 0.4 : 0.1,
+    malolacticButter: oakChoice === 'oaky_buttery' ? 0.8 : oakChoice === 'neutral' ? 0.3 : 0.0,
+    oxidative: 0.2,
+    minerality: 0.5, // temporary; refined after fruitRipeness calculation
+    fruitRipeness: 0.5
+  }
+  // Derive fruit ripeness roughly from body and sweetness, then set minerality inversely
+  styleLevers.fruitRipeness = Math.min(1, (stablePalate.body * 0.6) + (stablePalate.sweetness * 0.4))
+  styleLevers.minerality = Math.max(0, 1 - styleLevers.fruitRipeness)
+
+  // Aromas
+  const likes = (get('aroma_likes') as string[] | undefined) || []
+  const aromaAffinities: AromaAffinity[] = likes.slice(0, 2).map((fam) => ({ family: fam as any, affinity: 0.6 }))
+
+  // Sparkling specifics
+  const sparklingDryness = get('sparkling') as string | undefined
+  const sparkling = { drynessBand: sparklingDryness, bubbleIntensity: stablePalate.sparkleIntensity }
+
+  // Occasions → default weights
+  const occasionAnswers = (get('occasions') as string[] | undefined) || []
+  const defaultOccasions = ['everyday','hot_day_patio','cozy_winter']
+  const occasions = (occasionAnswers.length ? occasionAnswers : defaultOccasions).slice(0, 3)
+  const contextWeights = occasions.map(occ => ({
+    occasion: occ as any,
+    weights: defaultContextWeightsFor(occ)
+  }))
+
+  // Food profile
+  const heatLevel = Number(get('food_calibrators'))
+  const foodProfile = isNaN(heatLevel) ? undefined : {
+    heatLevel: Math.max(0, Math.min(5, heatLevel)) as 0|1|2|3|4|5,
+    salt: 0.5,
+    fat: 0.5,
+    sauceSweetness: stablePalate.sweetness,
+    sauceAcidity: stablePalate.acidity,
+    cuisines: [],
+    proteins: []
+  }
+
+  // Exploration + budget
+  const expl = get('exploration_budget') as { novelty: number; budgetTier: any } | undefined
+  const preferences = {
+    novelty: expl ? expl.novelty : 0.5,
+    budgetTier: (expl ? expl.budgetTier : 'weekend') as any,
+    values: []
+  }
+
+  // Dislikes
+  const dislikes = ((get('dislikes') as string[] | undefined) || []).slice(0, 5)
+
+  // Flavor maps (simple aggregation by color)
+  const flavorMaps: FlavorMaps = {
+    red: {
+      tannin: stablePalate.tannin,
+      acidity: stablePalate.acidity,
+      body: stablePalate.body,
+      oak: styleLevers.oak,
+      fruitRipeness: styleLevers.fruitRipeness,
+      aromaAffinitiesTop: aromaAffinities.map(a => a.family).slice(0, 2)
+    },
+    white: {
+      acidity: stablePalate.acidity,
+      body: stablePalate.body,
+      oak: styleLevers.oak,
+      aromaAffinitiesTop: aromaAffinities.map(a => a.family).slice(0, 2)
+    },
+    sparkling: {
+      dryness: sparkling.drynessBand,
+      bubbleIntensity: stablePalate.sparkleIntensity
+    }
+  }
+
+  const wineKnowledge = (get('experience-level') as any) || 'novice'
+
+  const profile: UserProfile = {
+    userId,
+    stablePalate,
+    aromaAffinities,
+    styleLevers,
+    contextWeights,
+    foodProfile,
+    preferences,
+    dislikes,
+    sparkling,
+    wineKnowledge,
+    flavorMaps
+  }
+
+  return profile
+}
+
+function defaultContextWeightsFor(occasion: string) {
+  switch (occasion) {
+    case 'hot_day_patio':
+      return { acidity: 0.8, sparkleIntensity: 0.6, body: 0.2 }
+    case 'cozy_winter':
+      return { body: 0.7, tannin: 0.6, oak: 0.4, alcoholWarmth: 0.6 }
+    case 'spicy_food_night':
+      return { sweetness: 0.3, acidity: 0.6, alcoholWarmth: 0.2 }
+    case 'steak_night':
+      return { tannin: 0.7, body: 0.6 }
+    case 'seafood_sushi':
+      return { acidity: 0.7, body: 0.3 }
+    case 'pizza_pasta':
+      return { acidity: 0.6, tannin: 0.4 }
+    case 'celebration_toast':
+      return { sparkleIntensity: 0.7, acidity: 0.5 }
+    case 'dessert_night':
+      return { sweetness: 0.6 }
+    case 'aperitif':
+      return { acidity: 0.6, bitterness: 0.3 }
+    default:
+      return { body: 0.3, acidity: 0.4 }
+  }
+}
+
+/**
  * Determine user experience level from responses
  */
 function determineExperienceLevel(
@@ -87,6 +231,11 @@ function calculateRedWinePreferences(responseMap: Map<string, any>): Partial<Fla
   const sweetnessPreference = responseMap.get('sweetness-preference')
   if (sweetnessPreference !== undefined) {
     preferences.sweetness = Math.max(1, sweetnessPreference - 2) // Red wines are typically drier
+  }
+  // Occasion nuance can slightly shift toward drier if user picks dry at dining
+  const sweetnessOccasion = responseMap.get('sweetness-occasion')
+  if (sweetnessOccasion === 'dining-dry') {
+    preferences.sweetness = Math.max(1, (preferences.sweetness ?? 3) - 1)
   }
   
   // Body preference
@@ -191,6 +340,10 @@ function calculateWhiteWinePreferences(responseMap: Map<string, any>): Partial<F
   const sweetnessPreference = responseMap.get('sweetness-preference')
   if (sweetnessPreference !== undefined) {
     preferences.sweetness = sweetnessPreference
+  }
+  const sweetnessOccasion = responseMap.get('sweetness-occasion')
+  if (sweetnessOccasion === 'dining-off-dry') {
+    preferences.sweetness = Math.max(3, (preferences.sweetness ?? 3))
   }
   
   // Body preference

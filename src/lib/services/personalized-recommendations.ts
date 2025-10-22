@@ -352,36 +352,30 @@ export class PersonalizedRecommendationService {
     tasteProfile: TasteProfile,
     consumptionHistory: ConsumptionRecord[]
   ): number {
-    let score = 0.5 // Base score
+    // Backwards-compatible fallback using existing taste profile if structured profile not yet wired
+    let score = 0.5
 
-    // Get relevant flavor profile based on wine type
-    const flavorProfile = wine.type === 'red' 
+    const flavorProfile = wine.type === 'red'
       ? tasteProfile.redWinePreferences
       : wine.type === 'white'
       ? tasteProfile.whiteWinePreferences
       : tasteProfile.sparklingPreferences
 
-    // Check preferred regions
     if (flavorProfile.preferredRegions.includes(wine.region)) {
-      score += 0.2
+      score += 0.15
     }
 
-    // Check preferred varietals
-    const hasPreferredVarietal = wine.varietal.some(v => 
-      flavorProfile.preferredVarietals.includes(v)
-    )
+    const hasPreferredVarietal = wine.varietal.some(v => flavorProfile.preferredVarietals.includes(v))
     if (hasPreferredVarietal) {
-      score += 0.2
+      score += 0.15
     }
 
-    // Check recent consumption patterns
     const recentConsumption = consumptionHistory
       .filter(c => c.wineId === wine.id)
       .slice(0, 3)
-
     if (recentConsumption.length > 0) {
       const avgRating = recentConsumption.reduce((sum, c) => sum + (c.rating || 5), 0) / recentConsumption.length
-      score += (avgRating - 5) * 0.1 // Adjust based on past ratings
+      score += (avgRating - 5) * 0.1
     }
 
     return Math.min(Math.max(score, 0), 1)

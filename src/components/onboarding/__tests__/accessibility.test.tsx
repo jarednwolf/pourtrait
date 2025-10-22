@@ -267,7 +267,6 @@ describe('Onboarding Accessibility', () => {
         <QuizResult
           result={mockResult}
           onComplete={vi.fn()}
-          onRetake={vi.fn()}
         />
       )
 
@@ -289,11 +288,8 @@ describe('Onboarding Accessibility', () => {
         />
       )
 
-      const completeButton = screen.getByRole('button', { name: /complete setup/i })
-      const retakeButton = screen.getByRole('button', { name: /retake quiz/i })
-
-      expect(completeButton).toBeInTheDocument()
-      expect(retakeButton).toBeInTheDocument()
+      const saveButton = screen.getByRole('button', { name: /create account to save your profile/i })
+      expect(saveButton).toBeInTheDocument()
     })
 
     it('should have descriptive content for screen readers', () => {
@@ -301,7 +297,6 @@ describe('Onboarding Accessibility', () => {
         <QuizResult
           result={mockResult}
           onComplete={vi.fn()}
-          onRetake={vi.fn()}
         />
       )
 

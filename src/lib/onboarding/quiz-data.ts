@@ -80,244 +80,216 @@ interface GeneralPreferences {
  * Designed to be approachable for beginners while gathering meaningful data
  */
 export const quizQuestions: QuizQuestion[] = [
-  // Experience Level Assessment
+  // 12 Core questions aligned to the long-term profile model
   {
     id: 'experience-level',
     type: 'single-choice',
     category: 'experience',
-    question: 'How would you describe your wine experience?',
-    description: 'This helps us tailor our recommendations to your comfort level.',
+    question: 'What best describes your wine experience?',
     options: [
-      {
-        id: 'beginner',
-        label: 'New to wine',
-        description: "I'm just starting to explore wine and want to learn",
-        value: 'beginner',
-        educationalNote: "Perfect! We'll focus on approachable wines and educational content."
-      },
-      {
-        id: 'casual',
-        label: 'Casual wine drinker',
-        description: 'I enjoy wine occasionally but want to learn more',
-        value: 'intermediate',
-        educationalNote: "Great! We'll help you discover new styles and deepen your knowledge."
-      },
-      {
-        id: 'enthusiast',
-        label: 'Wine enthusiast',
-        description: 'I have experience with different wines and regions',
-        value: 'advanced',
-        educationalNote: "Excellent! We'll provide detailed recommendations and advanced insights."
-      }
-    ],
-    required: true,
-    educationalNote: "There's no wrong answer here - everyone starts somewhere, and wine is meant to be enjoyed at any level!"
-  },
-
-  // Wine Frequency and Context
-  {
-    id: 'drinking-frequency',
-    type: 'single-choice',
-    category: 'lifestyle',
-    question: 'How often do you typically drink wine?',
-    description: 'This helps us understand your wine consumption patterns.',
-    options: [
-      { id: 'rarely', label: 'Rarely (special occasions only)', value: 'rarely' },
-      { id: 'monthly', label: 'A few times a month', value: 'monthly' },
-      { id: 'weekly', label: 'Weekly', value: 'weekly' },
-      { id: 'daily', label: 'Most days', value: 'daily' }
+      { id: 'novice', label: 'New to wine', value: 'novice' },
+      { id: 'intermediate', label: 'Comfortable exploring', value: 'intermediate' },
+      { id: 'expert', label: 'Wine expert', value: 'expert' }
     ],
     required: true
   },
-
-  // Price Comfort Zone
   {
-    id: 'price-range',
-    type: 'single-choice',
-    category: 'preferences',
-    question: 'What\'s your typical budget for a bottle of wine?',
-    description: 'We\'ll recommend wines that fit comfortably within your budget.',
-    options: [
-      { id: 'budget', label: 'Under $15', value: { min: 0, max: 15 } },
-      { id: 'moderate', label: '$15 - $30', value: { min: 15, max: 30 } },
-      { id: 'premium', label: '$30 - $60', value: { min: 30, max: 60 } },
-      { id: 'luxury', label: '$60+', value: { min: 60, max: 200 } },
-      { id: 'varies', label: 'It varies by occasion', value: { min: 0, max: 100 } }
-    ],
-    required: true,
-    educationalNote: 'Great wines exist at every price point - we\'ll help you find the best value for your budget.'
-  },
-
-  // Wine Types Experience
-  {
-    id: 'wine-types-tried',
-    type: 'multiple-choice',
-    category: 'experience',
-    question: 'Which types of wine have you tried and enjoyed?',
-    description: 'Select all that apply. Don\'t worry if you haven\'t tried many - we\'ll help you explore!',
-    options: [
-      { id: 'red-light', label: 'Light red wines (like Pinot Noir)', value: 'red-light' },
-      { id: 'red-medium', label: 'Medium-bodied reds (like Merlot)', value: 'red-medium' },
-      { id: 'red-full', label: 'Full-bodied reds (like Cabernet Sauvignon)', value: 'red-full' },
-      { id: 'white-crisp', label: 'Crisp white wines (like Sauvignon Blanc)', value: 'white-crisp' },
-      { id: 'white-rich', label: 'Rich white wines (like Chardonnay)', value: 'white-rich' },
-      { id: 'sparkling', label: 'Sparkling wines (like Champagne or Prosecco)', value: 'sparkling' },
-      { id: 'rose', label: 'Rosé wines', value: 'rose' },
-      { id: 'sweet', label: 'Sweet wines (like Riesling or Port)', value: 'sweet' },
-      { id: 'none', label: 'I haven\'t tried many wines yet', value: 'none' }
-    ],
-    required: false,
-    educationalNote: 'Each wine type offers unique flavors and experiences - there\'s a whole world to explore!'
-  },
-
-  // Flavor Preferences - Sweetness
-  {
-    id: 'sweetness-preference',
+    id: 'sweetness',
     type: 'scale',
     category: 'preferences',
-    question: 'Do you prefer dry or sweet wines?',
-    description: 'Think about other drinks you enjoy - do you like sweet cocktails or prefer them dry?',
-    scaleConfig: {
-      min: 1,
-      max: 10,
-      minLabel: 'Very dry (no sweetness)',
-      maxLabel: 'Very sweet',
-      step: 1
-    },
-    required: true,
-    educationalNote: 'Dry wines have little to no residual sugar, while sweet wines have noticeable sweetness. Most table wines are dry to off-dry.'
+    question: 'Sweetness tolerance',
+    description: 'Bone-dry ↔ noticeable sweetness',
+    scaleConfig: { min: 0, max: 10, minLabel: 'Bone-dry', maxLabel: 'Sweet', step: 1 },
+    required: true
   },
-
-  // Flavor Preferences - Body/Weight
   {
-    id: 'body-preference',
+    id: 'acidity',
+    type: 'scale',
+    category: 'preferences',
+    question: 'Acidity (refreshment) tolerance',
+    description: 'Mellow ↔ lemonade-like zing',
+    scaleConfig: { min: 0, max: 10, minLabel: 'Mellow', maxLabel: 'Zippy', step: 1 },
+    required: true
+  },
+  {
+    id: 'tannin',
+    type: 'scale',
+    category: 'preferences',
+    question: 'Tannin tolerance (drying/tea-like grip)',
+    scaleConfig: { min: 0, max: 10, minLabel: 'Low', maxLabel: 'High', step: 1 },
+    required: true
+  },
+  {
+    id: 'bitterness',
+    type: 'scale',
+    category: 'preferences',
+    question: 'Bitterness sensitivity',
+    scaleConfig: { min: 0, max: 10, minLabel: 'Sensitive', maxLabel: 'Enjoy some', step: 1 },
+    required: false
+  },
+  {
+    id: 'body',
+    type: 'scale',
+    category: 'preferences',
+    question: 'Body preference',
+    description: 'Light ↔ full (skim ↔ whole milk mouthfeel)',
+    scaleConfig: { min: 0, max: 10, minLabel: 'Light', maxLabel: 'Full', step: 1 },
+    required: true
+  },
+  {
+    id: 'oak_and_butter',
     type: 'single-choice',
     category: 'preferences',
-    question: 'When it comes to wine weight and richness, what appeals to you?',
-    description: 'Think of it like milk - skim milk is light, whole milk is fuller.',
+    question: 'Oak/vanilla and buttery notes',
     options: [
-      {
-        id: 'light',
-        label: 'Light and delicate',
-        description: 'Refreshing, easy-drinking wines',
-        value: 'light',
-        educationalNote: 'Light wines are perfect for warm weather and pair well with lighter foods.'
-      },
-      {
-        id: 'medium',
-        label: 'Medium-bodied',
-        description: 'Balanced between light and rich',
-        value: 'medium',
-        educationalNote: 'Medium-bodied wines are versatile and pair with a wide range of foods.'
-      },
-      {
-        id: 'full',
-        label: 'Rich and full-bodied',
-        description: 'Bold, intense wines with lots of flavor',
-        value: 'full',
-        educationalNote: 'Full-bodied wines are great with hearty meals and for sipping slowly.'
-      },
-      {
-        id: 'varies',
-        label: 'I enjoy different styles',
-        description: 'It depends on my mood and the occasion',
-        value: 'varies'
-      }
+      { id: 'crisp', label: 'Prefer crisp/stainless (no butter/oak)', value: 'stainless' },
+      { id: 'neutral', label: 'Some neutral oak OK', value: 'neutral' },
+      { id: 'oaky_buttery', label: 'I enjoy vanilla/toast/buttery', value: 'oaky_buttery' }
     ],
     required: true
   },
-
-  // Food Pairing Importance
   {
-    id: 'food-pairing-importance',
-    type: 'scale',
-    category: 'food-pairing',
-    question: 'How important is it that wine pairs well with food?',
-    description: 'Some people love wine with meals, others prefer it on its own.',
-    scaleConfig: {
-      min: 1,
-      max: 10,
-      minLabel: 'I mostly drink wine alone',
-      maxLabel: 'Wine and food pairing is essential',
-      step: 1
-    },
-    required: true,
-    educationalNote: 'Great wine can be enjoyed both ways! Food pairing can enhance both the wine and the meal.'
-  },
-
-  // Occasion Preferences
-  {
-    id: 'occasion-preferences',
-    type: 'multiple-choice',
-    category: 'lifestyle',
-    question: 'When do you most enjoy drinking wine?',
-    description: 'Select all situations where you might enjoy wine.',
+    id: 'sparkling',
+    type: 'single-choice',
+    category: 'preferences',
+    question: 'Sparkling sweetness',
     options: [
-      { id: 'dinner-home', label: 'Dinner at home', value: 'dinner-home' },
-      { id: 'dinner-out', label: 'Dining out at restaurants', value: 'dinner-out' },
-      { id: 'social', label: 'Social gatherings with friends', value: 'social' },
-      { id: 'romantic', label: 'Romantic occasions', value: 'romantic' },
-      { id: 'celebrations', label: 'Celebrations and special events', value: 'celebrations' },
-      { id: 'relaxing', label: 'Relaxing after work', value: 'relaxing' },
-      { id: 'cooking', label: 'While cooking', value: 'cooking' },
-      { id: 'weekend', label: 'Weekend afternoons', value: 'weekend' }
+      { id: 'brut', label: 'Brut-dry', value: 'Brut' },
+      { id: 'extra_brut', label: 'Extra Brut', value: 'Extra Brut' },
+      { id: 'demi_sec', label: 'Hint of sweetness (Demi-Sec)', value: 'Demi-Sec' }
     ],
     required: false
   },
-
-  // Flavor Intensity Preference
   {
-    id: 'flavor-intensity',
-    type: 'single-choice',
+    id: 'sparkle_intensity',
+    type: 'scale',
     category: 'preferences',
-    question: 'How do you feel about bold, intense flavors?',
-    description: 'Think about your preferences in food - do you like subtle or bold flavors?',
-    options: [
-      {
-        id: 'subtle',
-        label: 'I prefer subtle, delicate flavors',
-        value: 'subtle',
-        educationalNote: 'Elegant wines with finesse can be incredibly complex and rewarding.'
-      },
-      {
-        id: 'moderate',
-        label: 'I like a good balance',
-        value: 'moderate',
-        educationalNote: 'Balanced wines offer the best of both worlds - complexity without overwhelming intensity.'
-      },
-      {
-        id: 'bold',
-        label: 'I love bold, intense flavors',
-        value: 'bold',
-        educationalNote: 'Bold wines can be incredibly expressive and pair wonderfully with rich foods.'
-      }
-    ],
-    required: true
+    question: 'Bubble intensity preference',
+    scaleConfig: { min: 0, max: 10, minLabel: 'Gentle', maxLabel: 'Vigorous', step: 1 },
+    required: false
   },
-
-  // Regional Interest
   {
-    id: 'regional-interest',
+    id: 'aroma_likes',
     type: 'multiple-choice',
     category: 'preferences',
-    question: 'Are there any wine regions that interest you?',
-    description: 'Don\'t worry if you\'re not familiar with regions - we can help you explore!',
+    question: 'Pick up to 2 aroma families you love lately',
     options: [
-      { id: 'france', label: 'France (Bordeaux, Burgundy, Champagne)', value: 'france' },
-      { id: 'italy', label: 'Italy (Tuscany, Piedmont, Veneto)', value: 'italy' },
-      { id: 'spain', label: 'Spain (Rioja, Ribera del Duero)', value: 'spain' },
-      { id: 'california', label: 'California (Napa Valley, Sonoma)', value: 'california' },
-      { id: 'oregon', label: 'Oregon (Willamette Valley)', value: 'oregon' },
-      { id: 'washington', label: 'Washington State', value: 'washington' },
-      { id: 'australia', label: 'Australia (Barossa Valley, Hunter Valley)', value: 'australia' },
-      { id: 'newzealand', label: 'New Zealand (Marlborough, Central Otago)', value: 'newzealand' },
-      { id: 'argentina', label: 'Argentina (Mendoza)', value: 'argentina' },
-      { id: 'chile', label: 'Chile (Maipo Valley, Casablanca)', value: 'chile' },
-      { id: 'explore', label: 'I\'d like to explore different regions', value: 'explore' },
-      { id: 'no-preference', label: 'No preference - surprise me!', value: 'no-preference' }
+      { id: 'citrus', label: 'Citrus', value: 'citrus' },
+      { id: 'stone_fruit', label: 'Stone fruit', value: 'stone_fruit' },
+      { id: 'tropical', label: 'Tropical', value: 'tropical' },
+      { id: 'red_fruit', label: 'Red fruit', value: 'red_fruit' },
+      { id: 'black_fruit', label: 'Black fruit', value: 'black_fruit' },
+      { id: 'floral', label: 'Floral', value: 'floral' },
+      { id: 'herbal_green', label: 'Herbal/green', value: 'herbal_green' },
+      { id: 'pepper_spice', label: 'Pepper/spice', value: 'pepper_spice' },
+      { id: 'earth_mineral', label: 'Earth/mineral', value: 'earth_mineral' },
+      { id: 'oak_vanilla_smoke', label: 'Oak/vanilla/smoke', value: 'oak_vanilla_smoke' },
+      { id: 'dairy_butter', label: 'Dairy/butter', value: 'dairy_butter' },
+      { id: 'honey_oxidative', label: 'Honey/oxidative', value: 'honey_oxidative' }
     ],
-    required: false,
-    educationalNote: 'Each region has its own unique style and character - exploring different regions is one of the joys of wine!'
+    required: false
+  },
+  {
+    id: 'dislikes',
+    type: 'multiple-choice',
+    category: 'preferences',
+    question: 'Any characteristics to avoid?',
+    options: [
+      { id: 'green_bell_pepper', label: 'Green bell pepper (pyrazine)', value: 'green_bell_pepper' },
+      { id: 'buttery', label: 'Buttery/diacetyl', value: 'buttery' },
+      { id: 'smoky', label: 'Smoky/oak', value: 'smoky' },
+      { id: 'high_alcohol', label: 'High alcohol heat', value: 'high_alcohol' },
+      { id: 'sweet', label: 'Noticeable sweetness', value: 'sweet' }
+    ],
+    required: false
+  },
+  {
+    id: 'occasions',
+    type: 'multiple-choice',
+    category: 'lifestyle',
+    question: 'Top two occasions you care about now',
+    options: [
+      { id: 'everyday', label: 'Everyday', value: 'everyday' },
+      { id: 'hot_day_patio', label: 'Hot day/patio', value: 'hot_day_patio' },
+      { id: 'cozy_winter', label: 'Cozy winter night', value: 'cozy_winter' },
+      { id: 'spicy_food_night', label: 'Spicy food night', value: 'spicy_food_night' },
+      { id: 'steak_night', label: 'Steak night', value: 'steak_night' },
+      { id: 'seafood_sushi', label: 'Seafood/sushi', value: 'seafood_sushi' },
+      { id: 'pizza_pasta', label: 'Pizza/pasta', value: 'pizza_pasta' },
+      { id: 'celebration_toast', label: 'Celebration/toast', value: 'celebration_toast' },
+      { id: 'dessert_night', label: 'Dessert night', value: 'dessert_night' },
+      { id: 'aperitif', label: 'Aperitif', value: 'aperitif' }
+    ],
+    required: false
+  },
+  {
+    id: 'food_calibrators',
+    type: 'scale',
+    category: 'food-pairing',
+    question: 'Spice/heat level you enjoy (0–5)',
+    scaleConfig: { min: 0, max: 5, minLabel: 'None', maxLabel: 'Very spicy', step: 1 },
+    required: false
+  },
+  {
+    id: 'exploration_budget',
+    type: 'single-choice',
+    category: 'preferences',
+    question: 'Exploration vs safe + typical budget lane',
+    options: [
+      { id: 'safe_weeknight', label: 'Play it safe • Weeknight', value: { novelty: 0.2, budgetTier: 'weeknight' } },
+      { id: 'mix_weekend', label: 'Mix of both • Weekend', value: { novelty: 0.5, budgetTier: 'weekend' } },
+      { id: 'adventurous_celebration', label: 'Adventurous • Celebration', value: { novelty: 0.8, budgetTier: 'celebration' } }
+    ],
+    required: true
+  }
+]
+
+// Optional expert-only questions (appended if experience-level === 'expert')
+export const expertQuestions: QuizQuestion[] = [
+  {
+    id: 'expert_regions_liked',
+    type: 'multiple-choice',
+    category: 'experience',
+    question: 'Regions you often enjoy (optional)',
+    options: [
+      { id: 'bordeaux', label: 'Bordeaux', value: 'Bordeaux' },
+      { id: 'burgundy', label: 'Burgundy', value: 'Burgundy' },
+      { id: 'rhine', label: 'Rhine/Mosel', value: 'Rhine' },
+      { id: 'tuscany', label: 'Tuscany', value: 'Tuscany' },
+      { id: 'piedmont', label: 'Piedmont', value: 'Piedmont' },
+      { id: 'napa', label: 'Napa Valley', value: 'Napa Valley' },
+      { id: 'willamette', label: 'Willamette', value: 'Willamette' }
+    ],
+    required: false
+  },
+  {
+    id: 'expert_grapes_liked',
+    type: 'multiple-choice',
+    category: 'experience',
+    question: 'Grapes/styles you seek out (optional)',
+    options: [
+      { id: 'pinot_noir', label: 'Pinot Noir', value: 'Pinot Noir' },
+      { id: 'cabernet', label: 'Cabernet Sauvignon', value: 'Cabernet Sauvignon' },
+      { id: 'nebbiolo', label: 'Nebbiolo', value: 'Nebbiolo' },
+      { id: 'chardonnay', label: 'Chardonnay', value: 'Chardonnay' },
+      { id: 'sauv_blanc', label: 'Sauvignon Blanc', value: 'Sauvignon Blanc' },
+      { id: 'riesling', label: 'Riesling', value: 'Riesling' },
+      { id: 'syrah', label: 'Syrah/Shiraz', value: 'Syrah' }
+    ],
+    required: false
+  },
+  {
+    id: 'expert_sensitivities',
+    type: 'multiple-choice',
+    category: 'experience',
+    question: 'Any sensitivities? (optional)',
+    options: [
+      { id: 'pyrazine', label: 'Pyrazine (green pepper)', value: 'pyrazine' },
+      { id: 'diacetyl', label: 'Diacetyl (buttery)', value: 'diacetyl' },
+      { id: 'brett', label: 'Brettanomyces (barnyard)', value: 'brett' },
+      { id: 'tdn', label: 'TDN (petrol)', value: 'tdn' }
+    ],
+    required: false
   }
 ]
 

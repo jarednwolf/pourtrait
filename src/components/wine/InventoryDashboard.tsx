@@ -371,13 +371,7 @@ export function InventoryDashboard({
               >
                 Add sample
               </Button>
-              <a
-                href="/import"
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                aria-label="Open CSV import helper"
-              >
-                CSV import helper
-              </a>
+              {/* CSV import helper removed for streamlined onboarding */}
             </div>
           </CardContent>
         </Card>

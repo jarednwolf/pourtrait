@@ -9,7 +9,7 @@ import React from 'react'
 import { QuizQuestion } from './QuizQuestion'
 import { QuizProgress } from './QuizProgress'
 import { QuizResult } from './QuizResult'
-import { quizQuestions, QuizResponse } from '@/lib/onboarding/quiz-data'
+import { quizQuestions, expertQuestions, QuizResponse } from '@/lib/onboarding/quiz-data'
 import { calculateTasteProfile, validateQuizResponses } from '@/lib/onboarding/quiz-calculator'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -50,9 +50,11 @@ export function TasteProfileQuiz({
     } catch {}
   }, [])
 
-  const currentQuestion = quizQuestions[currentQuestionIndex]
-  const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1
   const responseMap = new Map(responses.map(r => [r.questionId, r.value]))
+  const exp = responseMap.get('experience-level')
+  const assembledQuestions = exp === 'expert' ? [...quizQuestions, ...expertQuestions] : quizQuestions
+  const currentQuestion = assembledQuestions[currentQuestionIndex]
+  const isLastQuestion = currentQuestionIndex === assembledQuestions.length - 1
   const currentValue = responseMap.get(currentQuestion.id)
 
   // Auto-save responses when they change
@@ -113,7 +115,7 @@ export function TasteProfileQuiz({
       setErrors([
         ...validation.errors,
         ...validation.missingRequired.map(id => {
-          const question = quizQuestions.find(q => q.id === id)
+          const question = assembledQuestions.find(q => q.id === id)
           return `Please answer: ${question?.question || id}`
         })
       ])
@@ -121,7 +123,7 @@ export function TasteProfileQuiz({
     }
 
     const result = calculateTasteProfile(responses)
-    setQuizResult(result)
+    setQuizResult({ ...result, responses })
     setShowResult(true)
   }
 
@@ -139,7 +141,7 @@ export function TasteProfileQuiz({
     setErrors([])
   }
 
-  const progress = ((currentQuestionIndex + 1) / quizQuestions.length) * 100
+  const progress = ((currentQuestionIndex + 1) / assembledQuestions.length) * 100
 
   if (showResult && quizResult) {
     return (
@@ -169,7 +171,7 @@ export function TasteProfileQuiz({
       {/* Progress */}
       <QuizProgress
         currentQuestion={currentQuestionIndex + 1}
-        totalQuestions={quizQuestions.length}
+        totalQuestions={assembledQuestions.length}
         progress={progress}
       />
 
@@ -212,7 +214,7 @@ export function TasteProfileQuiz({
         <div className="flex items-center space-x-2 text-sm text-gray-500">
           <span>{currentQuestionIndex + 1}</span>
           <span>of</span>
-          <span>{quizQuestions.length}</span>
+          <span>{assembledQuestions.length}</span>
         </div>
 
         <Button

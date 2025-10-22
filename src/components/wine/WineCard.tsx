@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useAuth } from '@/hooks/useAuth'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -39,6 +40,7 @@ export function WineCard({
   priority = false
 }: WineCardProps) {
   const urgencyScore = DrinkingWindowService.getDrinkingUrgencyScore(wine)
+  const { getAccessToken } = useAuth()
 
   const handleCardClick = () => {
     if (onView) {
@@ -257,6 +259,16 @@ export function WineCard({
               onClick={(e) => {
                 e.stopPropagation()
                 onConsume(wine)
+                ;(async () => {
+                  try {
+                    const token = await getAccessToken()
+                    await fetch('/api/interactions/track', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
+                      body: JSON.stringify({ wineId: wine.id, reasons: ['consume'], context: {} })
+                    })
+                  } catch {}
+                })()
               }}
               className="flex-1"
             >
