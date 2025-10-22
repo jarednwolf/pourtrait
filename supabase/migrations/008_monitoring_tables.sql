@@ -389,7 +389,7 @@ RETURNS TABLE (
   type TEXT,
   severity TEXT,
   message TEXT,
-  timestamp TIMESTAMPTZ,
+  logged_at TIMESTAMPTZ,
   age INTERVAL
 ) AS $$
 BEGIN
@@ -399,7 +399,7 @@ BEGIN
     a.type,
     a.severity,
     a.message,
-    a.timestamp,
+    a.timestamp AS logged_at,
     NOW() - a.timestamp as age
   FROM alerts a
   WHERE a.resolved = FALSE

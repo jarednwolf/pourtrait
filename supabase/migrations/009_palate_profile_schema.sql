@@ -44,8 +44,13 @@ CREATE INDEX IF NOT EXISTS idx_palate_profiles_updated_at ON palate_profiles(upd
 
 -- RLS
 ALTER TABLE palate_profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Users can manage own palate profile" ON palate_profiles
-  FOR ALL USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename = 'palate_profiles' AND policyname = 'Users can manage own palate profile'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can manage own palate profile" ON palate_profiles FOR ALL USING (auth.uid() = user_id)';
+  END IF;
+END $$;
 
 -- Trigger to maintain updated_at
 DO $$ BEGIN
@@ -77,8 +82,13 @@ CREATE TABLE IF NOT EXISTS aroma_preferences (
 CREATE INDEX IF NOT EXISTS idx_aroma_preferences_user_id ON aroma_preferences(user_id);
 
 ALTER TABLE aroma_preferences ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Users can manage own aroma preferences" ON aroma_preferences
-  FOR ALL USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename = 'aroma_preferences' AND policyname = 'Users can manage own aroma preferences'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can manage own aroma preferences" ON aroma_preferences FOR ALL USING (auth.uid() = user_id)';
+  END IF;
+END $$;
 
 -- ============================================================================
 -- Context Preferences (occasion → weight vector)
@@ -101,8 +111,13 @@ CREATE INDEX IF NOT EXISTS idx_context_preferences_occasion ON context_preferenc
 CREATE INDEX IF NOT EXISTS idx_context_preferences_weights_gin ON context_preferences USING GIN (weights);
 
 ALTER TABLE context_preferences ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Users can manage own context preferences" ON context_preferences
-  FOR ALL USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename = 'context_preferences' AND policyname = 'Users can manage own context preferences'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can manage own context preferences" ON context_preferences FOR ALL USING (auth.uid() = user_id)';
+  END IF;
+END $$;
 
 -- ============================================================================
 -- Food Profiles (optional 1–1)
@@ -124,8 +139,13 @@ CREATE TABLE IF NOT EXISTS food_profiles (
 CREATE INDEX IF NOT EXISTS idx_food_profiles_user_id ON food_profiles(user_id);
 
 ALTER TABLE food_profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Users can manage own food profile" ON food_profiles
-  FOR ALL USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename = 'food_profiles' AND policyname = 'Users can manage own food profile'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can manage own food profile" ON food_profiles FOR ALL USING (auth.uid() = user_id)';
+  END IF;
+END $$;
 
 DO $$ BEGIN
   IF NOT EXISTS (
@@ -156,8 +176,13 @@ CREATE INDEX IF NOT EXISTS idx_style_likes_type ON style_likes(type);
 CREATE INDEX IF NOT EXISTS idx_style_likes_key ON style_likes(key);
 
 ALTER TABLE style_likes ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Users can manage own style likes" ON style_likes
-  FOR ALL USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename = 'style_likes' AND policyname = 'Users can manage own style likes'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can manage own style likes" ON style_likes FOR ALL USING (auth.uid() = user_id)';
+  END IF;
+END $$;
 
 -- ============================================================================
 -- Interaction Events (ongoing learning)
@@ -181,8 +206,13 @@ CREATE INDEX IF NOT EXISTS idx_interaction_events_ts ON interaction_events(ts DE
 CREATE INDEX IF NOT EXISTS idx_interaction_events_context_gin ON interaction_events USING GIN (context);
 
 ALTER TABLE interaction_events ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Users can manage own interaction events" ON interaction_events
-  FOR ALL USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename = 'interaction_events' AND policyname = 'Users can manage own interaction events'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can manage own interaction events" ON interaction_events FOR ALL USING (auth.uid() = user_id)';
+  END IF;
+END $$;
 
 -- ============================================================================
 -- Views (optional future): none in this migration

@@ -104,7 +104,7 @@ CREATE POLICY "Users can manage own chat feedback" ON chat_feedback
 
 -- Function to update conversation metadata when new message is added
 CREATE OR REPLACE FUNCTION update_conversation_on_message()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 BEGIN
   -- Update or create conversation record
   INSERT INTO chat_conversations (id, user_id, message_count, last_message_at, updated_at)
@@ -114,9 +114,9 @@ BEGIN
     last_message_at = NEW.created_at,
     updated_at = NEW.created_at;
   
-  RETURN NEW;
+RETURN NEW;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Trigger to update conversation metadata
 CREATE TRIGGER update_conversation_on_chat_message
@@ -125,7 +125,7 @@ CREATE TRIGGER update_conversation_on_chat_message
 
 -- Function to generate conversation title from first message
 CREATE OR REPLACE FUNCTION generate_conversation_title(conversation_uuid UUID)
-RETURNS TEXT AS $
+RETURNS TEXT AS $$
 DECLARE
   first_message TEXT;
   title TEXT;
@@ -149,9 +149,9 @@ BEGIN
     title := title || '...';
   END IF;
   
-  RETURN title;
+RETURN title;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Function to get conversation history with context
 CREATE OR REPLACE FUNCTION get_conversation_history(
@@ -159,7 +159,7 @@ CREATE OR REPLACE FUNCTION get_conversation_history(
   conversation_uuid UUID,
   message_limit INTEGER DEFAULT 20
 )
-RETURNS JSON AS $
+RETURNS JSON AS $$
 DECLARE
   result JSON;
 BEGIN
@@ -182,16 +182,16 @@ BEGIN
     LIMIT message_limit
   ) AS recent_messages;
   
-  RETURN COALESCE(result, '[]'::json);
+RETURN COALESCE(result, '[]'::json);
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to get user's recent conversations
 CREATE OR REPLACE FUNCTION get_user_conversations(
   target_user_id UUID,
   conversation_limit INTEGER DEFAULT 10
 )
-RETURNS JSON AS $
+RETURNS JSON AS $$
 DECLARE
   result JSON;
 BEGIN
@@ -216,9 +216,9 @@ BEGIN
   ORDER BY c.last_message_at DESC
   LIMIT conversation_limit;
   
-  RETURN COALESCE(result, '[]'::json);
+RETURN COALESCE(result, '[]'::json);
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================================
 -- Views for Analytics
@@ -285,4 +285,3 @@ VALUES (
   145
 ) ON CONFLICT DO NOTHING;
 */
-</content>
