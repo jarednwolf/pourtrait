@@ -9,7 +9,7 @@ import React from 'react'
 import { QuizQuestion } from './QuizQuestion'
 import { QuizProgress } from './QuizProgress'
 import { QuizResult } from './QuizResult'
-import { quizQuestions, expertQuestions, QuizResponse } from '@/lib/onboarding/quiz-data'
+import { quizQuestions, expertQuestions, exploringQuestions, experienceQuestion, QuizResponse } from '@/lib/onboarding/quiz-data'
 import { calculateTasteProfile, validateQuizResponses } from '@/lib/onboarding/quiz-calculator'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -52,7 +52,11 @@ export function TasteProfileQuiz({
 
   const responseMap = new Map(responses.map(r => [r.questionId, r.value]))
   const exp = responseMap.get('experience-level')
-  const assembledQuestions = exp === 'expert' ? [...quizQuestions, ...expertQuestions] : quizQuestions
+  const assembledQuestions = React.useMemo(() => {
+    if (exp === 'expert') {return [experienceQuestion, ...expertQuestions]}
+    if (exp === 'intermediate') {return [experienceQuestion, ...exploringQuestions]}
+    return quizQuestions
+  }, [exp])
   const currentQuestion = assembledQuestions[currentQuestionIndex]
   const isLastQuestion = currentQuestionIndex === assembledQuestions.length - 1
   const currentValue = responseMap.get(currentQuestion.id)
@@ -88,7 +92,7 @@ export function TasteProfileQuiz({
 
   const handleNext = () => {
     // Validate current question if required
-    if (currentQuestion.required && currentValue === undefined) {
+    if (currentQuestion.required && (currentValue === undefined || currentValue === '')) {
       setErrors([`Please answer the question: ${currentQuestion.question}`])
       return
     }
@@ -109,17 +113,25 @@ export function TasteProfileQuiz({
   }
 
   const handleFinishQuiz = () => {
-    const validation = validateQuizResponses(responses)
-    
-    if (!validation.isValid) {
-      setErrors([
-        ...validation.errors,
-        ...validation.missingRequired.map(id => {
-          const question = assembledQuestions.find(q => q.id === id)
-          return `Please answer: ${question?.question || id}`
-        })
-      ])
-      return
+    // For novice path, run existing validation. For exploring/expert, only require experience-level and allow empty free-text.
+    if (exp !== 'intermediate' && exp !== 'expert') {
+      const validation = validateQuizResponses(responses)
+      if (!validation.isValid) {
+        setErrors([
+          ...validation.errors,
+          ...validation.missingRequired.map(id => {
+            const question = assembledQuestions.find(q => q.id === id)
+            return `Please answer: ${question?.question || id}`
+          })
+        ])
+        return
+      }
+    } else {
+      // Ensure experience is set
+      if (!exp) {
+        setErrors(['Please select your experience level'])
+        return
+      }
     }
 
     const result = calculateTasteProfile(responses)

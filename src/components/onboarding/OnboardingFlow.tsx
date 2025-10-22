@@ -46,15 +46,37 @@ export function OnboardingFlow({
   const handleOnboardingComplete = async () => {
     // Persist structured profile if user is available
     if (user && quizResponses.length > 0) {
-      const structured = calculateStructuredUserProfile(user.id, quizResponses)
-      // Send via secure API route
+      const exp = new Map(quizResponses.map(r => [r.questionId, r.value])).get('experience-level')
       try {
         const token = await getAccessToken()
-        await fetch('/api/profile/upsert', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
-          body: JSON.stringify(structured)
-        })
+        if (exp === 'intermediate' || exp === 'expert') {
+          // Build free-text payload from responses
+          const freeTextAnswers: Record<string, string> = {}
+          quizResponses.forEach(r => {
+            if (typeof r.value === 'string') { freeTextAnswers[r.questionId] = r.value }
+          })
+          const mapRes = await fetch('/api/profile/map', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
+            body: JSON.stringify({ experience: exp, freeTextAnswers })
+          })
+          const mapped = await mapRes.json()
+          const profile = mapped?.data?.profile
+          if (profile) {
+            await fetch('/api/profile/upsert', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
+              body: JSON.stringify(profile)
+            })
+          }
+        } else {
+          const structured = calculateStructuredUserProfile(user.id, quizResponses)
+          await fetch('/api/profile/upsert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token || ''}` },
+            body: JSON.stringify(structured)
+          })
+        }
       } catch {}
     }
     onComplete(quizResult)

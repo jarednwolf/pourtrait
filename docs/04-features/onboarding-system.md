@@ -31,14 +31,12 @@ src/lib/onboarding/
 
 ## Key Features
 
-### 1. Adaptive Question Flow
+### 1. Adaptive Question Flow (Experience Branching)
 
-The quiz adapts to user responses and experience levels:
+We branch immediately by experience using `experience-level`:
 
-- **Beginner-friendly language**: Questions use approachable terminology
-- **Educational content**: Optional explanations for wine concepts
-- **Progressive disclosure**: Complex concepts introduced gradually
-- **Experience-based customization**: Different paths for different experience levels
+- **Novice (baseline)**: 10–12 structured scale/single-choice items. We explicitly separate dry/bitter tolerance and sweet preference as two distinct scale prompts. Output is mapped directly to the structured `UserProfile` via `calculateStructuredUserProfile`.
+- **Exploring / Expert (free-text)**: Replace most sliders with 3–5 free‑text prompts: bottles enjoyed and why; bottles not enjoyed and why; contexts/occasions; descriptors; plus a short prompt about sweet vs dry/bitter. These answers are sent to `/api/profile/map` where an LLM maps the notes to `UserProfile` (validated by Zod) and then `/api/profile/upsert` persists.
 
 ### 2. Question Types
 
@@ -68,7 +66,7 @@ The quiz adapts to user responses and experience levels:
 }
 ```
 
-#### Scale Questions
+#### Scale Questions (Novice path)
 ```typescript
 {
   id: 'sweetness-preference',
@@ -83,9 +81,9 @@ The quiz adapts to user responses and experience levels:
 }
 ```
 
-### 3. Taste Profile Calculation
+### 3. Taste Profile Calculation and LLM Mapping
 
-The system calculates comprehensive taste profiles:
+For Novice, we compute on-device via `quiz-calculator.ts`. For Exploring/Expert, we submit free‑text to `/api/profile/map` which uses `src/lib/profile/llm-mapper.ts` to produce a `UserProfile` that conforms to `UserProfileSchema`.
 
 #### Red Wine Preferences
 - Fruitiness (1-10 scale)
@@ -340,21 +338,19 @@ if (DEBUG_QUIZ) {
 
 The onboarding system integrates with the backend through:
 
-### 1. Profile Creation
+### 1. Profile Mapping (Exploring/Expert)
 ```typescript
-// Save taste profile to user account
-const saveProfile = async (userId: string, profile: TasteProfile) => {
-  await supabase
-    .from('taste_profiles')
-    .upsert({
-      user_id: userId,
-      ...profile,
-      last_updated: new Date()
-    })
-}
+// POST /api/profile/map (Node runtime)
+// body: { experience: 'intermediate'|'expert', freeTextAnswers: Record<string,string> }
 ```
 
-### 2. Response Persistence
+### 2. Profile Upsert
+```typescript
+// POST /api/profile/upsert (Edge runtime)
+// body: UserProfile (zod-validated)
+```
+
+### 3. Response Persistence
 ```typescript
 // Auto-save quiz responses
 const saveResponses = async (responses: QuizResponse[]) => {

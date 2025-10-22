@@ -58,31 +58,22 @@ This document outlines the design decisions and rationale behind the Pourtrait w
 - Personal vs. professional ratings separation
 - Image storage via URL references
 
-### Taste Profiles Table
+### Palate Profile (Long-term UserProfile)
 
-**Design Decision**: One-to-one relationship with users, storing preferences as JSONB objects.
+**Design Decision**: Use structured columns for stable palatal traits and style levers, with JSONB for flavor maps and flexible weights. Tables include `palate_profiles`, `aroma_preferences`, `context_preferences`, `food_profiles`, `style_likes`, and `interaction_events`.
 
 **Rationale**:
-- Taste preferences are complex, multi-dimensional data
-- JSONB allows for flexible preference structures
-- Separate profiles for different wine types (red, white, sparkling)
-- Learning history enables AI model improvement
+- Stable traits (sweetness, acidity, tannin, bitterness, body, alcohol warmth, sparkle intensity) are numeric 0..1 for modeling
+- Style levers (oak, malolactic butter, oxidative, minerality, fruit ripeness) enable precise recommendation scoring
+- JSONB flavor maps summarize red/white/sparkling preferences; context weights remain flexible per occasion
+- Separate aroma preferences and style likes support learning loops
 
-**Schema Structure**:
-```json
-{
-  "fruitiness": 1-10,
-  "earthiness": 1-10,
-  "oakiness": 1-10,
-  "acidity": 1-10,
-  "tannins": 1-10,
-  "sweetness": 1-10,
-  "body": "light|medium|full",
-  "preferredRegions": ["string"],
-  "preferredVarietals": ["string"],
-  "dislikedCharacteristics": ["string"]
-}
-```
+**LLM Mapping**:
+- Exploring/Expert onboarding collects free‑text; `/api/profile/map` uses an LLM to map text to `UserProfile` and validates with Zod (`UserProfileSchema`)
+- Include a per-section confidence (0..1) internally; low confidence values can down‑weight in scoring
+
+**Flavor Maps**:
+- `flavor_maps` JSONB stores compact summaries per color: key palate levers and top aroma families; used for UI and heuristics
 
 ### Recommendations Table
 

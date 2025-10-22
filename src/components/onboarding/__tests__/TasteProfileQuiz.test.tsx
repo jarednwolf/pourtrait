@@ -150,7 +150,7 @@ describe('TasteProfileQuiz Integration', () => {
       )
 
       // Should show the pre-selected answer
-      const selectedOption = screen.getByRole('button', { name: /Comfortable exploring/i })
+      const selectedOption = screen.getByRole('button', { name: /Exploring/i })
     expect(selectedOption?.parentElement?.parentElement).toHaveClass('border-primary')
     })
   })

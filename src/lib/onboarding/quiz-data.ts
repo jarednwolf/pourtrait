@@ -8,7 +8,7 @@
 
 export interface QuizQuestion {
   id: string
-  type: 'single-choice' | 'multiple-choice' | 'scale' | 'preference-grid'
+  type: 'single-choice' | 'multiple-choice' | 'scale' | 'preference-grid' | 'free-text'
   category: 'experience' | 'preferences' | 'lifestyle' | 'food-pairing'
   question: string
   description?: string
@@ -79,20 +79,23 @@ interface GeneralPreferences {
  * Quiz Questions Configuration
  * Designed to be approachable for beginners while gathering meaningful data
  */
+// Experience gate (shared first question)
+export const experienceQuestion: QuizQuestion = {
+  id: 'experience-level',
+  type: 'single-choice',
+  category: 'experience',
+  question: 'What best describes your wine experience?',
+  options: [
+    { id: 'novice', label: 'New to wine', value: 'novice' },
+    { id: 'intermediate', label: 'Exploring', value: 'intermediate' },
+    { id: 'expert', label: 'Expert', value: 'expert' }
+  ],
+  required: true
+}
+
 export const quizQuestions: QuizQuestion[] = [
-  // 12 Core questions aligned to the long-term profile model
-  {
-    id: 'experience-level',
-    type: 'single-choice',
-    category: 'experience',
-    question: 'What best describes your wine experience?',
-    options: [
-      { id: 'novice', label: 'New to wine', value: 'novice' },
-      { id: 'intermediate', label: 'Comfortable exploring', value: 'intermediate' },
-      { id: 'expert', label: 'Wine expert', value: 'expert' }
-    ],
-    required: true
-  },
+  // 12 Core questions aligned to the long-term profile model (Novice path)
+  experienceQuestion,
   {
     id: 'sweetness',
     type: 'scale',
@@ -125,7 +128,7 @@ export const quizQuestions: QuizQuestion[] = [
     category: 'preferences',
     question: 'Bitterness sensitivity',
     scaleConfig: { min: 0, max: 10, minLabel: 'Sensitive', maxLabel: 'Enjoy some', step: 1 },
-    required: false
+    required: true
   },
   {
     id: 'body',
@@ -247,51 +250,41 @@ export const quizQuestions: QuizQuestion[] = [
 // Optional expert-only questions (appended if experience-level === 'expert')
 export const expertQuestions: QuizQuestion[] = [
   {
-    id: 'expert_regions_liked',
-    type: 'multiple-choice',
+    id: 'free_enjoyed',
+    type: 'free-text',
     category: 'experience',
-    question: 'Regions you often enjoy (optional)',
-    options: [
-      { id: 'bordeaux', label: 'Bordeaux', value: 'Bordeaux' },
-      { id: 'burgundy', label: 'Burgundy', value: 'Burgundy' },
-      { id: 'rhine', label: 'Rhine/Mosel', value: 'Rhine' },
-      { id: 'tuscany', label: 'Tuscany', value: 'Tuscany' },
-      { id: 'piedmont', label: 'Piedmont', value: 'Piedmont' },
-      { id: 'napa', label: 'Napa Valley', value: 'Napa Valley' },
-      { id: 'willamette', label: 'Willamette', value: 'Willamette' }
-    ],
+    question: "Tell us about bottles you've enjoyed and why.",
+    description: 'Names, styles, producers, occasions — anything that stood out',
     required: false
   },
   {
-    id: 'expert_grapes_liked',
-    type: 'multiple-choice',
+    id: 'free_disliked',
+    type: 'free-text',
     category: 'experience',
-    question: 'Grapes/styles you seek out (optional)',
-    options: [
-      { id: 'pinot_noir', label: 'Pinot Noir', value: 'Pinot Noir' },
-      { id: 'cabernet', label: 'Cabernet Sauvignon', value: 'Cabernet Sauvignon' },
-      { id: 'nebbiolo', label: 'Nebbiolo', value: 'Nebbiolo' },
-      { id: 'chardonnay', label: 'Chardonnay', value: 'Chardonnay' },
-      { id: 'sauv_blanc', label: 'Sauvignon Blanc', value: 'Sauvignon Blanc' },
-      { id: 'riesling', label: 'Riesling', value: 'Riesling' },
-      { id: 'syrah', label: 'Syrah/Shiraz', value: 'Syrah' }
-    ],
+    question: "Tell us about bottles you didn't like and why.",
+    description: 'Flaws, styles, occasions that didn’t work for you',
     required: false
   },
   {
-    id: 'expert_sensitivities',
-    type: 'multiple-choice',
-    category: 'experience',
-    question: 'Any sensitivities? (optional)',
-    options: [
-      { id: 'pyrazine', label: 'Pyrazine (green pepper)', value: 'pyrazine' },
-      { id: 'diacetyl', label: 'Diacetyl (buttery)', value: 'diacetyl' },
-      { id: 'brett', label: 'Brettanomyces (barnyard)', value: 'brett' },
-      { id: 'tdn', label: 'TDN (petrol)', value: 'tdn' }
-    ],
+    id: 'free_contexts',
+    type: 'free-text',
+    category: 'lifestyle',
+    question: 'When and why do you enjoy drinking wine?',
+    description: 'Occasions, moods, seasons, meals, company',
+    required: false
+  },
+  {
+    id: 'free_descriptors',
+    type: 'free-text',
+    category: 'preferences',
+    question: 'Describe flavors/textures you tend to enjoy.',
+    description: 'Crisp, mineral, juicy, savory, herbal, smoky, creamy, etc.',
     required: false
   }
 ]
+
+// Exploring path shares the same free-text prompts as expert
+export const exploringQuestions: QuizQuestion[] = expertQuestions
 
 /**
  * Educational content for different experience levels

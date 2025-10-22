@@ -34,8 +34,7 @@ export function OnboardingWelcome({
             Welcome to Pourtrait
           </CardTitle>
           <CardDescription className="text-lg mt-2">
-            Let's discover your wine preferences and create a personalized profile 
-            that will help us recommend wines you'll love.
+            We’ll get a quick baseline today and keep learning your palate over time as you explore and give feedback.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

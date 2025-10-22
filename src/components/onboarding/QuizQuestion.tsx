@@ -53,6 +53,14 @@ export function QuizQuestion({
             onChange={onChange}
           />
         )
+      case 'free-text':
+        return (
+          <FreeTextQuestion
+            question={question}
+            value={value}
+            onChange={onChange}
+          />
+        )
       default:
         return <div>Unsupported question type</div>
     }
@@ -212,6 +220,33 @@ function ScaleQuestion({
           </span>
         </div>
       )}
+    </div>
+  )
+}
+
+/**
+ * Free Text Question Component
+ */
+function FreeTextQuestion({
+  question,
+  value,
+  onChange
+}: {
+  question: QuizQuestionType
+  value?: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <div className="space-y-2">
+      <textarea
+        className="w-full min-h-[120px] rounded-md border border-gray-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+        placeholder={question.description || 'Type your answer here'}
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      <div className="text-xs text-gray-500">
+        Tip: short sentences or bullets are fine.
+      </div>
     </div>
   )
 }
