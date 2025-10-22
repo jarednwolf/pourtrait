@@ -65,18 +65,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 })
     }
 
-    const [{ data: profile }, { data: aromas }, { data: contexts }] = await Promise.all([
+    const [{ data: _profile }, { data: _aromas }, { data: _contexts }] = await Promise.all([
       supabase.from('palate_profiles').select('*').eq('user_id', user.id).single(),
       supabase.from('aroma_preferences').select('*').eq('user_id', user.id),
       supabase.from('context_preferences').select('*').eq('user_id', user.id)
     ])
 
     const engine = new AIRecommendationEngine()
-    const summaryPrompt = `Summarize this user's wine palate into 3 concise bullets for red, white, and sparkling.
-Profile: ${JSON.stringify(profile)}
-Aromas: ${JSON.stringify(aromas)}
-Contexts: ${JSON.stringify(contexts)}
-Keep it actionable and friendly.`
 
     const ai = await engine.generateRecommendations({
       userId: user.id,
