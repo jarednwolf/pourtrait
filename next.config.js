@@ -85,7 +85,6 @@ const nextConfig = {
   // Used to conditionally tweak behavior on preview deployments
   // Note: evaluated at build time on Vercel
   // eslint-disable-next-line no-undef
-  __isPreview: process.env.VERCEL_ENV === 'preview',
   typedRoutes: true,
   eslint: {
     // Disable ESLint during builds to prevent build failures from warnings
@@ -102,7 +101,6 @@ const nextConfig = {
       // 'your-project.supabase.co',
     ],
     formats: ['image/webp', 'image/avif'],
-    qualities: [50, 60, 75, 85],
   },
   // Optimize for Vercel deployment
   // Enable PWA capabilities
