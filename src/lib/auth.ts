@@ -233,10 +233,14 @@ export class AuthService {
    */
   static async resendConfirmation(email: string) {
     try {
+      const emailRedirectTo = typeof window !== 'undefined'
+        ? `${window.location.origin}/auth/callback?next=%2Fdashboard`
+        : undefined
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,
-      })
+        options: { emailRedirectTo }
+      } as any)
 
       if (error) {
         throw error
