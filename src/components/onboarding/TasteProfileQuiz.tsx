@@ -21,13 +21,20 @@ interface TasteProfileQuizProps {
   onSave?: (responses: QuizResponse[]) => void
   initialResponses?: QuizResponse[]
   className?: string
+  /**
+   * If true, bypasses the interim QuizResult screen and calls onComplete
+   * immediately when the last question is finished. Useful for flows that
+   * want to route to an LLM-powered preview instantly.
+   */
+  autoCompleteOnFinish?: boolean
 }
 
 export function TasteProfileQuiz({
   onComplete,
   onSave,
   initialResponses = [],
-  className
+  className,
+  autoCompleteOnFinish = false
 }: TasteProfileQuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0)
   const [responses, setResponses] = React.useState<QuizResponse[]>(initialResponses)
@@ -135,6 +142,10 @@ export function TasteProfileQuiz({
     }
 
     const result = calculateTasteProfile(responses)
+    if (autoCompleteOnFinish) {
+      onComplete({ ...result, responses })
+      return
+    }
     setQuizResult({ ...result, responses })
     setShowResult(true)
   }

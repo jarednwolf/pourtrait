@@ -17,7 +17,7 @@ export default function OnboardingStep1() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <TasteProfileQuiz onComplete={(_result) => {
+        <TasteProfileQuiz autoCompleteOnFinish onComplete={(_result) => {
           track('quiz_completed')
           track('preview_started')
           router.push('/onboarding/preview')
