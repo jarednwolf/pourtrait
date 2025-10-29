@@ -26,16 +26,33 @@ export async function mapFreeTextToProfile({
 }): Promise<{ profile: UserProfileInput; summary: string }> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   const messages = buildMappingMessages({ userId, experience, answers })
+  
+  async function requestWithFallback(): Promise<string> {
+    const candidates = [model, 'gpt-4o', 'gpt-4o-mini']
+    let lastErr: any
+    for (const m of candidates) {
+      try {
+        const r = await openai.chat.completions.create({
+          model: m,
+          messages,
+          temperature: 0.15,
+          max_tokens: 900,
+          response_format: { type: 'json_object' }
+        })
+        const content = r.choices[0]?.message?.content
+        if (content && content.trim().length > 0) {
+          return content
+        }
+      } catch (err: any) {
+        lastErr = err
+        // try next model
+      }
+    }
+    throw lastErr || new Error('LLM mapping failed')
+  }
 
-  const completion = await openai.chat.completions.create({
-    model,
-    messages,
-    temperature: 0.15,
-    max_tokens: 900,
-    response_format: { type: 'json_object' }
-  })
+  const content = await requestWithFallback()
 
-  const content = completion.choices[0]?.message?.content || '{}'
   let parsed: unknown
   try {
     parsed = JSON.parse(content)
