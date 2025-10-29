@@ -24,11 +24,42 @@ function FinishClient() {
 
     const finalizeProfile = async () => {
       try {
+        const PREVIEW_KEY = 'pourtrait_profile_preview_v1'
         const LOCAL_KEY = 'pourtrait_quiz_responses_v1'
+        const previewRaw = typeof window !== 'undefined' ? window.localStorage.getItem(PREVIEW_KEY) : null
         const raw = typeof window !== 'undefined' ? window.localStorage.getItem(LOCAL_KEY) : null
+
+        const token = await getAccessToken()
+        if (!token) {
+          if (!cancelled) router.replace(nextParam)
+          return
+        }
+
+        // If a preview profile exists, upsert it immediately
+        if (previewRaw) {
+          try {
+            const parsedPreview = JSON.parse(previewRaw)
+            const previewProfile = parsedPreview?.profile
+            if (previewProfile) {
+              await fetch('/api/profile/upsert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(previewProfile)
+              })
+              // Track profile_created via interactions API (reusing event schema)
+              await fetch('/api/interactions/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ reasons: ['profile_created'], context: { source: 'preview', used_llm: true } })
+              }).catch(() => {})
+            }
+          } catch {}
+        }
 
         if (!raw) {
           if (!cancelled) router.replace(nextParam)
+          // Clear preview key if present
+          if (typeof window !== 'undefined') { window.localStorage.removeItem(PREVIEW_KEY) }
           return
         }
 
@@ -47,13 +78,7 @@ function FinishClient() {
 
         const responseMap = new Map(responses.map(r => [r.questionId, r.value]))
         const exp = responseMap.get('experience-level') as string | undefined
-        const token = await getAccessToken()
-
-        if (!token) {
-          window.localStorage.removeItem(LOCAL_KEY)
-          if (!cancelled) router.replace(nextParam)
-          return
-        }
+        
 
         if (exp === 'intermediate' || exp === 'expert') {
           const freeTextAnswers: Record<string, string> = {}
@@ -98,7 +123,10 @@ function FinishClient() {
           })
         }
 
-        window.localStorage.removeItem(LOCAL_KEY)
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem(LOCAL_KEY)
+          window.localStorage.removeItem(PREVIEW_KEY)
+        }
       } catch (err) {
         // Non-fatal: proceed to app regardless
       } finally {
