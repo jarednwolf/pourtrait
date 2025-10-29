@@ -5,13 +5,11 @@ import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { track } from '@/lib/utils/track'
 import { TasteProfileQuiz } from '@/components/onboarding/TasteProfileQuiz'
-import { calculateStructuredUserProfile } from '@/lib/onboarding/quiz-calculator'
-import { upsertUserProfile } from '@/lib/profile/persist'
-import { useAuth } from '@/hooks/useAuth'
+ 
 
 export default function OnboardingStep1() {
   const router = useRouter()
-  const { user } = useAuth()
+ 
 
   useEffect(() => {
     track('onboarding_started')
