@@ -2,7 +2,7 @@
 
 ## Overview
 
-Successfully implemented a comprehensive AI-powered wine recommendation system for Pourtrait using OpenAI GPT-4, Pinecone vector database, and Vercel Edge Functions. The system maintains professional sommelier standards while providing personalized recommendations for users of all experience levels.
+Successfully implemented a comprehensive AI-powered wine recommendation system for Pourtrait using OpenAI models (GPT‑4 family for recs) and a GPT‑5 mapper for onboarding taste-profile normalization, along with Pinecone vector database and Vercel Edge Functions. The system maintains professional sommelier standards while providing personalized recommendations for users of all experience levels.
 
 ## Completed Components
 

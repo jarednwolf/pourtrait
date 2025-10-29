@@ -127,6 +127,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 # OpenAI
 OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-5
 
 # Application
 NEXT_PUBLIC_APP_URL=http://localhost:3000

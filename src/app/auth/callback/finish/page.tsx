@@ -102,7 +102,7 @@ function FinishClient() {
       } catch (err) {
         // Non-fatal: proceed to app regardless
       } finally {
-        if (!cancelled) router.replace(nextParam)
+        if (!cancelled) router.replace('/onboarding/summary')
       }
     }
 

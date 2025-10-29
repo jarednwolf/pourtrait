@@ -53,6 +53,21 @@ export default function DashboardPage() {
           <AlertsPanelComponent />
 
           <ExplorationPanelComponent />
+
+          <Card className="h-full">
+            <CardHeader className="p-4">
+              <CardTitle className="flex items-center text-base">
+                <Icon name="user" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
+                Profile insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="text-sm text-gray-700">See your palate balance and style levers.</div>
+              <div className="mt-3">
+                <Button asChild size="sm" onClick={() => track('profile_insights_cta_clicked', { source: 'dashboard' })}><a href="/profile">View</a></Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </ProtectedRoute>

@@ -1,5 +1,6 @@
 import { OpenAI } from 'openai'
 import { UserProfileSchema, type UserProfileInput } from './schema'
+import { buildMappingMessages } from './prompt'
 
 type Experience = 'novice' | 'intermediate' | 'expert'
 
@@ -16,7 +17,7 @@ export async function mapFreeTextToProfile({
   userId,
   experience,
   answers,
-  model = process.env.OPENAI_MODEL || 'gpt-4o-mini'
+  model = process.env.OPENAI_MODEL || 'gpt-5'
 }: {
   userId: string
   experience: Experience
@@ -24,27 +25,14 @@ export async function mapFreeTextToProfile({
   model?: string
 }): Promise<{ profile: UserProfileInput; summary: string }> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-  const system = `You are a sommelier data normalizer. Return STRICT JSON matching the provided schema. 
-  - Infer reasonable values from the user's free text.
-  - Use defaults when uncertain. 
-  - Keep within 0..1 for numeric scales. 
-  - Do not include comments.`
-
-  const user = JSON.stringify({ experience, answers })
-
-  const schemaExcerpt = UserProfileSchema.toString()
-
-  const messages = [
-    { role: 'system' as const, content: system },
-    { role: 'user' as const, content: `Schema (TypeScript/Zod, abbreviated): ${schemaExcerpt}\nUserId: ${userId}\nInput: ${user}\nReturn JSON only with keys of UserProfileSchema.` }
-  ]
+  const messages = buildMappingMessages({ userId, experience, answers })
 
   const completion = await openai.chat.completions.create({
     model,
     messages,
-    temperature: 0.2,
-    max_tokens: 900
+    temperature: 0.15,
+    max_tokens: 900,
+    response_format: { type: 'json_object' }
   })
 
   const content = completion.choices[0]?.message?.content || '{}'
@@ -69,7 +57,7 @@ export async function mapFreeTextToProfile({
 
   const profile = UserProfileSchema.parse(parsed)
 
-  const summary = `Profile created from free-text. Experience: ${experience}. Keys present: ${Object.keys(profile).length}.`
+  const summary = `Profile created from free-text. Experience: ${experience}.`
 
   return { profile, summary }
 }

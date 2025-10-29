@@ -26,15 +26,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 })
     }
 
+    const startedAt = Date.now()
+    console.log('llm_map_started', { userId: user.id, experience })
+
     const { profile, summary } = await mapFreeTextToProfile({
       userId: user.id,
       experience,
       answers: freeTextAnswers || {}
     })
 
+    const latencyMs = Date.now() - startedAt
+    console.log('llm_map_completed', { userId: user.id, latencyMs })
+
     return NextResponse.json({ success: true, data: { profile, summary } })
 
   } catch (error) {
+    console.error('llm_map_failed', { error: (error as any)?.message || String(error) })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

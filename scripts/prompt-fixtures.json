@@ -1,0 +1,34 @@
+[
+  {
+    "label": "novice_crisp_white",
+    "experience": "novice",
+    "answers": {
+      "free_enjoyed": "Loved a light white that tasted crisp and citrusy last summer.",
+      "free_disliked": "Heavy oaky buttery flavors give me a headache.",
+      "free_contexts": "Patio on a hot day, seafood dinners.",
+      "free_descriptors": "lemon, lime, mineral, refreshing"
+    }
+  },
+  {
+    "label": "intermediate_earthy_red",
+    "experience": "intermediate",
+    "answers": {
+      "free_enjoyed": "Enjoy Barolo and Rioja reservas with dried cherry, leather, and spice.",
+      "free_disliked": "Jammy overripe styles feel cloying.",
+      "free_contexts": "Steak nights and slow-cooked ragù.",
+      "free_descriptors": "tannic, savory, cedar, mushroom"
+    }
+  },
+  {
+    "label": "expert_champagne",
+    "experience": "expert",
+    "answers": {
+      "free_enjoyed": "Prefer Extra Brut grower Champagne; tension, oyster shell, fine mousse.",
+      "free_disliked": "Dosage above 6 g/L feels sweet; oxidative sherry notes only in context.",
+      "free_contexts": "Aperitif and raw bar.",
+      "free_descriptors": "citrus zest, green apple, chalk, autolytic"
+    }
+  }
+]
+
+
