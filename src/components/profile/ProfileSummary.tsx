@@ -50,7 +50,7 @@ export function ProfileSummary({ dbProfile, summary, className }: ProfileSummary
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Icon name="adjustments" className="w-5 h-5 text-primary" />
+            <Icon name="scale" className="w-5 h-5 text-primary" />
             Style levers
           </CardTitle>
         </CardHeader>
