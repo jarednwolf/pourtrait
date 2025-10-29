@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { ProfileSummary } from '@/components/profile/ProfileSummary'
 import { track } from '@/lib/utils/track'
 import type { UserProfileInput } from '@/lib/profile/schema'
+import { useAuth } from '@/hooks/useAuth'
 
 const QUIZ_KEY = 'pourtrait_quiz_responses_v1'
 const PREVIEW_KEY = 'pourtrait_profile_preview_v1'
@@ -31,6 +32,7 @@ function mapProfileToDisplay(profile: UserProfileInput) {
 
 export default function OnboardingPreviewPage() {
   const router = useRouter()
+  const { user, getAccessToken } = useAuth()
   const [loading, setLoading] = React.useState(true)
   const [summary, setSummary] = React.useState<string>('')
   const [display, setDisplay] = React.useState<any | null>(null)
@@ -85,6 +87,25 @@ export default function OnboardingPreviewPage() {
             window.localStorage.setItem(PREVIEW_KEY, JSON.stringify({ profile: prof, summary: sum }))
           } catch {}
           track('preview_map_completed')
+
+          // If the user is already authenticated, upsert immediately
+          if (user) {
+            try {
+              const token = await getAccessToken()
+              if (token) {
+                await fetch('/api/profile/upsert', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                  body: JSON.stringify(prof)
+                })
+                await fetch('/api/interactions/track', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                  body: JSON.stringify({ reasons: ['profile_created'], context: { source: 'preview_authed', used_llm: true } })
+                }).catch(() => {})
+              }
+            } catch {}
+          }
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -108,9 +129,15 @@ export default function OnboardingPreviewPage() {
               <>
                 <ProfileSummary dbProfile={display} summary={summary} />
                 <div className="mt-8 flex gap-3">
-                  <Button asChild onClick={() => track('preview_signup_clicked')}>
-                    <a href="/auth/signup?next=/dashboard" aria-label="Create account to save your profile">Save my profile</a>
-                  </Button>
+                  {user ? (
+                    <Button asChild>
+                      <a href="/dashboard?show=recs=1" aria-label="Continue to your dashboard">Continue to dashboard</a>
+                    </Button>
+                  ) : (
+                    <Button asChild onClick={() => track('preview_signup_clicked')}>
+                      <a href="/auth/signup?next=/dashboard" aria-label="Create account to save your profile">Save my profile</a>
+                    </Button>
+                  )}
                   <Button asChild variant="outline">
                     <a href="/onboarding/step1">Refine answers</a>
                   </Button>

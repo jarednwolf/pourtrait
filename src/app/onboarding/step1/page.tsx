@@ -19,18 +19,10 @@ export default function OnboardingStep1() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <TasteProfileQuiz onComplete={(result) => {
+        <TasteProfileQuiz onComplete={(_result) => {
           track('quiz_completed')
-          if (user) {
-            try {
-              const structured = calculateStructuredUserProfile(user.id, result?.responses || [])
-              upsertUserProfile(user.id, structured)
-            } catch {}
-            router.push('/onboarding/completed')
-          } else {
-            track('preview_started')
-            router.push('/onboarding/preview')
-          }
+          track('preview_started')
+          router.push('/onboarding/preview')
         }} />
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600 mb-2">Create an account to save these answers to your profile.</p>
