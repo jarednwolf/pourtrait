@@ -64,7 +64,7 @@ export default function DashboardPage() {
             <CardContent className="p-4 pt-0">
               <div className="text-sm text-gray-700">See your palate balance and style levers.</div>
               <div className="mt-3">
-                <Button asChild size="sm" onClick={() => track('profile_insights_cta_clicked', { source: 'dashboard' })}><a href="/profile">View</a></Button>
+                <Button asChild size="sm"><a href="/profile">View</a></Button>
               </div>
             </CardContent>
           </Card>
