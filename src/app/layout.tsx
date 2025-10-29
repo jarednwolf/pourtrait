@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { OnboardingRedirect } from '@/components/providers/OnboardingRedirect'
@@ -28,10 +28,6 @@ export const metadata: Metadata = {
     ],
     shortcut: ['/icons/icon-32x32.png']
   },
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#6D28D9' },
-    { media: '(prefers-color-scheme: dark)', color: '#0B0B0E' }
-  ],
   openGraph: {
     type: 'website',
     siteName: 'Pourtrait',
@@ -47,6 +43,13 @@ export const metadata: Metadata = {
     description: 'Your personal AI-powered wine cellar and sommelier. Each bottle a brushstroke.',
     images: ['/images/og-card.jpg']
   }
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#6D28D9' },
+    { media: '(prefers-color-scheme: dark)', color: '#0B0B0E' }
+  ]
 }
 
 export default function RootLayout({

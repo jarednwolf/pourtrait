@@ -1,12 +1,13 @@
 'use client'
 
 import * as React from 'react'
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { calculateStructuredUserProfile } from '@/lib/onboarding/quiz-calculator'
 import type { QuizResponse } from '@/lib/onboarding/quiz-data'
 
-export default function AuthCallbackFinishPage() {
+function FinishClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const nextParam = searchParams.get('next') || '/dashboard'
@@ -48,7 +49,6 @@ export default function AuthCallbackFinishPage() {
         const exp = responseMap.get('experience-level') as string | undefined
         const token = await getAccessToken()
 
-        // Default: if no token for some reason, just route forward
         if (!token) {
           window.localStorage.removeItem(LOCAL_KEY)
           if (!cancelled) router.replace(nextParam)
@@ -56,7 +56,6 @@ export default function AuthCallbackFinishPage() {
         }
 
         if (exp === 'intermediate' || exp === 'expert') {
-          // Build free-text payload from responses
           const freeTextAnswers: Record<string, string> = {}
           responses.forEach(r => {
             if (typeof r.value === 'string') {
@@ -88,7 +87,6 @@ export default function AuthCallbackFinishPage() {
             }
           }
         } else {
-          // Novice/beginner path – compute structured profile locally
           const structured = calculateStructuredUserProfile(user.id, responses)
           await fetch('/api/profile/upsert', {
             method: 'POST',
@@ -120,6 +118,20 @@ export default function AuthCallbackFinishPage() {
         <div className="text-sm text-gray-500">This only takes a moment.</div>
       </div>
     </div>
+  )
+}
+
+export default function AuthCallbackFinishPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center text-gray-700">
+          <div className="animate-pulse mb-3">Preparing your account…</div>
+        </div>
+      </div>
+    }>
+      <FinishClient />
+    </Suspense>
   )
 }
 
