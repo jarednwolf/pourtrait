@@ -4,7 +4,6 @@ import { AuthProvider } from '@/components/providers/AuthProvider'
 import { OnboardingRedirect } from '@/components/providers/OnboardingRedirect'
 import { BrandHomeLink } from '@/components/layout/BrandHomeLink'
 import { HeaderCta } from '@/components/layout/HeaderCta'
-import { Inter, Playfair_Display } from 'next/font/google'
 import React from 'react'
 import { PushOptInBanner } from '@/components/notifications/PushOptInBanner'
 import { WebVitalsProvider } from '@/components/providers/WebVitalsProvider'
@@ -12,8 +11,7 @@ import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { SignUpDialog } from '@/components/auth/SignUpDialog'
 import { AuthBottomNav } from '@/components/layout/AuthBottomNav'
 
-const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
-const playfair = Playfair_Display({ subsets: ['latin'], display: 'swap', variable: '--font-playfair' })
+// Fonts are provided via system fallbacks to avoid build-time fetch failures
 
 export const metadata: Metadata = {
   title: 'Pourtrait - AI Wine Sommelier',
@@ -58,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="en">
       <body className="bg-surface text-gray-900 dark:bg-dark-surface dark:text-gray-100">
         {/* Always remove dark class ASAP to prevent FOUC; add SW kill switch via ?sw=off */}
         <script
@@ -101,9 +99,7 @@ export default function RootLayout({
               </nav>
             </div>
               </header>
-              {/* Preconnects for critical third-parties */}
-              <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
-              <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+              {/* Removed Google Fonts preconnect to ensure offline-safe builds */}
               {/* Preconnect to Supabase for faster initial auth/db calls. Use env if available. */}
               {process.env.NEXT_PUBLIC_SUPABASE_URL && (
                 <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} crossOrigin="anonymous" />
