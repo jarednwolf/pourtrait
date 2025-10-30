@@ -73,7 +73,8 @@ export default function OnboardingPreviewPage() {
           body: JSON.stringify({ experience: exp, freeTextAnswers })
         })
         if (!res.ok) {
-          track('preview_map_failed', { status: res.status })
+          const errText = await res.text().catch(() => '')
+          track('preview_map_failed', { status: res.status, body: errText?.slice?.(0, 200) })
           throw new Error('preview mapping failed')
         }
         const { data } = await res.json()

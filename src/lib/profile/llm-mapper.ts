@@ -72,7 +72,25 @@ export async function mapFreeTextToProfile({
     }
   }
 
-  const profile = UserProfileSchema.parse(parsed)
+  let profile: UserProfileInput
+  try {
+    profile = UserProfileSchema.parse(parsed)
+  } catch {
+    // Shape mismatch fallback to safe defaults based on experience
+    profile = UserProfileSchema.parse({
+      userId,
+      stablePalate: { sweetness: 0.5, acidity: 0.5, tannin: 0.5, bitterness: 0.5, body: 0.5, alcoholWarmth: 0.5, sparkleIntensity: 0.5 },
+      aromaAffinities: [],
+      styleLevers: { oak: 0.3, malolacticButter: 0.2, oxidative: 0.2, minerality: 0.5, fruitRipeness: 0.5 },
+      contextWeights: [],
+      foodProfile: undefined,
+      preferences: { novelty: 0.5, budgetTier: 'weekend', values: [] },
+      dislikes: [],
+      sparkling: {},
+      wineKnowledge: experience === 'expert' ? 'expert' : experience === 'intermediate' ? 'intermediate' : 'novice',
+      flavorMaps: {}
+    })
+  }
 
   const summary = `Profile created from free-text. Experience: ${experience}.`
 
