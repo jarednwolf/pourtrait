@@ -14,6 +14,7 @@ import path from 'node:path'
 
 const ROOT = path.resolve(path.join(process.cwd()))
 const fixturesPath = path.join(ROOT, 'scripts', 'prompt-fixtures.json')
+const suitePath = path.join(ROOT, 'scripts', 'prompt-suite.json')
 
 function buildMessages({ userId, experience, answers }) {
   const system = [
@@ -104,7 +105,8 @@ function parseArgs() {
   const only = onlyArg ? onlyArg.split('=')[1] : null
   const live = process.env.EVAL_LIVE === '1'
   const evaluate = process.argv.some(a => a === '--evaluate' || a === '--evaluate=1')
-  return { only, live, evaluate }
+  const suite = process.argv.some(a => a === '--suite' || a === '--suite=1')
+  return { only, live, evaluate, suite }
 }
 
 function loadFixtures() {
@@ -113,9 +115,22 @@ function loadFixtures() {
 }
 
 async function main() {
-  const { only, live, evaluate } = parseArgs()
+  const { only, live, evaluate, suite } = parseArgs()
   const fixtures = loadFixtures()
-  const selected = only ? fixtures.filter(f => f.label === only) : fixtures
+  let selected = only ? fixtures.filter(f => f.label === only) : fixtures
+  let suiteExpect = {}
+  if (suite) {
+    try { suiteExpect = JSON.parse(fs.readFileSync(suitePath, 'utf-8')).reduce((m, x) => (m[x.label] = x.expect || {}, m), {}) } catch {}
+    // If suite includes additional cases not in fixtures, merge them in
+    try {
+      const fromSuite = JSON.parse(fs.readFileSync(suitePath, 'utf-8'))
+      for (const item of fromSuite) {
+        if (!fixtures.find(f => f.label === item.label)) {
+          selected.push({ label: item.label, experience: item.experience || 'intermediate', answers: item.answers || {} })
+        }
+      }
+    } catch {}
+  }
   if (!selected.length) {
     console.error('No fixtures matched.');
     process.exit(1)
@@ -222,8 +237,26 @@ async function main() {
         if (celebration) push('ctx-celebration', got.has('celebration_toast'), 'celebration_toast', Array.from(got))
         if (brunchRose) push('ctx-aperitif', got.has('aperitif') || got.has('everyday'), 'aperitif|everyday', Array.from(got))
 
-        const failed = checks.filter(c => !c.ok)
-        console.log('evaluation checks:', { total: checks.length, failed: failed.length })
+        // Suite expectations override or augment generic checks
+        const exp = suiteExpect[fx.label] || {}
+        const suiteChecks = []
+        const inRange = (v, [lo, hi]) => typeof v === 'number' && v >= lo && v <= hi
+        if (exp.tannin_min !== undefined) suiteChecks.push({ id: 'suite-tannin_min', ok: (sp.tannin ?? 0) >= exp.tannin_min, expected: `>=${exp.tannin_min}`, actual: sp.tannin })
+        if (exp.tannin_max !== undefined) suiteChecks.push({ id: 'suite-tannin_max', ok: (sp.tannin ?? 1) <= exp.tannin_max, expected: `<=${exp.tannin_max}`, actual: sp.tannin })
+        if (exp.body_min !== undefined) suiteChecks.push({ id: 'suite-body_min', ok: (sp.body ?? 0) >= exp.body_min, expected: `>=${exp.body_min}`, actual: sp.body })
+        if (exp.acidity_max !== undefined) suiteChecks.push({ id: 'suite-acidity_max', ok: (sp.acidity ?? 1) <= exp.acidity_max, expected: `<=${exp.acidity_max}`, actual: sp.acidity })
+        if (exp.sweetness_min !== undefined) suiteChecks.push({ id: 'suite-sweetness_min', ok: (sp.sweetness ?? 0) >= exp.sweetness_min, expected: `>=${exp.sweetness_min}`, actual: sp.sweetness })
+        if (exp.sweetness_max !== undefined) suiteChecks.push({ id: 'suite-sweetness_max', ok: (sp.sweetness ?? 1) <= exp.sweetness_max, expected: `<=${exp.sweetness_max}`, actual: sp.sweetness })
+        if (exp.oak_min !== undefined) suiteChecks.push({ id: 'suite-oak_min', ok: (sl.oak ?? 0) >= exp.oak_min, expected: `>=${exp.oak_min}`, actual: sl.oak })
+        if (exp.oak_max !== undefined) suiteChecks.push({ id: 'suite-oak_max', ok: (sl.oak ?? 1) <= exp.oak_max, expected: `<=${exp.oak_max}`, actual: sl.oak })
+        if (Array.isArray(exp.oak_range)) suiteChecks.push({ id: 'suite-oak_range', ok: inRange(sl.oak ?? 0, exp.oak_range), expected: `${exp.oak_range[0]}-${exp.oak_range[1]}`, actual: sl.oak })
+        if (Array.isArray(exp.aromas)) suiteChecks.push({ id: 'suite-aromas_all', ok: (exp.aromas || []).every(a => (parsed.aromaAffinities || []).some((x) => x.family === a)), expected: exp.aromas.join(','), actual: (parsed.aromaAffinities || []).map(x => x.family).join(',') })
+        if (Array.isArray(exp.aromas_any)) suiteChecks.push({ id: 'suite-aromas_any', ok: (exp.aromas_any || []).some(a => (parsed.aromaAffinities || []).some((x) => x.family === a)), expected: exp.aromas_any.join(','), actual: (parsed.aromaAffinities || []).map(x => x.family).join(',') })
+        if (Array.isArray(exp.contexts_any)) suiteChecks.push({ id: 'suite-contexts_any', ok: (exp.contexts_any || []).some(c => (parsed.contextWeights || []).some((x) => x.occasion === c)), expected: exp.contexts_any.join(','), actual: (parsed.contextWeights || []).map(x => x.occasion).join(',') })
+
+        const allChecks = checks.concat(suiteChecks)
+        const failed = allChecks.filter(c => !c.ok)
+        console.log('evaluation checks:', { total: allChecks.length, failed: failed.length })
         if (failed.length) {
           console.table(failed)
         }

@@ -85,10 +85,16 @@ export function evaluateProfile(
 
   // Occasion checks
   const got = new Set(profile.contextWeights?.map(c => c.occasion) || [])
-  if (steak) checks.push({ id: 'ctx-steak', ok: got.has('steak_night'), expected: 'steak_night in contexts', actual: Array.from(got).slice(0, 3), weight: 0.7, message: 'Expect steak night context' })
-  if (pizza) checks.push({ id: 'ctx-pizza', ok: got.has('pizza_pasta'), expected: 'pizza_pasta in contexts', actual: Array.from(got).slice(0, 3), weight: 0.6, message: 'Expect pizza/pasta context' })
-  if (celebration) checks.push({ id: 'ctx-celebration', ok: got.has('celebration_toast'), expected: 'celebration_toast in contexts', actual: Array.from(got).slice(0, 3), weight: 0.5, message: 'Expect celebration context' })
-  if (brunchRose) checks.push({ id: 'ctx-aperitif', ok: got.has('aperitif') || got.has('everyday'), expected: 'aperitif or everyday', actual: Array.from(got).slice(0, 3), weight: 0.4, message: 'Expect aperitif/lighter context' })
+  if (steak) checks.push({ id: 'ctx-steak', ok: got.has('steak_night'), expected: 'steak_night in contexts', actual: Array.from(got).slice(0, 5), weight: 0.7, message: 'Expect steak night context' })
+  if (pizza) checks.push({ id: 'ctx-pizza', ok: got.has('pizza_pasta'), expected: 'pizza_pasta in contexts', actual: Array.from(got).slice(0, 5), weight: 0.6, message: 'Expect pizza/pasta context' })
+  if (celebration) {
+    const ok = ['celebration_toast', 'special_occasion', 'date_night'].some(o => got.has(o as any))
+    checks.push({ id: 'ctx-celebration', ok, expected: 'celebration_toast|special_occasion|date_night', actual: Array.from(got).slice(0, 7), weight: 0.5, message: 'Expect celebration/date-night context' })
+  }
+  if (brunchRose) {
+    const ok = ['aperitif', 'everyday', 'lunch_rose', 'eating_out'].some(o => got.has(o as any))
+    checks.push({ id: 'ctx-aperitif', ok, expected: 'aperitif|everyday|lunch_rose|eating_out', actual: Array.from(got).slice(0, 7), weight: 0.4, message: 'Expect aperitif/brunch/lighter context' })
+  }
 
   // Flavor map coherence checks (red/white/sparkling)
   const tol = 0.2

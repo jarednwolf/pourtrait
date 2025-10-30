@@ -1,0 +1,14 @@
+[
+  { "label": "expert_user_case", "expect": { "tannin_min": 0.7, "body_min": 0.7, "oak_range": [0.55, 0.75], "acidity_max": 0.65, "aromas": ["black_fruit","pepper_spice"], "contexts_any": ["steak_night","pizza_pasta"] } },
+  { "label": "novice_crisp_white", "expect": { "acidity_min": 0.55, "sweetness_max": 0.4, "aromas_any": ["citrus","stone_fruit"] } },
+  { "label": "intermediate_earthy_red", "expect": { "tannin_min": 0.5, "oak_max": 0.6, "aromas_any": ["earth_mineral","red_fruit"] } },
+  { "label": "expert_champagne", "expect": { "sparkle_min": 0.3, "sweetness_max": 0.35 } },
+  { "label": "oaky_butter_chard", "experience": "intermediate", "answers": { "free_enjoyed": "Buttery California Chardonnay with oak and malo", "free_disliked": "lean razor sharp whites", "free_contexts": "seafood pasta, roast chicken" }, "expect": { "oak_min": 0.6, "malolactic_min": 0.5, "acidity_max": 0.6 } },
+  { "label": "beaujolais_lover", "experience": "intermediate", "answers": { "free_enjoyed": "juicy low-tannin Beaujolais and chillable reds", "free_disliked": "heavy oak and high tannin", "free_contexts": "picnics and aperitif" }, "expect": { "tannin_max": 0.4, "oak_max": 0.4, "aromas_any": ["red_fruit","floral"] } },
+  { "label": "moscato_sweet", "experience": "novice", "answers": { "free_enjoyed": "sweet moscato and off-dry whites, dessert wine", "free_disliked": "bitter tannic reds", "free_contexts": "dessert night" }, "expect": { "sweetness_min": 0.6, "tannin_max": 0.3 } },
+  { "label": "high_acid_chablis", "experience": "expert", "answers": { "free_enjoyed": "Chablis, razor-sharp acidity and oyster shell minerality", "free_disliked": "buttery oaky chardonnay", "free_contexts": "raw bar and seafood" }, "expect": { "acidity_min": 0.65, "oak_max": 0.3, "minerality_min": 0.6 } },
+  { "label": "rose_brunch", "experience": "novice", "answers": { "free_enjoyed": "dry rosé for lunch dates and brunch", "free_disliked": "overly sweet wines", "free_contexts": "brunch, lunch, day drinking" }, "expect": { "sweetness_max": 0.4, "contexts_any": ["aperitif","everyday","lunch_rose"] } },
+  { "label": "natural_herbal_mineral", "experience": "intermediate", "answers": { "free_enjoyed": "natural wines with herbal green notes and stony minerality", "free_disliked": "overt oak and heavy extraction", "free_contexts": "casual dinners" }, "expect": { "oak_max": 0.4, "aromas_any": ["herbal_green","earth_mineral"] } }
+]
+
+
