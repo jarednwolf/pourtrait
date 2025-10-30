@@ -110,6 +110,20 @@ async function main() {
       try { parsed = JSON.parse(content) } catch { parsed = { parseError: true, content } }
       console.log('latencyMs=', ms)
       console.dir(parsed, { depth: null })
+      // Lightweight validation
+      const sp = parsed?.stablePalate || {}
+      const sl = parsed?.styleLevers || {}
+      const rangesOk = ['sweetness','acidity','tannin','bitterness','body','alcoholWarmth','sparkleIntensity']
+        .every(k => typeof sp[k] === 'number' && sp[k] >= 0 && sp[k] <= 1)
+      const styleOk = ['oak','malolacticButter','oxidative','minerality','fruitRipeness']
+        .every(k => typeof sl[k] === 'number' && sl[k] >= 0 && sl[k] <= 1)
+      const notFlat = (() => {
+        const vals = ['sweetness','acidity','tannin','bitterness','body'].map(k => Number(sp[k] ?? 0.5))
+        const mean = vals.reduce((a,b)=>a+b,0)/vals.length
+        const varc = vals.reduce((a,b)=>a + Math.pow(b-mean,2),0)/vals.length
+        return varc > 0.0025 // ~stddev > 0.05
+      })()
+      console.log('validation:', { rangesOk, styleOk, notFlat })
     } catch (e) {
       console.error('Error:', e?.message || e)
     }

@@ -28,6 +28,16 @@
       "free_contexts": "Aperitif and raw bar.",
       "free_descriptors": "citrus zest, green apple, chalk, autolytic"
     }
+  },
+  {
+    "label": "expert_user_case",
+    "experience": "expert",
+    "answers": {
+      "free_enjoyed": "I love structured Napa cabs, Heitz c91 is a favorite with steak dinner. Northern Rhone Syrah with grilled food (black garlic steak kabobs). Enjoy merlot-leaning Bordeaux for contemplation. Elk Cove Pinot Gris is a comfort white; Sancerre with seafood and Caesar salad. Robust Pinot Noir or Rioja for pizza/burger nights. Warming up to round rosé.",
+      "free_disliked": "I don't love overly acidic Italian wines; extremely acidic or crisp whites can throw me off; prefer balanced whites.",
+      "free_contexts": "Making dinner at home, special occasions, date night, eating out, lunch rosé, friends and family over; wine fits the food; price varies.",
+      "free_descriptors": "structured, black fruit, pepper spice, mineral, savory, balanced white"
+    }
   }
 ]
 
