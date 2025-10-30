@@ -42,7 +42,7 @@ function qualitative(n: number): string {
 export function evaluateProfile(
   profile: UserProfileInput,
   freeText?: Record<string, unknown>,
-  experience?: 'novice' | 'intermediate' | 'expert'
+  _experience?: 'novice' | 'intermediate' | 'expert'
 ): EvaluationResult {
   const text = normalizeTextMap(freeText)
   const checks: EvaluationCheck[] = []
