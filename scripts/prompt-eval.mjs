@@ -110,6 +110,9 @@ async function main() {
             max_output_tokens: 900
           })
           content = resp.output_text || (resp.output?.[0]?.content?.[0]?.text) || ''
+          if (!content) {
+            console.log('raw response (truncated):', JSON.stringify(resp).slice(0, 2000))
+          }
         } catch (err) {
           throw err
         }
