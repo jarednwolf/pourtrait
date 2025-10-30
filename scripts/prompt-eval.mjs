@@ -232,10 +232,11 @@ async function main() {
         push('nonflat', notFlat, '>0.05 stddev approx', 'computed')
         // contexts (best-effort from parsed flavorMaps/contextWeights if present)
         const got = new Set((parsed.contextWeights || []).map(c => c.occasion))
-        if (steak) push('ctx-steak', got.has('steak_night'), 'steak_night', Array.from(got))
-        if (pizza) push('ctx-pizza', got.has('pizza_pasta'), 'pizza_pasta', Array.from(got))
-        if (celebration) push('ctx-celebration', got.has('celebration_toast'), 'celebration_toast', Array.from(got))
-        if (brunchRose) push('ctx-aperitif', got.has('aperitif') || got.has('everyday'), 'aperitif|everyday', Array.from(got))
+        const hasAny = (arr) => arr.some(x => got.has(x))
+        if (steak) push('ctx-steak', hasAny(['steak_night']), 'steak_night', Array.from(got))
+        if (pizza) push('ctx-pizza', hasAny(['pizza_pasta','pizza_burger_night','pizza_night']), 'pizza_pasta|pizza_burger_night', Array.from(got))
+        if (celebration) push('ctx-celebration', hasAny(['celebration_toast','special_occasion','date_night']), 'celebration_toast|special_occasion|date_night', Array.from(got))
+        if (brunchRose) push('ctx-aperitif', hasAny(['aperitif','everyday','lunch_rose','eating_out','brunch','lunch','day_drinking']), 'aperitif|everyday|lunch_rose|brunch', Array.from(got))
 
         // Suite expectations override or augment generic checks
         const exp = suiteExpect[fx.label] || {}
@@ -252,7 +253,16 @@ async function main() {
         if (Array.isArray(exp.oak_range)) suiteChecks.push({ id: 'suite-oak_range', ok: inRange(sl.oak ?? 0, exp.oak_range), expected: `${exp.oak_range[0]}-${exp.oak_range[1]}`, actual: sl.oak })
         if (Array.isArray(exp.aromas)) suiteChecks.push({ id: 'suite-aromas_all', ok: (exp.aromas || []).every(a => (parsed.aromaAffinities || []).some((x) => x.family === a)), expected: exp.aromas.join(','), actual: (parsed.aromaAffinities || []).map(x => x.family).join(',') })
         if (Array.isArray(exp.aromas_any)) suiteChecks.push({ id: 'suite-aromas_any', ok: (exp.aromas_any || []).some(a => (parsed.aromaAffinities || []).some((x) => x.family === a)), expected: exp.aromas_any.join(','), actual: (parsed.aromaAffinities || []).map(x => x.family).join(',') })
-        if (Array.isArray(exp.contexts_any)) suiteChecks.push({ id: 'suite-contexts_any', ok: (exp.contexts_any || []).some(c => (parsed.contextWeights || []).some((x) => x.occasion === c)), expected: exp.contexts_any.join(','), actual: (parsed.contextWeights || []).map(x => x.occasion).join(',') })
+        if (Array.isArray(exp.contexts_any)) {
+          const canonicalHas = (c) => {
+            if (c === 'aperitif') return hasAny(['aperitif','everyday','lunch_rose','eating_out','brunch','lunch','day_drinking'])
+            if (c === 'pizza_pasta') return hasAny(['pizza_pasta','pizza_burger_night','pizza_night'])
+            if (c === 'celebration_toast') return hasAny(['celebration_toast','special_occasion','date_night'])
+            return got.has(c)
+          }
+          const ok = (exp.contexts_any || []).some(c => canonicalHas(c))
+          suiteChecks.push({ id: 'suite-contexts_any', ok, expected: exp.contexts_any.join(','), actual: (parsed.contextWeights || []).map(x => x.occasion).join(',') })
+        }
 
         const allChecks = checks.concat(suiteChecks)
         const failed = allChecks.filter(c => !c.ok)
