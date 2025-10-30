@@ -32,14 +32,47 @@ export async function mapFreeTextToProfile({
     let lastErr: any
     for (const m of candidates) {
       try {
-        const r = await openai.chat.completions.create({
-          model: m,
-          messages,
-          temperature: 0.15,
-          max_tokens: 900,
-          response_format: { type: 'json_object' }
-        })
-        const content = r.choices[0]?.message?.content
+        let content: string | undefined
+        if (m.startsWith('gpt-5')) {
+          // Prefer Responses API for GPT‑5 models
+          try {
+            const resp = await openai.responses.create({
+              model: m,
+              input: messages as any,
+              temperature: 0.15,
+              // Some SDKs use max_output_tokens; older runtimes expect max_completion_tokens
+              max_output_tokens: 900,
+              response_format: { type: 'json_object' as any }
+            } as any)
+            // Try to read output_text helper, then fall back to manual extraction
+            content = (resp as any).output_text || (resp as any).text || JSON.stringify(resp)
+            if (!content && (resp as any).output?.[0]?.content?.[0]?.text) {
+              content = (resp as any).output[0].content[0].text
+            }
+          } catch (err) {
+            // Retry with alternate parameter name if required by the backend
+            const resp2 = await (openai as any).responses.create({
+              model: m,
+              input: messages as any,
+              temperature: 0.15,
+              max_completion_tokens: 900,
+              response_format: { type: 'json_object' }
+            })
+            content = (resp2 as any).output_text || (resp2 as any).text || JSON.stringify(resp2)
+            if (!content && (resp2 as any).output?.[0]?.content?.[0]?.text) {
+              content = (resp2 as any).output[0].content[0].text
+            }
+          }
+        } else {
+          const r = await openai.chat.completions.create({
+            model: m,
+            messages,
+            temperature: 0.15,
+            max_tokens: 900,
+            response_format: { type: 'json_object' }
+          })
+          content = r.choices[0]?.message?.content
+        }
         if (content && content.trim().length > 0) {
           return content
         }

@@ -97,17 +97,40 @@ async function main() {
     console.log(`\n--- LIVE RUN: ${fx.label} ---`)
     const started = Date.now()
     try {
-      const completion = await client.chat.completions.create({
-        model,
-        messages,
-        temperature: 0.15,
-        max_tokens: 900,
-        response_format: { type: 'json_object' }
-      })
+      let content
+      if ((model || '').startsWith('gpt-5')) {
+        try {
+          const resp = await client.responses.create({
+            model,
+            input: messages,
+            temperature: 0.15,
+            max_output_tokens: 900,
+            response_format: { type: 'json_object' }
+          })
+          content = resp.output_text || (resp.output?.[0]?.content?.[0]?.text) || ''
+        } catch (err) {
+          const resp2 = await client.responses.create({
+            model,
+            input: messages,
+            temperature: 0.15,
+            max_completion_tokens: 900,
+            response_format: { type: 'json_object' }
+          })
+          content = resp2.output_text || (resp2.output?.[0]?.content?.[0]?.text) || ''
+        }
+      } else {
+        const completion = await client.chat.completions.create({
+          model,
+          messages,
+          temperature: 0.15,
+          max_tokens: 900,
+          response_format: { type: 'json_object' }
+        })
+        content = completion.choices?.[0]?.message?.content || '{}'
+      }
       const ms = Date.now() - started
-      const content = completion.choices?.[0]?.message?.content || '{}'
       let parsed
-      try { parsed = JSON.parse(content) } catch { parsed = { parseError: true, content } }
+      try { parsed = JSON.parse(content || '{}') } catch { parsed = { parseError: true, content } }
       console.log('latencyMs=', ms)
       console.dir(parsed, { depth: null })
       // Lightweight validation
@@ -121,7 +144,7 @@ async function main() {
         const vals = ['sweetness','acidity','tannin','bitterness','body'].map(k => Number(sp[k] ?? 0.5))
         const mean = vals.reduce((a,b)=>a+b,0)/vals.length
         const varc = vals.reduce((a,b)=>a + Math.pow(b-mean,2),0)/vals.length
-        return varc > 0.0025 // ~stddev > 0.05
+        return varc > 0.0025
       })()
       console.log('validation:', { rangesOk, styleOk, notFlat })
     } catch (e) {
