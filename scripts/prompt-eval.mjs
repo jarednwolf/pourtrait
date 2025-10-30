@@ -108,8 +108,7 @@ async function main() {
             model,
             input: messagesToString(messages),
             temperature: 0.15,
-            max_output_tokens: 900,
-            text: { format: 'json_object' }
+            max_output_tokens: 900
           })
           content = resp.output_text || (resp.output?.[0]?.content?.[0]?.text) || ''
         } catch (err) {
