@@ -104,7 +104,7 @@ export function evaluateProfile(
   const within = (a?: number, b?: number) => typeof a === 'number' && typeof b === 'number' && Math.abs(a - b) <= tol
 
   if (Object.keys(red).length) {
-    checks.push({ id: 'coherence-red-tannin', ok: within(red.tannin, stablePalate.tannin), expected: stablePalate.tannin, actual: red.tannin, weight: 0.7, message: 'Red map tannin should reflect stable palate' })
+    checks.push({ id: 'coherence-red-tannin', ok: within(red.tannin, stablePalate.tannin), expected: stablePalate.tannin, actual: red.tannin, weight: 1.3, message: 'Red map tannin should reflect stable palate' })
     checks.push({ id: 'coherence-red-acidity', ok: within(red.acidity, stablePalate.acidity), expected: stablePalate.acidity, actual: red.acidity, weight: 0.5, message: 'Red map acidity should reflect stable palate' })
     checks.push({ id: 'coherence-red-body', ok: within(red.body, stablePalate.body), expected: stablePalate.body, actual: red.body, weight: 0.5, message: 'Red map body should reflect stable palate' })
     checks.push({ id: 'coherence-red-oak', ok: within(red.oak, styleLevers.oak), expected: styleLevers.oak, actual: red.oak, weight: 0.5, message: 'Red map oak should reflect style levers' })
