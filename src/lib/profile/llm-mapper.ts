@@ -23,12 +23,12 @@ export async function mapFreeTextToProfile({
   experience: Experience
   answers: FreeTextAnswers
   model?: string
-}): Promise<{ profile: UserProfileInput; summary: string }> {
+}): Promise<{ profile: UserProfileInput; summary: string; usedModel: string }> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   const messages = buildMappingMessages({ userId, experience, answers })
   const messagesToString = (msgs: any[]) => msgs.map(m => `${m.role.toUpperCase()}: ${typeof m.content === 'string' ? m.content : JSON.stringify(m.content)}`).join('\n\n')
   
-  async function requestWithFallback(): Promise<string> {
+  async function requestWithFallback(): Promise<{ content: string; usedModel: string }> {
     const candidates = [model, 'gpt-4o', 'gpt-4o-mini']
     let lastErr: any
     for (const m of candidates) {
@@ -64,7 +64,7 @@ export async function mapFreeTextToProfile({
           content = r.choices[0]?.message?.content
         }
         if (content && content.trim().length > 0) {
-          return content
+          return { content, usedModel: m }
         }
       } catch (err: any) {
         lastErr = err
@@ -74,7 +74,7 @@ export async function mapFreeTextToProfile({
     throw lastErr || new Error('LLM mapping failed')
   }
 
-  const content = await requestWithFallback()
+  const { content, usedModel } = await requestWithFallback()
 
   let parsed: unknown
   try {
@@ -105,7 +105,7 @@ export async function mapFreeTextToProfile({
 
   const summary = `Profile created from free-text. Experience: ${experience}.`
 
-  return { profile, summary }
+  return { profile, summary, usedModel }
 }
 
 function heuristicProfileFromAnswers(userId: string, experience: Experience, answers: FreeTextAnswers): UserProfileInput {

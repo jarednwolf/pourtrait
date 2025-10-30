@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mapFreeTextToProfile } from '@/lib/profile/llm-mapper'
 import { evaluateProfile } from '@/lib/profile/evaluator'
+import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
 
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     const anonUserId = `preview-${now}`
     console.log('preview_map_started', { experience })
 
-    const { profile, summary } = await mapFreeTextToProfile({
+    const { profile, summary, usedModel } = await mapFreeTextToProfile({
       userId: anonUserId,
       experience,
       answers: freeTextAnswers || {}
@@ -44,6 +45,30 @@ export async function POST(request: NextRequest) {
     console.log('preview_map_completed', { latencyMs })
 
     const evalRes = evaluateProfile(profile, freeTextAnswers, experience)
+
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      )
+      const answersStr = JSON.stringify(freeTextAnswers || {})
+      const excerpt = answersStr.slice(0, 160)
+      await supabase.from('llm_mapping_runs').insert({
+        user_id: null,
+        anon_id: anonUserId,
+        model: usedModel,
+        prompt_version: process.env.NEXT_PUBLIC_PROMPT_VERSION || null,
+        evaluator_version: process.env.NEXT_PUBLIC_EVALUATOR_VERSION || null,
+        experience,
+        latency_ms: latencyMs,
+        confidence: evalRes.confidence,
+        success: true,
+        answers_excerpt: excerpt,
+        answers_hash: null,
+        checks: process.env.NEXT_PUBLIC_SHOW_EVAL_DIAGNOSTICS ? (evalRes.checks as any) : null
+      })
+    } catch {}
+
     const res = NextResponse.json({ success: true, data: { profile, summary, evaluation: { confidence: evalRes.confidence, checks: process.env.NEXT_PUBLIC_SHOW_EVAL_DIAGNOSTICS ? evalRes.checks : undefined }, commentary: evalRes.commentary } })
     res.cookies.set('pp_preview_ts', String(now), { httpOnly: false, sameSite: 'lax', maxAge: 60 * 5 })
     return res

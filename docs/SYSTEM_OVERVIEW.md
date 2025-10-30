@@ -1,225 +1,95 @@
-# Pourtrait AI Wine Sommelier - System Overview
+# Pourtrait – Current System Overview (October 2025)
 
-## 🍷 About Pourtrait
+## Product state
+- Deployed on Vercel, linked to GitHub; Supabase (Postgres + Auth + RLS) as data + auth.
+- Onboarding is end‑to‑end with a pre‑auth, LLM‑powered preview flow and post‑auth finalize.
+- Authenticated UX routes to `/dashboard`; users can view their profile insights at `/profile`.
 
-Pourtrait is an AI-powered personal wine cellar and sommelier web application that revolutionizes how wine lovers manage their collections and discover new wines. Built with modern web technologies and sophisticated AI, it serves both seasoned enthusiasts and newcomers with personalized, intelligent wine guidance.
+## Tech stack
+- Frontend: Next.js 15 (App Router), TypeScript, Tailwind, PWA via next‑pwa/Workbox.
+- Backend: Next.js Route Handlers (Node for privileged ops; Edge for light/read routes).
+- Data/Auth: Supabase (Postgres + Auth, RLS). SQL migrations in `supabase/migrations`.
+- AI: OpenAI GPT‑5 (Responses API) for free‑text onboarding mapping; automatic fallback to GPT‑4o/4o‑mini in the server mapper when needed; Zod schema validation and heuristic fallback.
+- Testing: Vitest, @testing-library/react, jest‑axe; live eval harness for LLM mapping.
+- Observability: per‑run logging to `llm_mapping_runs`, daily rollups to `llm_daily_stats`, metrics endpoints and admin dashboard.
 
-## 🎯 Core Features
+## Core flows
+### Onboarding (guest → preview → signup)
+1. Taste quiz saves responses in `localStorage` (`pourtrait_quiz_responses_v1`).
+2. Finish routes to `/onboarding/preview` (loader: “Painting your pourtrait…”).
+3. Preview calls `POST /api/profile/map/preview` (Node):
+   - Builds messages and invokes GPT‑5 Responses API (fallbacks if needed).
+   - Validates output with Zod; evaluator computes confidence + diagnostics.
+   - Returns `{ profile, summary, commentary, evaluation }`.
+   - Logs a run in `llm_mapping_runs` (anon_id + excerpt/hash only).
+4. UI renders bars + commentary + confidence; guest CTA is “Save my profile”.
+5. After signup/callback: `/auth/callback/finish` upserts preview profile to DB, logs events, and routes to `/onboarding/summary`.
 
-### 📱 Smart Wine Inventory Management
-- **Automated Data Entry**: Wine label recognition and OCR for effortless wine addition
-- **Comprehensive Tracking**: Producer, vintage, region, varietal, quantity, purchase details
-- **Visual Organization**: Grid and list views with advanced filtering and search
-- **Consumption History**: Track what you've enjoyed with ratings and notes
+### Authenticated
+- `/profile` shows ProfileSummary (bars, commentary, confidence).
+- `/dashboard` includes a link to Profile insights and recs entry points.
 
-### 🧠 AI-Powered Sommelier
-- **Personalized Recommendations**: Tailored suggestions based on taste profile and context
-- **Natural Language Queries**: Conversational interface for wine advice
-- **Food Pairing Suggestions**: Intelligent pairing recommendations for meals and occasions
-- **Restaurant Wine List Analysis**: Photo-based analysis of restaurant wine selections
+## AI mapping and evaluator
+- Mapper: `src/lib/profile/llm-mapper.ts`
+  - Default model `OPENAI_MODEL` (gpt‑5); for GPT‑5 uses Responses API with `max_output_tokens`.
+  - Falls back to 4o/4o‑mini if call fails; parses JSON via Zod; heuristic fill‑ins to avoid complete failure.
+  - Returns `{ profile, summary, usedModel }`.
+- Evaluator: `src/lib/profile/evaluator.ts`
+  - Rule‑based expectations from free‑text signals (e.g., Napa Cab/Syrah/Bdx → tannin/body/oak; Sancerre/Pinot Gris → minerality/balanced sweetness; dislikes → acidity cap).
+  - Coherence checks between red/white/sparkling flavor maps and stable palate; context checks with synonym matching (pizza_pasta ⇢ pizza_burger_night, etc.).
+  - Outputs `confidence`, `checks`, and a 2–3 sentence somm commentary.
 
-### ⏰ Intelligent Drinking Window Tracking
-- **Hybrid Data Approach**: Combines expert knowledge with algorithmic calculations
-- **Expert-Curated Data**: Wine Spectator, Robert Parker, Jancis Robinson, Decanter
-- **Visual Status Indicators**: Professional badges showing wine readiness
-- **Smart Notifications**: Alerts for optimal drinking windows and urgency priorities
-- **Data Source Transparency**: Users always know the source and confidence level
+## APIs (selected)
+- `POST /api/profile/map` (Node): auth required; maps free‑text to profile; evaluator; logs to `llm_mapping_runs`.
+- `POST /api/profile/map/preview` (Node): unauthenticated; same mapping/evaluator; logs run with `anon_id`.
+- `POST /api/profile/upsert` (Node): service role upserts palate/aroma/context/food into DB; sets onboarding complete.
+- `GET/POST /api/profile/summary`: AI summary for an existing profile.
+- `POST /api/metrics/llm-map/log`: authenticated by `x-ingest-key`; allows harness uploads of suite results.
+- `GET /api/metrics/llm-map-digest?days=7`: aggregate metrics over time window.
+- `GET /api/metrics/llm-map-rollup?offset=1`: compute/store prior day’s rollup to `llm_daily_stats`.
 
-### 👤 Personalized Taste Profiling
-- **Interactive Onboarding**: Approachable quiz system for all experience levels
-- **Adaptive Learning**: Profile updates based on consumption feedback
-- **Multiple Profiles**: Support for drinking partners and group preferences
-- **Experience-Appropriate Language**: Tailored communication for beginners to experts
+## Logging and metrics
+- Per‑run logging table: `llm_mapping_runs(user_id|anon_id, model, latency_ms, confidence, success, answers_excerpt, answers_hash, checks)` with indexes.
+- Daily rollups table: `llm_daily_stats(day, totals, averages, failure_rate, models jsonb)`.
+- Cron jobs in `vercel.json`:
+  - `0 2 * * *` → digest endpoint
+  - `5 2 * * *` → rollup endpoint
+- Admin dashboard: `/(auth)/admin/llm` (totals, averages, per‑model stats).
 
-### 📸 Advanced Image Processing
-- **Wine Label Recognition**: AI-powered identification of wines from photos
-- **Restaurant Menu Scanning**: OCR and analysis of wine lists
-- **Optimized Storage**: Efficient image processing and storage
+## Developer tooling
+- Live eval harness: `scripts/prompt-eval.mjs`
+  - Run one: `EVAL_LIVE=1 OPENAI_API_KEY=... OPENAI_MODEL=gpt-5 node scripts/prompt-eval.mjs --only=expert_user_case --evaluate`
+  - Run suite: `... node scripts/prompt-eval.mjs --suite --evaluate`
+  - Upload: add `--upload` with `INGEST_URL=/api/metrics/llm-map/log` and `METRICS_INGEST_KEY` set.
+  - Suite cases defined in `scripts/prompt-suite.json` (10 diverse personas with expectations).
 
-## 🏗️ Technical Architecture
+## Completed (high‑impact)
+- Pre‑auth LLM preview with loader and personalized bars; post‑auth finalize.
+- GPT‑5 Responses API integration with Zod validation + evaluator confidence + commentary.
+- Profile insights page and dashboard entry.
+- Logging + daily rollups + metrics endpoints + admin page.
+- Context synonym handling; non‑flat sanity; coherent flavor map checks.
+- A11y coverage on preview and core pages; type‑checks and lints clean.
 
-### Frontend Stack
-- **Next.js 14**: React framework with App Router
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first styling
-- **PWA Support**: Progressive Web App capabilities
-- **Responsive Design**: Mobile-first approach
+## Known gaps / next work
+- Alerts: optional Slack/webhook (deferred by decision).
+- Cross‑device preview continuity (server “preview_profiles” store) if needed.
+- Expand suite coverage for additional cuisines/regions and sparkling styles.
+- Strengthen security around ingest: IP allowlist/rate limiting; rotate `METRICS_INGEST_KEY`.
+- UI: richer profile summary (per‑dimension confidence), quick actions to recs.
+- Performance: consider `next/font/local`, image size tuning for hero assets.
 
-### Backend Services
-- **Supabase**: PostgreSQL database with real-time capabilities
-- **Edge Functions**: Serverless API endpoints
-- **Row Level Security**: Data protection and privacy
-- **Real-time Subscriptions**: Live updates for collaborative features
+## Environment variables (additions)
+- `OPENAI_MODEL` (default `gpt-5`)
+- `NEXT_PUBLIC_PROMPT_VERSION`, `NEXT_PUBLIC_EVALUATOR_VERSION` (optional; surfaced in logs)
+- `METRICS_INGEST_KEY`, `LLM_LOG_SALT` (ingest + hashing)
 
-### AI & Machine Learning
-- **OpenAI Integration**: GPT-4 for natural language processing
-- **Image Recognition**: Wine label and text extraction
-- **Vector Embeddings**: Semantic search and recommendations
-- **Expert Data Integration**: Curated wine knowledge from industry sources
-
-### Data Management
-- **PostgreSQL**: Primary database with JSONB support
-- **Redis Caching**: Performance optimization
-- **Object Storage**: Image and file management
-- **Full-Text Search**: Advanced wine discovery
-
-## 🎨 Design Philosophy
-
-### Professional & Approachable
-- **No Emojis Policy**: Professional visual communication
-- **Expert Icon Libraries**: Feather Icons, Heroicons, Lucide
-- **Sophisticated Color Palette**: Wine-inspired, professional colors
-- **Clean Typography**: Trustworthy and readable design
-
-### User Experience Principles
-- **Beginner-Friendly**: Approachable language and educational content
-- **Expert-Capable**: Advanced features for wine professionals
-- **Mobile-First**: Optimized for on-the-go wine management
-- **Accessibility**: WCAG compliant design and interactions
-
-## 🔧 Key Services & Components
-
-### Drinking Window System
-```typescript
-// Hybrid approach with expert data priority
-DrinkingWindowService.calculateDrinkingWindow(wine)
-ExpertDrinkingWindowService.findExpertData(wine)
-NotificationService.generateDrinkingWindowAlerts(userId, wines)
-```
-
-### AI Recommendation Engine
-```typescript
-// Personalized recommendations with context
-RecommendationEngine.getPersonalizedRecommendations(userId, context)
-RecommendationEngine.getFoodPairings(userId, foodDescription)
-RecommendationEngine.processNaturalLanguageQuery(userId, query)
-```
-
-### Image Processing Pipeline
-```typescript
-// Wine label recognition and data extraction
-ImageProcessingService.recognizeWineLabel(imageBuffer)
-ImageProcessingService.extractTextFromImage(imageBuffer)
-ImageProcessingService.processWineListImage(imageBuffer)
-```
-
-### Enhanced Wine Management
-```typescript
-// Automatic drinking window calculation
-EnhancedWineService.createWine(userId, wineInput)
-EnhancedWineService.updateWine(wineId, updates)
-EnhancedWineService.getUserWinesWithUpdatedStatus(userId)
-```
-
-## 📊 Data Sources & Quality
-
-### Expert Wine Knowledge
-- **Wine Spectator**: Professional ratings and aging guidance
-- **Robert Parker**: Renowned wine critic assessments
-- **Jancis Robinson**: Master of Wine expertise
-- **Decanter Magazine**: Industry-leading wine journalism
-
-### External Integrations
-- **Wine APIs**: Vivino, Wine.com, CellarTracker (planned)
-- **Professional Databases**: Industry wine data sources
-- **Regional Authorities**: Official wine region information
-
-### Quality Assurance
-- **Confidence Scoring**: 60-95% based on data source
-- **Cross-Validation**: Multiple source verification
-- **User Feedback Integration**: Continuous improvement
-- **Expert Review Process**: Regular data validation
-
-## 🧪 Testing & Quality
-
-### Comprehensive Test Coverage
-- **Unit Tests**: 50+ test cases across core services
-- **Integration Tests**: API and database interactions
-- **Component Tests**: UI functionality and accessibility
-- **E2E Tests**: Complete user workflows
-
-### Performance Optimization
-- **Lazy Loading**: Efficient resource management
-- **Image Optimization**: Automatic compression and formats
-- **Database Indexing**: Optimized query performance
-- **Caching Strategies**: Redis and browser caching
-
-## 🚀 Deployment & Scalability
-
-### Production Architecture
-- **Vercel Deployment**: Automatic scaling and CDN
-- **Supabase Managed Services**: Database and authentication
-- **Edge Functions**: Global serverless compute
-- **Monitoring**: Error tracking and performance metrics
-
-### Scalability Features
-- **Horizontal Scaling**: Automatic load balancing
-- **Database Optimization**: Efficient queries and indexing
-- **CDN Distribution**: Global content delivery
-- **Background Processing**: Asynchronous task handling
-
-## 🔐 Security & Privacy
-
-### Data Protection
-- **Row Level Security**: Database-level access control
-- **Authentication**: Supabase Auth with social providers
-- **HTTPS Everywhere**: Encrypted data transmission
-- **Privacy Controls**: User data management options
-
-### Compliance
-- **GDPR Ready**: European privacy regulation compliance
-- **Data Minimization**: Only collect necessary information
-- **User Consent**: Clear privacy policy and controls
-- **Secure Storage**: Encrypted data at rest
-
-## 📈 Future Roadmap
-
-### Short-term Enhancements
-- **Wine API Integration**: External data source connections
-- **Mobile App**: Native iOS and Android applications
-- **Social Features**: Wine sharing and community
-- **Advanced Analytics**: Collection insights and trends
-
-### Long-term Vision
-- **Machine Learning**: Predictive taste modeling
-- **IoT Integration**: Smart cellar monitoring
-- **Marketplace Integration**: Purchase recommendations
-- **Professional Tools**: Sommelier and restaurant features
-
-## 🤝 Contributing
-
-### Development Setup
-```bash
-# Clone repository
-git clone [repository-url]
-
-# Install dependencies
-npm install
-
-# Set up environment
-cp .env.example .env.local
-
-# Run development server
-npm run dev
-```
-
-### Code Standards
-- **TypeScript**: Strict type checking
-- **ESLint**: Code quality enforcement
-- **Prettier**: Consistent formatting
-- **Conventional Commits**: Standardized commit messages
-
-## 📚 Documentation
-
-- **[API Documentation](./api/)**: Complete API reference
-- **[Component Library](./components/)**: UI component documentation
-- **[Database Schema](./database/)**: Data model documentation
-- **[Deployment Guide](./deployment/)**: Production setup instructions
-
-## 📞 Support & Contact
-
-For questions, issues, or contributions, please refer to our documentation or reach out through the appropriate channels.
+## File map (key)
+- Mapping: `src/lib/profile/llm-mapper.ts`, evaluator: `src/lib/profile/evaluator.ts`
+- Onboarding preview: `src/app/onboarding/preview/page.tsx`
+- Profile insights: `src/app/(auth)/profile/page.tsx`
+- Metrics: `src/app/api/metrics/*`, admin: `src/app/(auth)/admin/llm/page.tsx`
+- Logging schema: `supabase/migrations/*llm_*`
 
 ---
-
-*Pourtrait - Elevating your wine journey through intelligent technology and expert knowledge.*
+This document is the source‑of‑truth overview. Keep it updated alongside any changes to onboarding, mapping, evaluator rules, or metrics.

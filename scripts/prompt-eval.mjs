@@ -201,7 +201,8 @@ async function main() {
       })()
       console.log('validation:', { rangesOk, styleOk, notFlat })
 
-      if (evaluate && !(parsed && parsed.stablePalate && parsed.styleLevers)) {
+      const validProfile = !!(parsed && parsed.stablePalate && parsed.styleLevers)
+      if (evaluate && !validProfile) {
         console.log('evaluation: skipped (invalid profile)')
       } else if (evaluate) {
         const text = fx.answers || {}
@@ -269,6 +270,31 @@ async function main() {
         console.log('evaluation checks:', { total: allChecks.length, failed: failed.length })
         if (failed.length) {
           console.table(failed)
+        }
+
+        // Optional upload to metrics
+        if (process.argv.includes('--upload')) {
+          try {
+            const url = process.env.INGEST_URL || ''
+            const key = process.env.METRICS_INGEST_KEY || ''
+            if (url && key) {
+              await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-ingest-key': key },
+                body: JSON.stringify({
+                  model,
+                  latencyMs: ms,
+                  confidence: null,
+                  success: failed.length === 0 && validProfile,
+                  experience: fx.experience,
+                  answers: fx.answers,
+                  checks: allChecks,
+                  userId: null,
+                  anonId: `suite-${fx.label}-${Date.now()}`
+                })
+              })
+            }
+          } catch {}
         }
       }
     } catch (e) {
