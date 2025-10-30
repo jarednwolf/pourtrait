@@ -77,24 +77,93 @@ export async function mapFreeTextToProfile({
     profile = UserProfileSchema.parse(parsed)
   } catch {
     // Shape mismatch fallback to safe defaults based on experience
-    profile = UserProfileSchema.parse({
-      userId,
-      stablePalate: { sweetness: 0.5, acidity: 0.5, tannin: 0.5, bitterness: 0.5, body: 0.5, alcoholWarmth: 0.5, sparkleIntensity: 0.5 },
-      aromaAffinities: [],
-      styleLevers: { oak: 0.3, malolacticButter: 0.2, oxidative: 0.2, minerality: 0.5, fruitRipeness: 0.5 },
-      contextWeights: [],
-      foodProfile: undefined,
-      preferences: { novelty: 0.5, budgetTier: 'weekend', values: [] },
-      dislikes: [],
-      sparkling: {},
-      wineKnowledge: experience === 'expert' ? 'expert' : experience === 'intermediate' ? 'intermediate' : 'novice',
-      flavorMaps: {}
-    })
+    profile = heuristicProfileFromAnswers(userId, experience, answers)
   }
 
   const summary = `Profile created from free-text. Experience: ${experience}.`
 
   return { profile, summary }
+}
+
+function heuristicProfileFromAnswers(userId: string, experience: Experience, answers: FreeTextAnswers): UserProfileInput {
+  const text = Object.values(answers).filter(Boolean).join(' ').toLowerCase()
+
+  const mentions = (tokens: string[]) => tokens.some(t => text.includes(t))
+
+  const lovesCab = mentions(['napa cab', 'napa cabernet', 'cabernet', 'heitz'])
+  const lovesSyrah = mentions(['northern rhone', 'syrah', 'cote rotie', 'hermitage'])
+  const lovesBordeaux = mentions(['bordeaux', 'merlot'])
+  const lovesPinotGris = mentions(['pinot gris'])
+  const lovesSancerre = mentions(['sancerre', 'sauvignon blanc'])
+  const dislikesHighAcid = mentions(['overly acidic', 'extremely acidic'])
+  const steak = mentions(['steak', 'grilled', 'kabob'])
+  const pizza = mentions(['pizza', 'burger'])
+  const celebration = mentions(['special occasion', 'date night', 'friends', 'family'])
+
+  // Base palate leaning towards structured reds
+  const stablePalate = {
+    sweetness: 0.25,
+    acidity: dislikesHighAcid ? 0.45 : 0.55,
+    tannin: lovesCab || lovesSyrah || lovesBordeaux ? 0.75 : 0.55,
+    bitterness: 0.4,
+    body: lovesCab || lovesBordeaux ? 0.75 : 0.6,
+    alcoholWarmth: 0.6,
+    sparkleIntensity: 0.3,
+  }
+
+  const styleLevers = {
+    oak: lovesCab || lovesBordeaux ? 0.65 : 0.45,
+    malolacticButter: 0.25,
+    oxidative: 0.25,
+    minerality: lovesSancerre ? 0.6 : 0.4,
+    fruitRipeness: lovesCab || lovesBordeaux ? 0.65 : 0.5,
+  }
+
+  const aromaAffinities = [
+    lovesSyrah ? { family: 'pepper_spice' as const, affinity: 0.7 } : null,
+    lovesCab || lovesBordeaux ? { family: 'black_fruit' as const, affinity: 0.6 } : null,
+    lovesSancerre || lovesPinotGris ? { family: 'citrus' as const, affinity: 0.55 } : null,
+    { family: 'earth_mineral' as const, affinity: 0.5 },
+  ].filter(Boolean) as UserProfileInput['aromaAffinities']
+
+  const occasions = [
+    steak ? 'steak_night' : 'everyday',
+    pizza ? 'pizza_pasta' : 'everyday',
+    celebration ? 'celebration_toast' : 'everyday',
+  ]
+
+  const contextWeights = Array.from(new Set(occasions)).slice(0, 3).map((o) => ({
+    occasion: o as any,
+    weights: {},
+  }))
+
+  const dislikes: string[] = []
+
+  const preferences = {
+    novelty: 0.55,
+    budgetTier: 'weekend' as const,
+    values: [] as string[],
+  }
+
+  const profile: UserProfileInput = {
+    userId,
+    stablePalate,
+    aromaAffinities,
+    styleLevers,
+    contextWeights,
+    foodProfile: undefined,
+    preferences,
+    dislikes,
+    sparkling: { drynessBand: 'Brut', bubbleIntensity: 0.4 },
+    wineKnowledge: experience === 'expert' ? 'expert' : experience === 'intermediate' ? 'intermediate' : 'novice',
+    flavorMaps: {
+      red: { tannin: stablePalate.tannin, acidity: stablePalate.acidity, body: stablePalate.body, oak: styleLevers.oak, fruitRipeness: styleLevers.fruitRipeness, aromaAffinitiesTop: ['black_fruit','pepper_spice'] },
+      white: { acidity: stablePalate.acidity, body: 0.5, oak: 0.2, aromaAffinitiesTop: ['citrus'] },
+      sparkling: { dryness: 'Brut', bubbleIntensity: stablePalate.sparkleIntensity },
+    }
+  }
+
+  return profile
 }
 
 
