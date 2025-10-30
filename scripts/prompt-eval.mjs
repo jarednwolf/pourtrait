@@ -24,6 +24,8 @@ function buildMessages({ userId, experience, answers }) {
     '- When uncertain, choose sensible midpoints/defaults rather than refusing.',
     '- All numeric intensities are in [0,1].',
     '- Only include keys present in the requested schema; do not add commentary.',
+    '- For aromaAffinities.family use ONLY these exact enum values (snake_case): citrus, stone_fruit, tropical, red_fruit, black_fruit, floral, herbal_green, pepper_spice, earth_mineral, oak_vanilla_smoke, dairy_butter, honey_oxidative.',
+    '- Output must be valid JSON (no trailing commas, no comments).',
   ].join('\n')
 
   const fewShotUserNovice = {
@@ -53,8 +55,44 @@ function buildMessages({ userId, experience, answers }) {
     }),
   }
 
+  const fewShotUserExpert = {
+    role: 'user',
+    content: JSON.stringify({
+      experience: 'expert',
+      answers: {
+        free_enjoyed: 'Napa Cabernet like Heitz with steak; Northern Rhône Syrah; merlot-leaning Bordeaux; Elk Cove Pinot Gris; Sancerre with seafood.',
+        free_disliked: 'Overly acidic Italian reds; extremely acidic whites.',
+        free_contexts: 'Steak dinners, pizza nights, celebration toasts, lunch rosé.',
+        free_descriptors: 'structured, black fruit, pepper spice, mineral, balanced'
+      }
+    })
+  }
+  const fewShotAssistantExpert = {
+    role: 'assistant',
+    content: JSON.stringify({
+      userId: 'example-expert',
+      stablePalate: { sweetness: 0.25, acidity: 0.5, tannin: 0.8, bitterness: 0.45, body: 0.8, alcoholWarmth: 0.65, sparkleIntensity: 0.3 },
+      aromaAffinities: [
+        { family: 'black_fruit', affinity: 0.65 },
+        { family: 'pepper_spice', affinity: 0.7 },
+        { family: 'earth_mineral', affinity: 0.55 }
+      ],
+      styleLevers: { oak: 0.65, malolacticButter: 0.25, oxidative: 0.25, minerality: 0.55, fruitRipeness: 0.65 },
+      contextWeights: [
+        { occasion: 'steak_night', weights: {} },
+        { occasion: 'pizza_pasta', weights: {} },
+        { occasion: 'celebration_toast', weights: {} }
+      ],
+      preferences: { novelty: 0.55, budgetTier: 'weekend', values: [] },
+      dislikes: [],
+      sparkling: { drynessBand: 'Brut', bubbleIntensity: 0.35 },
+      wineKnowledge: 'expert',
+      flavorMaps: {}
+    })
+  }
+
   const user = { role: 'user', content: JSON.stringify({ userId, experience, answers }) }
-  return [ { role: 'system', content: system }, fewShotUserNovice, fewShotAssistantNovice, user ]
+  return [ { role: 'system', content: system }, fewShotUserNovice, fewShotAssistantNovice, fewShotUserExpert, fewShotAssistantExpert, user ]
 }
 
 function messagesToString(messages) {
