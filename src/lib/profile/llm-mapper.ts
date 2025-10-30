@@ -40,7 +40,8 @@ export async function mapFreeTextToProfile({
             const resp = await openai.responses.create({
               model: m,
               input: messagesToString(messages),
-              max_output_tokens: 900,
+              max_output_tokens: 1500,
+              reasoning: { effort: 'low' } as any,
               // For GPT‑5, omit text.format to avoid param errors; rely on prompt to enforce JSON
             } as any)
             // Try to read output_text helper, then fall back to manual extraction

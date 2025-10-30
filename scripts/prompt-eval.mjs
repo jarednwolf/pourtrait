@@ -107,7 +107,8 @@ async function main() {
           const resp = await client.responses.create({
             model,
             input: messagesToString(messages),
-            max_output_tokens: 900
+            max_output_tokens: 1500,
+            reasoning: { effort: 'low' }
           })
           content = resp.output_text || (resp.output?.[0]?.content?.[0]?.text) || ''
           if (!content) {
