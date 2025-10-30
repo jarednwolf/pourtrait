@@ -40,7 +40,6 @@ export async function mapFreeTextToProfile({
             const resp = await openai.responses.create({
               model: m,
               input: messagesToString(messages),
-              temperature: 0.15,
               max_output_tokens: 900,
               // For GPT‑5, omit text.format to avoid param errors; rely on prompt to enforce JSON
             } as any)

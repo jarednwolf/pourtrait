@@ -107,7 +107,6 @@ async function main() {
           const resp = await client.responses.create({
             model,
             input: messagesToString(messages),
-            temperature: 0.15,
             max_output_tokens: 900
           })
           content = resp.output_text || (resp.output?.[0]?.content?.[0]?.text) || ''
