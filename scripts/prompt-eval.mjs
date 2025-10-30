@@ -105,7 +105,7 @@ async function main() {
             input: messages,
             temperature: 0.15,
             max_output_tokens: 900,
-            response_format: { type: 'json_object' }
+            text: { format: 'json_object' }
           })
           content = resp.output_text || (resp.output?.[0]?.content?.[0]?.text) || ''
         } catch (err) {
@@ -114,7 +114,7 @@ async function main() {
             input: messages,
             temperature: 0.15,
             max_completion_tokens: 900,
-            response_format: { type: 'json_object' }
+            text: { format: 'json_object' }
           })
           content = resp2.output_text || (resp2.output?.[0]?.content?.[0]?.text) || ''
         }

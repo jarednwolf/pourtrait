@@ -42,7 +42,7 @@ export async function mapFreeTextToProfile({
               temperature: 0.15,
               // Some SDKs use max_output_tokens; older runtimes expect max_completion_tokens
               max_output_tokens: 900,
-              response_format: { type: 'json_object' as any }
+              text: { format: 'json_object' as any }
             } as any)
             // Try to read output_text helper, then fall back to manual extraction
             content = (resp as any).output_text || (resp as any).text || JSON.stringify(resp)
@@ -56,7 +56,7 @@ export async function mapFreeTextToProfile({
               input: messages as any,
               temperature: 0.15,
               max_completion_tokens: 900,
-              response_format: { type: 'json_object' }
+              text: { format: 'json_object' }
             })
             content = (resp2 as any).output_text || (resp2 as any).text || JSON.stringify(resp2)
             if (!content && (resp2 as any).output?.[0]?.content?.[0]?.text) {
