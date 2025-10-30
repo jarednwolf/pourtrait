@@ -57,6 +57,10 @@ function buildMessages({ userId, experience, answers }) {
   return [ { role: 'system', content: system }, fewShotUserNovice, fewShotAssistantNovice, user ]
 }
 
+function messagesToString(messages) {
+  return messages.map(m => `${m.role.toUpperCase()}: ${typeof m.content === 'string' ? m.content : JSON.stringify(m.content)}`).join('\n\n')
+}
+
 function parseArgs() {
   const onlyArg = process.argv.find(a => a.startsWith('--only='))
   const only = onlyArg ? onlyArg.split('=')[1] : null
@@ -102,21 +106,14 @@ async function main() {
         try {
           const resp = await client.responses.create({
             model,
-            input: messages,
+            input: messagesToString(messages),
             temperature: 0.15,
             max_output_tokens: 900,
             text: { format: 'json_object' }
           })
           content = resp.output_text || (resp.output?.[0]?.content?.[0]?.text) || ''
         } catch (err) {
-          const resp2 = await client.responses.create({
-            model,
-            input: messages,
-            temperature: 0.15,
-            max_completion_tokens: 900,
-            text: { format: 'json_object' }
-          })
-          content = resp2.output_text || (resp2.output?.[0]?.content?.[0]?.text) || ''
+          throw err
         }
       } else {
         const completion = await client.chat.completions.create({

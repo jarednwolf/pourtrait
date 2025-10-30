@@ -26,6 +26,7 @@ export async function mapFreeTextToProfile({
 }): Promise<{ profile: UserProfileInput; summary: string }> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   const messages = buildMappingMessages({ userId, experience, answers })
+  const messagesToString = (msgs: any[]) => msgs.map(m => `${m.role.toUpperCase()}: ${typeof m.content === 'string' ? m.content : JSON.stringify(m.content)}`).join('\n\n')
   
   async function requestWithFallback(): Promise<string> {
     const candidates = [model, 'gpt-4o', 'gpt-4o-mini']
@@ -38,9 +39,8 @@ export async function mapFreeTextToProfile({
           try {
             const resp = await openai.responses.create({
               model: m,
-              input: messages as any,
+              input: messagesToString(messages),
               temperature: 0.15,
-              // Some SDKs use max_output_tokens; older runtimes expect max_completion_tokens
               max_output_tokens: 900,
               text: { format: 'json_object' as any }
             } as any)
@@ -50,18 +50,8 @@ export async function mapFreeTextToProfile({
               content = (resp as any).output[0].content[0].text
             }
           } catch (err) {
-            // Retry with alternate parameter name if required by the backend
-            const resp2 = await (openai as any).responses.create({
-              model: m,
-              input: messages as any,
-              temperature: 0.15,
-              max_completion_tokens: 900,
-              text: { format: 'json_object' }
-            })
-            content = (resp2 as any).output_text || (resp2 as any).text || JSON.stringify(resp2)
-            if (!content && (resp2 as any).output?.[0]?.content?.[0]?.text) {
-              content = (resp2 as any).output[0].content[0].text
-            }
+            lastErr = err
+            content = undefined
           }
         } else {
           const r = await openai.chat.completions.create({
