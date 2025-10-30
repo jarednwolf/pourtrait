@@ -6,6 +6,8 @@ import { Icon } from '@/components/ui/Icon'
 interface ProfileSummaryProps {
   dbProfile?: any
   summary?: string
+  commentary?: string
+  confidence?: number
   className?: string
 }
 
@@ -24,7 +26,7 @@ function Bar({ value = 0.5, label }: { value?: number; label: string }) {
   )
 }
 
-export function ProfileSummary({ dbProfile, summary, className }: ProfileSummaryProps) {
+export function ProfileSummary({ dbProfile, summary, commentary, confidence, className }: ProfileSummaryProps) {
   const dislikes: string[] = Array.isArray(dbProfile?.dislikes) ? dbProfile.dislikes : []
 
   return (
@@ -71,7 +73,10 @@ export function ProfileSummary({ dbProfile, summary, className }: ProfileSummary
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-700 leading-relaxed">{summary || 'Your AI taste summary will appear here.'}</p>
+          {typeof confidence === 'number' ? (
+            <div className="mb-2 text-sm text-gray-600">Profile confidence: {(confidence * 100).toFixed(0)}%</div>
+          ) : null}
+          <p className="text-gray-700 leading-relaxed">{commentary || summary || 'Your AI taste summary will appear here.'}</p>
           {dislikes?.length ? (
             <div className="mt-4">
               <div className="text-sm font-medium text-gray-900 mb-2">Avoids</div>

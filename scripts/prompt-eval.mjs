@@ -65,7 +65,8 @@ function parseArgs() {
   const onlyArg = process.argv.find(a => a.startsWith('--only='))
   const only = onlyArg ? onlyArg.split('=')[1] : null
   const live = process.env.EVAL_LIVE === '1'
-  return { only, live }
+  const evaluate = process.argv.some(a => a === '--evaluate' || a === '--evaluate=1')
+  return { only, live, evaluate }
 }
 
 function loadFixtures() {
@@ -74,7 +75,7 @@ function loadFixtures() {
 }
 
 async function main() {
-  const { only, live } = parseArgs()
+  const { only, live, evaluate } = parseArgs()
   const fixtures = loadFixtures()
   const selected = only ? fixtures.filter(f => f.label === only) : fixtures
   if (!selected.length) {
@@ -146,6 +147,49 @@ async function main() {
         return varc > 0.0025
       })()
       console.log('validation:', { rangesOk, styleOk, notFlat })
+
+      if (evaluate && !(parsed && parsed.stablePalate && parsed.styleLevers)) {
+        console.log('evaluation: skipped (invalid profile)')
+      } else if (evaluate) {
+        const text = fx.answers || {}
+        const txt = Object.values(text).filter(Boolean).map(v => String(v).toLowerCase()).join(' ')
+        const likesStructuredReds = /napa cab|cabernet|heitz|northern rhone|syrah|bordeaux|merlot/.test(txt)
+        const whiteSignals = /pinot gris|elk cove|sancerre|sauvignon blanc/.test(txt)
+        const dislikesHighAcid = /overly acidic|extremely acidic|too crisp/.test(txt)
+        const steak = /steak|grilled|kabob/.test(txt)
+        const pizza = /pizza|burger/.test(txt)
+        const celebration = /celebration|special occasion|date night/.test(txt)
+        const brunchRose = /lunch|brunch|rose|rosé/.test(txt)
+
+        const checks = []
+        const push = (id, ok, expected, actual) => checks.push({ id, ok, expected, actual })
+        if (likesStructuredReds) {
+          push('reds-tannin>=0.7', sp.tannin >= 0.7, '>=0.7', sp.tannin)
+          push('reds-body>=0.7', sp.body >= 0.7, '>=0.7', sp.body)
+          push('reds-oak~0.55-0.75', sl.oak >= 0.55 && sl.oak <= 0.75, '0.55-0.75', sl.oak)
+        }
+        if (whiteSignals) {
+          push('white-minerality>=0.55', sl.minerality >= 0.55, '>=0.55', sl.minerality)
+          push('white-sweetness<=0.35', sp.sweetness <= 0.35, '<=0.35', sp.sweetness)
+        }
+        if (dislikesHighAcid) {
+          push('acidity<=0.65', sp.acidity <= 0.65, '<=0.65', sp.acidity)
+        }
+        // non-flat
+        push('nonflat', notFlat, '>0.05 stddev approx', 'computed')
+        // contexts (best-effort from parsed flavorMaps/contextWeights if present)
+        const got = new Set((parsed.contextWeights || []).map(c => c.occasion))
+        if (steak) push('ctx-steak', got.has('steak_night'), 'steak_night', Array.from(got))
+        if (pizza) push('ctx-pizza', got.has('pizza_pasta'), 'pizza_pasta', Array.from(got))
+        if (celebration) push('ctx-celebration', got.has('celebration_toast'), 'celebration_toast', Array.from(got))
+        if (brunchRose) push('ctx-aperitif', got.has('aperitif') || got.has('everyday'), 'aperitif|everyday', Array.from(got))
+
+        const failed = checks.filter(c => !c.ok)
+        console.log('evaluation checks:', { total: checks.length, failed: failed.length })
+        if (failed.length) {
+          console.table(failed)
+        }
+      }
     } catch (e) {
       console.error('Error:', e?.message || e)
     }

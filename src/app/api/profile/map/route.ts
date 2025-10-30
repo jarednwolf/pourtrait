@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mapFreeTextToProfile } from '@/lib/profile/llm-mapper'
 import { createClient } from '@supabase/supabase-js'
+import { evaluateProfile } from '@/lib/profile/evaluator'
 
 export const runtime = 'nodejs'
 
@@ -38,7 +39,8 @@ export async function POST(request: NextRequest) {
     const latencyMs = Date.now() - startedAt
     console.log('llm_map_completed', { userId: user.id, latencyMs })
 
-    return NextResponse.json({ success: true, data: { profile, summary } })
+    const evalRes = evaluateProfile(profile, freeTextAnswers, experience)
+    return NextResponse.json({ success: true, data: { profile, summary, evaluation: { confidence: evalRes.confidence, checks: process.env.NEXT_PUBLIC_SHOW_EVAL_DIAGNOSTICS ? evalRes.checks : undefined }, commentary: evalRes.commentary } })
 
   } catch (error) {
     console.error('llm_map_failed', { error: (error as any)?.message || String(error) })

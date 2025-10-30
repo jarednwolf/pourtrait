@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mapFreeTextToProfile } from '@/lib/profile/llm-mapper'
+import { evaluateProfile } from '@/lib/profile/evaluator'
 
 export const runtime = 'nodejs'
 
@@ -42,7 +43,8 @@ export async function POST(request: NextRequest) {
     const latencyMs = Date.now() - startedAt
     console.log('preview_map_completed', { latencyMs })
 
-    const res = NextResponse.json({ success: true, data: { profile, summary } })
+    const evalRes = evaluateProfile(profile, freeTextAnswers, experience)
+    const res = NextResponse.json({ success: true, data: { profile, summary, evaluation: { confidence: evalRes.confidence, checks: process.env.NEXT_PUBLIC_SHOW_EVAL_DIAGNOSTICS ? evalRes.checks : undefined }, commentary: evalRes.commentary } })
     res.cookies.set('pp_preview_ts', String(now), { httpOnly: false, sameSite: 'lax', maxAge: 60 * 5 })
     return res
   } catch (error) {

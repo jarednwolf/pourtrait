@@ -12,6 +12,8 @@ export default function ProfileInsightsPage() {
   const { getAccessToken } = useAuth()
   const [dbProfile, setDbProfile] = React.useState<any | null>(null)
   const [aiSummary, setAiSummary] = React.useState<string>('')
+  const [commentary, setCommentary] = React.useState<string>('')
+  const [confidence, setConfidence] = React.useState<number | undefined>(undefined)
   const [loading, setLoading] = React.useState<boolean>(true)
 
   React.useEffect(() => {
@@ -36,6 +38,7 @@ export default function ProfileInsightsPage() {
           const s = await summaryRes.json().catch(() => ({}))
           setDbProfile(p?.data?.profile || null)
           setAiSummary(s?.data?.summary || '')
+          // If evaluation endpoints are added later to summary, pick them up here
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -55,7 +58,7 @@ export default function ProfileInsightsPage() {
           {loading ? (
             <Card className="p-6">Loading…</Card>
           ) : (
-            <ProfileSummary dbProfile={dbProfile || {}} summary={aiSummary} />
+            <ProfileSummary dbProfile={dbProfile || {}} summary={aiSummary} commentary={commentary} confidence={confidence} />
           )}
         </div>
 

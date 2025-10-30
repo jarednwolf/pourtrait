@@ -35,6 +35,8 @@ export default function OnboardingPreviewPage() {
   const { user, getAccessToken } = useAuth()
   const [loading, setLoading] = React.useState(true)
   const [summary, setSummary] = React.useState<string>('')
+  const [commentary, setCommentary] = React.useState<string>('')
+  const [confidence, setConfidence] = React.useState<number | undefined>(undefined)
   const [display, setDisplay] = React.useState<any | null>(null)
   const headingRef = React.useRef<HTMLHeadingElement | null>(null)
 
@@ -80,10 +82,14 @@ export default function OnboardingPreviewPage() {
         const { data } = await res.json()
         const prof: UserProfileInput | null = data?.profile || null
         const sum: string = data?.summary || ''
+        const comm: string = data?.commentary || ''
+        const conf: number | undefined = data?.evaluation?.confidence
         if (!cancelled && prof) {
           const disp = mapProfileToDisplay(prof)
           setDisplay(disp)
           setSummary(sum)
+          setCommentary(comm)
+          setConfidence(conf)
           try {
             window.localStorage.setItem(PREVIEW_KEY, JSON.stringify({ profile: prof, summary: sum }))
           } catch {}
@@ -128,7 +134,7 @@ export default function OnboardingPreviewPage() {
           ) : (
             display ? (
               <>
-                <ProfileSummary dbProfile={display} summary={summary} />
+                <ProfileSummary dbProfile={display} summary={summary} commentary={commentary} confidence={confidence} />
                 <div className="mt-8 flex gap-3">
                   {user ? (
                     <Button asChild>
