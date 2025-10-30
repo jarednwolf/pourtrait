@@ -17,6 +17,8 @@ export function buildMappingMessages({ userId, experience, answers }: BuildArgs)
     '- When uncertain, choose sensible midpoints/defaults rather than refusing.',
     '- All numeric intensities are in [0,1].',
     '- Only include keys present in the requested schema; do not add commentary.',
+    '- For aromaAffinities.family use ONLY these exact enum values (snake_case): citrus, stone_fruit, tropical, red_fruit, black_fruit, floral, herbal_green, pepper_spice, earth_mineral, oak_vanilla_smoke, dairy_butter, honey_oxidative.',
+    '- Output must be valid JSON (no trailing commas, no comments).',
   ].join('\n')
 
   // Minimal few-shot cues to bias consistency
