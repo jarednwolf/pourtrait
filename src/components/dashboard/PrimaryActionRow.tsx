@@ -14,6 +14,7 @@ import { track } from '@/lib/utils/track'
 export function PrimaryActionRow() {
   const { getAccessToken } = useAuth()
   const [hasProfile, setHasProfile] = React.useState<boolean>(false)
+  const [totalWines, setTotalWines] = React.useState<number>(0)
 
   React.useEffect(() => {
     let cancelled = false
@@ -21,9 +22,16 @@ export function PrimaryActionRow() {
       try {
         const token = await getAccessToken()
         if (!token) { return }
-        const res = await fetch('/api/profile/summary', { headers: { Authorization: `Bearer ${token}` } })
-        const json = await res.json().catch(() => ({}))
-        if (!cancelled) setHasProfile(Boolean(json?.data?.profile))
+        const [profileRes, exportRes] = await Promise.all([
+          fetch('/api/profile/summary', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('/api/data/export', { headers: { Authorization: `Bearer ${token}` } })
+        ])
+        const profileJson = await profileRes.json().catch(() => ({}))
+        const exportJson = await exportRes.json().catch(() => ({}))
+        if (!cancelled) {
+          setHasProfile(Boolean(profileJson?.data?.profile) || !!exportJson?.hasTasteProfile)
+          setTotalWines(exportJson?.totalWines || 0)
+        }
       } catch {}
     }
     run()
@@ -34,18 +42,18 @@ export function PrimaryActionRow() {
     <nav aria-label="Quick actions" className="overflow-x-auto -mx-4 px-4">
       <ul className="mx-auto flex max-w-6xl gap-2 sm:gap-3">
         <li>
-          <Button asChild variant="outline" size="sm" className="min-w-[128px]" onClick={() => track('primary_row_click', { item: hasProfile ? 'Resume profile' : 'Start profile' })}>
-            <a href="/onboarding/step1" aria-label={hasProfile ? 'Resume taste profile' : 'Start taste profile'}>
+          <Button asChild variant="outline" size="sm" className="min-w-[128px]" onClick={() => track('primary_row_click', { item: hasProfile ? 'Recalibrate' : 'Start profile' })}>
+            <a href="/onboarding/step1" aria-label={hasProfile ? 'Recalibrate profile' : 'Start taste profile'}>
               <Icon name="sparkles" className="mr-2 h-4 w-4" aria-hidden="true" />
-              {hasProfile ? 'Resume profile' : 'Start profile'}
+              {hasProfile ? 'Recalibrate' : 'Start profile'}
             </a>
           </Button>
         </li>
         <li>
-          <Button asChild variant="outline" size="sm" className="min-w-[128px]" onClick={() => track('primary_row_click', { item: 'Add first bottle' })}>
-            <a href="/inventory?action=add" aria-label="Add your first bottle">
+          <Button asChild variant="outline" size="sm" className="min-w-[128px]" onClick={() => track('primary_row_click', { item: totalWines > 0 ? 'Log bottle' : 'Add bottle' })}>
+            <a href="/inventory?action=add" aria-label={totalWines > 0 ? 'Log a bottle' : 'Add your first bottle'}>
               <Icon name="plus" className="mr-2 h-4 w-4" aria-hidden="true" />
-              Add bottle
+              {totalWines > 0 ? 'Log bottle' : 'Add bottle'}
             </a>
           </Button>
         </li>

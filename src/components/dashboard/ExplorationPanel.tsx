@@ -10,9 +10,9 @@ export function ExplorationPanel() {
   const onImpress = useCallback(() => track('panel_impression', { panel: 'Exploration' }), [])
   const ref = useImpression({ onImpress })
   const chips = [
-    { label: 'Explore new varietals', q: 'Suggest 3 varietals I might love and why' },
-    { label: 'Under $25', q: 'Find great wines under $25 that match my taste' },
-    { label: 'Weeknight reds', q: 'Recommend weeknight-friendly reds with medium tannins' }
+    { label: 'New varietals', q: 'Suggest 3 varietals I should try next and why' },
+    { label: 'Regions to explore', q: 'Which regions match my palate, with 2 producers to try per region?' },
+    { label: 'Styles I may like', q: 'Based on my preferences, what wine styles should I explore next and why?' }
   ]
   return (
     <Card className="h-full" ref={ref} role="region" aria-labelledby="exploration-heading">

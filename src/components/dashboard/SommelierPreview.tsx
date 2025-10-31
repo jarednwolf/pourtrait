@@ -1,12 +1,29 @@
 "use client"
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { useImpression } from '@/hooks/useImpression'
 import { track } from '@/lib/utils/track'
+import { useAuth } from '@/hooks/useAuth'
 
 export function SommelierPreview() {
+  const { getAccessToken } = useAuth()
+  const [totalWines, setTotalWines] = useState<number>(0)
+  useEffect(() => {
+    let cancelled = false
+    const run = async () => {
+      try {
+        const token = await getAccessToken()
+        if (!token) { return }
+        const res = await fetch('/api/data/export', { headers: { Authorization: `Bearer ${token}` } })
+        const json = await res.json().catch(() => ({}))
+        if (!cancelled) setTotalWines(json?.totalWines || 0)
+      } catch {}
+    }
+    run()
+    return () => { cancelled = true }
+  }, [getAccessToken])
   const onImpress = useCallback(() => track('panel_impression', { panel: 'SommelierPreview' }), [])
   const ref = useImpression({ onImpress })
   return (
@@ -20,6 +37,11 @@ export function SommelierPreview() {
       <CardContent className="p-5 pt-0">
         <div className="text-sm text-gray-700">Ask pairing or purchase advice—any time.</div>
         <div className="mt-3 flex flex-wrap gap-2">
+          {totalWines > 0 && (
+            <Button asChild size="sm" variant="outline" className="min-w-[160px]" onClick={() => track('sommelier_chip_click', { q: 'From my cellar tonight' })}>
+              <a href={`/chat?q=${encodeURIComponent('What should I open from my cellar tonight? Consider readiness and my taste.')}&send=1`} aria-label="What to open from my cellar tonight?">From my cellar tonight</a>
+            </Button>
+          )}
           <Button asChild size="sm" variant="outline" className="min-w-[128px]" onClick={() => track('sommelier_chip_click', { q: 'Weeknight reds' })}>
             <a href={`/chat?q=${encodeURIComponent('Recommend weeknight-friendly reds with medium tannins')}&send=1`} aria-label="Ask for weeknight reds">Weeknight reds</a>
           </Button>
