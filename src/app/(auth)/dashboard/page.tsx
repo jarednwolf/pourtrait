@@ -13,7 +13,7 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
-        <h1 className="font-serif text-display-2 sm:text-display-1">Welcome back</h1>
+        <h1 className="font-serif text-heading-1">Welcome back</h1>
         {/* Analytics: dashboard viewed */}
         {/* Fire analytics without rendering junk nodes */}
         {typeof window !== 'undefined' ? (track('dashboard_viewed'), null) : null}
@@ -26,7 +26,7 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-5 pt-0">
-              <div className="text-sm text-gray-700">We’ll recommend a bottle you’ll love.</div>
+              <div className="text-sm text-gray-700">Your personal pick for tonight.</div>
               <div className="mt-3">
                 <Button asChild size="sm"><a href="/chat?q=What%20should%20I%20drink%20tonight%3F&send=1">Ask now</a></Button>
               </div>

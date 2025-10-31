@@ -68,7 +68,7 @@ export function TasteProfilePanel() {
           </>
         ) : (
           <>
-            <div className="text-sm text-gray-700">Teach Pourtrait what you like with quick sliders.</div>
+            <div className="text-sm text-gray-700">Build your palate profile in minutes.</div>
             <div className="mt-3">
               <Button asChild size="sm"><a href="/onboarding/step1">Start profile</a></Button>
             </div>

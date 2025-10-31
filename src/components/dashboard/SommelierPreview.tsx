@@ -18,7 +18,7 @@ export function SommelierPreview() {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-5 pt-0">
-        <div className="text-sm text-gray-700">Ask what pairs with tonight’s dinner.</div>
+        <div className="text-sm text-gray-700">Ask pairing or purchase advice—any time.</div>
         <div className="mt-3">
           <Button asChild size="sm"><a href="/chat?q=I%27m%20cooking%20salmon%20tonight%20%E2%80%94%20what%20pairs%20well%3F&send=1">Ask a question</a></Button>
         </div>
