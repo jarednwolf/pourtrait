@@ -26,7 +26,6 @@ export async function mapFreeTextToProfile({
 }): Promise<{ profile: UserProfileInput; summary: string; usedModel: string }> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   const messages = buildMappingMessages({ userId, experience, answers })
-  const messagesToString = (msgs: any[]) => msgs.map(m => `${m.role.toUpperCase()}: ${typeof m.content === 'string' ? m.content : JSON.stringify(m.content)}`).join('\n\n')
   
   async function requestWithFallback(): Promise<{ content: string; usedModel: string }> {
     const candidates = [model, 'gpt-4o', 'gpt-4o-mini']
