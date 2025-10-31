@@ -39,7 +39,7 @@ export function WhatsNewTip() {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-3 text-sm flex items-center justify-between">
       <div className="flex items-center gap-2 text-gray-700">
-        <Icon name="light-bulb" className="h-4 w-4 text-primary" aria-hidden="true" />
+        <Icon name="lightbulb" className="h-4 w-4 text-primary" aria-hidden="true" />
         <span>{tip.text}</span>
       </div>
       <div className="flex items-center gap-2">
