@@ -75,18 +75,16 @@ export async function mapFreeTextToProfile({
 
   const { content, usedModel } = await requestWithFallback()
 
-  let parsed: unknown
-  parsed = JSON.parse(extractFirstJsonObject(content) ?? content)
+  const parsed: unknown = JSON.parse(extractFirstJsonObject(content) ?? content)
 
-  let profile: UserProfileInput
-  profile = UserProfileSchema.parse(parsed)
+  const profile: UserProfileInput = UserProfileSchema.parse(parsed)
 
   const summary = `Profile created from free-text. Experience: ${experience}.`
 
   return { profile, summary, usedModel }
 }
 
-function heuristicProfileFromAnswers(userId: string, experience: Experience, answers: FreeTextAnswers): UserProfileInput {
+function _heuristicProfileFromAnswers(userId: string, experience: Experience, answers: FreeTextAnswers): UserProfileInput {
   const text = Object.values(answers).filter(Boolean).join(' ').toLowerCase()
 
   const mentions = (tokens: string[]) => tokens.some(t => text.includes(t))
