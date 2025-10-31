@@ -39,7 +39,7 @@ export async function mapFreeTextToProfile({
           try {
             const resp = await openai.responses.create({
               model: m,
-              input: messagesToString(messages),
+              input: messages as any, // pass messages directly for best adherence
               max_output_tokens: 1500,
               reasoning: { effort: 'low' } as any,
               text: { format: { type: 'json_object' } } as any
@@ -77,20 +77,10 @@ export async function mapFreeTextToProfile({
   const { content, usedModel } = await requestWithFallback()
 
   let parsed: unknown
-  try {
-    parsed = JSON.parse(extractFirstJsonObject(content) ?? content)
-  } catch {
-    // If JSON parsing fails, fall back to heuristic profile based on answers
-    parsed = heuristicProfileFromAnswers(userId, experience, answers)
-  }
+  parsed = JSON.parse(extractFirstJsonObject(content) ?? content)
 
   let profile: UserProfileInput
-  try {
-    profile = UserProfileSchema.parse(parsed)
-  } catch {
-    // Shape mismatch fallback to safe defaults based on experience
-    profile = heuristicProfileFromAnswers(userId, experience, answers)
-  }
+  profile = UserProfileSchema.parse(parsed)
 
   const summary = `Profile created from free-text. Experience: ${experience}.`
 
