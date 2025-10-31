@@ -42,7 +42,7 @@ export async function mapFreeTextToProfile({
               input: messagesToString(messages),
               max_output_tokens: 1500,
               reasoning: { effort: 'low' } as any,
-              // For GPT‑5, omit text.format to avoid param errors; rely on prompt to enforce JSON
+              text: { format: { type: 'json_object' } } as any
             } as any)
             // Try to read output_text helper, then fall back to manual extraction
             content = (resp as any).output_text || (resp as any).text || JSON.stringify(resp)
@@ -78,21 +78,10 @@ export async function mapFreeTextToProfile({
 
   let parsed: unknown
   try {
-    parsed = JSON.parse(content)
+    parsed = JSON.parse(extractFirstJsonObject(content) ?? content)
   } catch {
-    // Fallback minimal profile
-    parsed = {
-      userId,
-      stablePalate: { sweetness: 0.5, acidity: 0.5, tannin: 0.5, bitterness: 0.5, body: 0.5, alcoholWarmth: 0.5, sparkleIntensity: 0.5 },
-      aromaAffinities: [],
-      styleLevers: { oak: 0.3, malolacticButter: 0.2, oxidative: 0.2, minerality: 0.5, fruitRipeness: 0.5 },
-      contextWeights: [],
-      preferences: { novelty: 0.5, budgetTier: 'weekend', values: [] },
-      dislikes: [],
-      sparkling: {},
-      wineKnowledge: experience === 'expert' ? 'expert' : experience === 'intermediate' ? 'intermediate' : 'novice',
-      flavorMaps: {}
-    }
+    // If JSON parsing fails, fall back to heuristic profile based on answers
+    parsed = heuristicProfileFromAnswers(userId, experience, answers)
   }
 
   let profile: UserProfileInput
@@ -187,6 +176,25 @@ function heuristicProfileFromAnswers(userId: string, experience: Experience, ans
   }
 
   return profile
+}
+
+// Try to extract the first JSON object from a string that may include prose or fences
+function extractFirstJsonObject(text: string): string | null {
+  if (!text) return null
+  const start = text.indexOf('{')
+  if (start === -1) return null
+  let depth = 0
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i]
+    if (ch === '{') depth++
+    else if (ch === '}') {
+      depth--
+      if (depth === 0) {
+        return text.slice(start, i + 1)
+      }
+    }
+  }
+  return null
 }
 
 

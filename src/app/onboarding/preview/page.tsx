@@ -125,8 +125,17 @@ export default function OnboardingPreviewPage() {
   return (
     <div className="min-h-screen bg-gray-50" aria-busy={loading || undefined}>
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <h1 ref={headingRef} tabIndex={-1} className="text-3xl font-bold text-gray-900">Painting your pourtrait…</h1>
-        <p className="text-gray-600 mt-2">This can take 1–2 minutes while we translate your answers into a personalized taste profile.</p>
+        {loading ? (
+          <>
+            <h1 ref={headingRef} tabIndex={-1} className="text-3xl font-bold text-gray-900">Painting your pourtrait…</h1>
+            <p className="text-gray-600 mt-2">This can take 1–2 minutes while we translate your answers into a personalized taste profile.</p>
+          </>
+        ) : (
+          <>
+            <h1 className="text-3xl font-bold text-gray-900">Your personalized pourtrait</h1>
+            <p className="text-gray-600 mt-2">Here’s your AI‑mapped taste profile from your answers.</p>
+          </>
+        )}
 
         <div className="mt-8">
           {loading ? (
