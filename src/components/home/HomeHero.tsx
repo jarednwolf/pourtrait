@@ -27,7 +27,7 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
               Every bottle a brushstroke
             </h1>
             <p className="mt-5 text-body-lg text-gray-700 dark:text-gray-300 max-w-2xl">
-              Build your palate profile and cellar over time. Pourtrait learns your taste, sends drink‑window alerts, and delivers smarter picks with every bottle.
+              Build your palate profile and cellar over time. Pourtrait learns your preferences, guides your wine journey with personalized recommendations, and alerts you when bottles are at their best.
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
