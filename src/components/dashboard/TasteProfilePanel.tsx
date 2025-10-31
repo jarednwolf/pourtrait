@@ -11,6 +11,7 @@ export function TasteProfilePanel() {
   const { getAccessToken } = useAuth()
   const [hasProfile, setHasProfile] = React.useState<boolean>(false)
   const [loading, setLoading] = React.useState<boolean>(true)
+  const [progress, setProgress] = React.useState<number>(0)
 
   React.useEffect(() => {
     let cancelled = false
@@ -44,6 +45,20 @@ export function TasteProfilePanel() {
     }
   }, [getAccessToken])
 
+  // Lightweight local progress indicator based on saved onboarding answers
+  React.useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return
+      const raw = window.localStorage.getItem('pourtrait_quiz_responses_v1')
+      if (!raw) { setProgress(0); return }
+      const arr = JSON.parse(raw)
+      const answered = Array.isArray(arr) ? arr.length : 0
+      const approxTotal = 10
+      const pct = Math.max(0, Math.min(100, Math.round((answered / approxTotal) * 100)))
+      setProgress(pct)
+    } catch { setProgress(0) }
+  }, [])
+
   const onImpress = React.useCallback(() => track('panel_impression', { panel: 'TasteProfile' }), [])
   const ref = useImpression({ onImpress })
 
@@ -62,15 +77,20 @@ export function TasteProfilePanel() {
           <>
             <div className="text-sm text-gray-700">See your palate balance and style levers.</div>
             <div className="mt-3 flex gap-2">
-              <Button asChild size="sm"><a href="/profile">View insights</a></Button>
-              <Button asChild size="sm" variant="outline"><a href="/onboarding/step1">Recalibrate</a></Button>
+              <Button asChild size="sm" className="min-w-[128px]"><a href="/profile" aria-label="See insights">View insights</a></Button>
+              <Button asChild size="sm" variant="outline" className="min-w-[128px]"><a href="/onboarding/step1" aria-label="Recalibrate profile">Recalibrate</a></Button>
             </div>
           </>
         ) : (
           <>
-            <div className="text-sm text-gray-700">Build your palate profile in minutes.</div>
+            <div className="text-sm text-gray-700">Build your palate profile in minutes. {progress > 0 ? `(${progress}% saved)` : '≈ 1 min'}</div>
+            {progress > 0 && (
+              <div className="mt-2 h-2 w-full rounded bg-gray-100">
+                <div className="h-2 rounded bg-primary" style={{ width: `${progress}%` }} aria-hidden="true" />
+              </div>
+            )}
             <div className="mt-3">
-              <Button asChild size="sm"><a href="/onboarding/step1">Start profile</a></Button>
+              <Button asChild size="sm" className="min-w-[128px]"><a href="/onboarding/step1" aria-label={progress > 0 ? 'Resume profile' : 'Start profile'}>{progress > 0 ? 'Resume profile' : 'Start profile'}</a></Button>
             </div>
           </>
         )}
