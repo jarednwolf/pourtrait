@@ -22,12 +22,12 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
           <div className="lg:col-span-7">
             <h1
               id="home-hero-heading"
-              className="font-serif font-bold tracking-tight text-gray-900 lg:text-brand-gradient text-display-2 sm:text-display-1"
+              className="font-serif font-bold tracking-tight text-gray-900 lg:text-brand-gradient text-heading-1"
             >
               Every bottle a brushstroke
             </h1>
             <p className="mt-5 text-body-lg text-gray-700 dark:text-gray-300 max-w-2xl">
-              Get a personalized wine pick in 60 seconds. Start your taste profile now and see tonight’s recommendation.
+              Build your palate profile and cellar over time. Pourtrait learns your taste, sends drink‑window alerts, and delivers smarter picks with every bottle.
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -42,12 +42,12 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
 
             <ul className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-700" role="list">
               <li className="flex items-center gap-3">
-                <Icon name="zap" className="w-5 h-5 text-primary" aria-hidden="true" />
-                <span>Under 60s to value</span>
+                <Icon name="sparkles" className="w-5 h-5 text-primary" aria-hidden="true" />
+                <span>Learns your taste over time</span>
               </li>
               <li className="flex items-center gap-3">
-                <Icon name="users" className="w-5 h-5 text-primary" aria-hidden="true" />
-                <span>Beginner friendly</span>
+                <Icon name="clock" className="w-5 h-5 text-primary" aria-hidden="true" />
+                <span>Drink‑window alerts</span>
               </li>
               <li className="flex items-center gap-3">
                 <Icon name="shield-check" className="w-5 h-5 text-primary" aria-hidden="true" />

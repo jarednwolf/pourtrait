@@ -13,7 +13,7 @@ describe('Home Page', () => {
   it('displays the tagline', () => {
     render(<Home />)
     
-    const tagline = screen.getByText(/Get a personalized wine pick/i)
+    const tagline = screen.getByText(/Build your palate profile/i)
     expect(tagline).toBeInTheDocument()
   })
 
