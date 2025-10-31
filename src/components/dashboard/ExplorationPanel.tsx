@@ -15,7 +15,7 @@ export function ExplorationPanel() {
     { label: 'Weeknight reds', q: 'Recommend weeknight-friendly reds with medium tannins' }
   ]
   return (
-    <Card className="h-full" ref={ref as any} role="region" aria-labelledby="exploration-heading">
+    <Card className="h-full" ref={ref} role="region" aria-labelledby="exploration-heading">
       <CardHeader className="p-5">
         <CardTitle id="exploration-heading" className="flex items-center text-heading-3">
           <Icon name="search" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />

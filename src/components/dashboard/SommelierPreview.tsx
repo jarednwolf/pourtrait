@@ -10,7 +10,7 @@ export function SommelierPreview() {
   const onImpress = useCallback(() => track('panel_impression', { panel: 'SommelierPreview' }), [])
   const ref = useImpression({ onImpress })
   return (
-    <Card className="h-full" ref={ref as any} role="region" aria-labelledby="sommelier-heading">
+    <Card className="h-full" ref={ref} role="region" aria-labelledby="sommelier-heading">
       <CardHeader className="p-5">
         <CardTitle id="sommelier-heading" className="flex items-center text-heading-3">
           <Icon name="chat-bubble-left" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />

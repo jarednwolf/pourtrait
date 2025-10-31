@@ -17,7 +17,10 @@ export function TasteProfilePanel() {
     const run = async () => {
       try {
         const token = await getAccessToken()
-        if (!token) { setHasProfile(false); return }
+        if (!token) {
+          setHasProfile(false)
+          return
+        }
         const res = await fetch('/api/profile/summary', {
           headers: { Authorization: `Bearer ${token}` }
         })
@@ -26,20 +29,26 @@ export function TasteProfilePanel() {
           setHasProfile(Boolean(json?.data?.profile))
         }
       } catch {
-        if (!cancelled) setHasProfile(false)
+        if (!cancelled) {
+          setHasProfile(false)
+        }
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
     run()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [getAccessToken])
 
   const onImpress = React.useCallback(() => track('panel_impression', { panel: 'TasteProfile' }), [])
   const ref = useImpression({ onImpress })
 
   return (
-    <Card className="h-full" ref={ref as any} role="region" aria-labelledby="taste-profile-heading">
+    <Card className="h-full" ref={ref} role="region" aria-labelledby="taste-profile-heading">
       <CardHeader className="p-5">
         <CardTitle id="taste-profile-heading" className="flex items-center text-heading-3">
           <Icon name="sparkles" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
