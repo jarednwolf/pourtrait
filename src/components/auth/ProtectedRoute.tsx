@@ -20,7 +20,21 @@ export function ProtectedRoute({
   redirectTo = '/auth/signin'
 }: ProtectedRouteProps) {
   const { user, loading, initialized } = useAuthContext()
+  const auth = useAuthContext()
   const router = useRouter()
+
+  useEffect(() => {
+    // Watchdog: if auth is stuck loading for too long, try a manual refresh
+    const timeout = setTimeout(() => {
+      try {
+        if (!initialized || loading) {
+          auth.refreshUser?.()
+        }
+      } catch {}
+    }, 2500)
+
+    return () => clearTimeout(timeout)
+  }, [initialized, loading, auth])
 
   useEffect(() => {
     if (!initialized || loading) {
