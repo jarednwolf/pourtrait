@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import type { User, AuthError } from '@supabase/supabase-js'
 import type { UserProfile } from './supabase'
-import { calculateTasteProfile } from '@/lib/onboarding/quiz-calculator'
+import { calculateStructuredUserProfile } from '@/lib/onboarding/quiz-calculator'
 import type { QuizResponse } from '@/lib/onboarding/quiz-data'
 
 export interface AuthUser extends User {
@@ -111,23 +111,18 @@ export class AuthService {
         timestamp: new Date(r.timestamp || Date.now())
       }))
 
-      // Compute a full taste profile from quiz responses
-      const result = calculateTasteProfile(responses)
+      // Compute the structured user profile used by palate_profiles schema
+      const structured = calculateStructuredUserProfile(userId, responses)
 
-      const { error } = await supabase
-        .from('taste_profiles')
-        .upsert({
-          user_id: userId,
-          red_wine_preferences: result.redWinePreferences as any,
-          white_wine_preferences: result.whiteWinePreferences as any,
-          sparkling_preferences: result.sparklingPreferences as any,
-          general_preferences: result.generalPreferences as any,
-          learning_history: responses as any,
-          confidence_score: result.confidenceScore as any,
-          last_updated: new Date().toISOString() as any,
-        }, { onConflict: 'user_id' } as any)
-
-      if (error) { throw error }
+      // Use the authenticated API route to persist to palate_profiles and related tables
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) { return }
+      await fetch('/api/profile/upsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(structured)
+      })
     } catch (error) {
       console.error('Upsert taste profile from quiz error:', error)
     }
