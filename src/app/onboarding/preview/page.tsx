@@ -110,12 +110,10 @@ export default function OnboardingPreviewPage() {
           setSummary(sum)
           setCommentary(comm)
           setConfidence(conf)
-          try {
-            window.localStorage.setItem(PREVIEW_KEY, JSON.stringify({ profile: prof, summary: sum }))
-          } catch {}
+          try { window.localStorage.setItem(PREVIEW_KEY, JSON.stringify({ profile: prof, summary: sum })) } catch {}
           track('preview_map_completed')
 
-          // If the user is already authenticated, upsert immediately
+          // If already authenticated, upsert immediately
           if (user) {
             try {
               const token = await getAccessToken()
@@ -125,11 +123,6 @@ export default function OnboardingPreviewPage() {
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                   body: JSON.stringify(prof)
                 })
-                await fetch('/api/interactions/track', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                  body: JSON.stringify({ reasons: ['profile_created'], context: { source: 'preview_authed', used_llm: true } })
-                }).catch(() => {})
               }
             } catch {}
           }
@@ -140,7 +133,30 @@ export default function OnboardingPreviewPage() {
     }
     run()
     return () => { cancelled = true }
-  }, [router])
+  }, [router, user, getAccessToken])
+
+  // Secondary guard: if user becomes available later, persist the preview we stored
+  React.useEffect(() => {
+    const saveIfPending = async () => {
+      if (!user) { return }
+      try {
+        const raw = typeof window !== 'undefined' ? window.localStorage.getItem(PREVIEW_KEY) : null
+        if (!raw) { return }
+        const parsed = JSON.parse(raw)
+        const prof = parsed?.profile
+        if (!prof) { return }
+        const token = await getAccessToken()
+        if (token) {
+          await fetch('/api/profile/upsert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(prof)
+          })
+        }
+      } catch {}
+    }
+    saveIfPending()
+  }, [user, getAccessToken])
 
   return (
     <div className="min-h-screen bg-gray-50" aria-busy={loading || undefined}>
