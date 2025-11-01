@@ -24,10 +24,14 @@ export async function mapFreeTextToProfile({
   answers: FreeTextAnswers
   model?: string
 }): Promise<{ profile: UserProfileInput; summary: string; usedModel: string }> {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  const hasApiKey = Boolean(process.env.OPENAI_API_KEY)
+  const openai = hasApiKey ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null
   const messages = buildMappingMessages({ userId, experience, answers })
   
   async function requestWithFallback(): Promise<{ content: string; usedModel: string }> {
+    if (!hasApiKey) {
+      throw new Error('NO_OPENAI_KEY')
+    }
     const candidates = [model, 'gpt-4o', 'gpt-4o-mini']
     let lastErr: any
     for (const m of candidates) {
@@ -36,7 +40,7 @@ export async function mapFreeTextToProfile({
         if (m.startsWith('gpt-5')) {
           // Prefer Responses API for GPT‑5 models
           try {
-            const resp = await openai.responses.create({
+            const resp = await (openai as any).responses.create({
               model: m,
               input: messages as any, // pass messages directly for best adherence
               max_output_tokens: 1500,
@@ -53,7 +57,7 @@ export async function mapFreeTextToProfile({
             content = undefined
           }
         } else {
-          const r = await openai.chat.completions.create({
+          const r = await (openai as any).chat.completions.create({
             model: m,
             messages,
             temperature: 0.15,
@@ -73,15 +77,18 @@ export async function mapFreeTextToProfile({
     throw lastErr || new Error('LLM mapping failed')
   }
 
-  const { content, usedModel } = await requestWithFallback()
-
-  const parsed: unknown = JSON.parse(extractFirstJsonObject(content) ?? content)
-
-  const profile: UserProfileInput = UserProfileSchema.parse(parsed)
-
-  const summary = `Profile created from free-text. Experience: ${experience}.`
-
-  return { profile, summary, usedModel }
+  try {
+    const { content, usedModel } = await requestWithFallback()
+    const parsed: unknown = JSON.parse(extractFirstJsonObject(content) ?? content)
+    const profile: UserProfileInput = UserProfileSchema.parse(parsed)
+    const summary = `Profile created from free-text. Experience: ${experience}.`
+    return { profile, summary, usedModel }
+  } catch (err) {
+    // Fallback: generate a heuristic profile so preview never blocks
+    const profile = _heuristicProfileFromAnswers(userId, experience, answers)
+    const summary = `Preview generated without LLM (heuristic) based on your answers.`
+    return { profile, summary, usedModel: 'heuristic' }
+  }
 }
 
 function _heuristicProfileFromAnswers(userId: string, experience: Experience, answers: FreeTextAnswers): UserProfileInput {
