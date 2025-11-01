@@ -1,5 +1,5 @@
 import { OpenAI } from 'openai'
-import { UserProfileSchema, type UserProfileInput } from './schema'
+import { UserProfileSchema, AromaFamily, type UserProfileInput } from './schema'
 import { buildMappingMessages } from './prompt'
 
 type Experience = 'novice' | 'intermediate' | 'expert'
@@ -89,12 +89,18 @@ export async function mapFreeTextToProfile({
   let profile: UserProfileInput
   try {
     profile = UserProfileSchema.parse(parsed)
-  } catch (err: any) {
-    const e = new Error('Model output failed schema validation')
-    ;(e as any).code = 'schema_validation_failed'
-    ;(e as any).issues = err?.issues || undefined
-    ;(e as any).outputSample = (content || '').slice(0, 400)
-    throw e
+  } catch (errFirst: any) {
+    // Attempt a single normalization pass for common enum/scale issues
+    const normalized = normalizeProfileCandidate(parsed)
+    try {
+      profile = UserProfileSchema.parse(normalized)
+    } catch (err: any) {
+      const e = new Error('Model output failed schema validation')
+      ;(e as any).code = 'schema_validation_failed'
+      ;(e as any).issues = err?.issues || errFirst?.issues || undefined
+      ;(e as any).outputSample = (content || '').slice(0, 400)
+      throw e
+    }
   }
   const summary = `Profile created from free-text. Experience: ${experience}.`
   return { profile, summary, usedModel }
@@ -198,6 +204,82 @@ function extractFirstJsonObject(text: string): string | null {
     }
   }
   return null
+}
+
+// Normalize model JSON to match schema (one best-effort pass)
+function normalizeProfileCandidate(input: any): any {
+  const out = structuredClone(input)
+  // Clamp scales to [0,1]
+  const clamp01 = (n: any) => {
+    const x = typeof n === 'number' ? n : Number(n)
+    if (Number.isFinite(x)) { return Math.max(0, Math.min(1, x)) }
+    return 0.5
+  }
+
+  if (out?.stablePalate) {
+    const s = out.stablePalate
+    for (const k of ['sweetness','acidity','tannin','bitterness','body','alcoholWarmth','sparkleIntensity']) {
+      if (k in s) s[k] = clamp01(s[k])
+    }
+  }
+
+  if (out?.styleLevers) {
+    const s = out.styleLevers
+    for (const k of ['oak','malolacticButter','oxidative','minerality','fruitRipeness'] as const) {
+      if (k in s) s[k] = clamp01(s[k])
+    }
+  }
+
+  const allowedFamilies = AromaFamily.options as unknown as string[]
+  const normalizeFamily = (v: any): string | undefined => {
+    if (typeof v !== 'string') return undefined
+    const t = v.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '')
+    // direct match
+    if (allowedFamilies.includes(t)) return t
+    // simple contains / typo fixes
+    const candidates: Record<string, string[]> = {
+      black_fruit: ['blackfruit','dark_fruit','black','lack_fruit'],
+      red_fruit: ['redfruit','strawberry','raspberry','cherry'],
+      pepper_spice: ['pepper','peppery','spice','pep','pepper_spicy'],
+      herbal_green: ['herbal','green','herb'],
+      earth_mineral: ['earth','mineral','soil'],
+      oak_vanilla_smoke: ['oak','vanilla','smoke','oaky'],
+      dairy_butter: ['butter','buttery','dairy','malolactic','malo'],
+      honey_oxidative: ['oxidative','honey','sherry'],
+      stone_fruit: ['stonefruit','peach','apricot'],
+      tropical: ['tropical','pineapple','mango'],
+      citrus: ['citrus','lemon','lime','grapefruit'],
+      floral: ['floral','flower','violet','rose']
+    }
+    for (const [fam, keys] of Object.entries(candidates)) {
+      if (keys.some(k => t.includes(k))) return fam
+    }
+    return undefined
+  }
+
+  if (Array.isArray(out?.aromaAffinities)) {
+    out.aromaAffinities = out.aromaAffinities
+      .map((a: any) => {
+        const family = normalizeFamily(a?.family)
+        const affinity = clamp01((a?.affinity ?? 0.5)) * (a?.affinity < 0 ? -1 : 1)
+        return family ? { family, affinity } : null
+      })
+      .filter(Boolean)
+  }
+
+  if (Array.isArray(out?.contextWeights)) {
+    const allowedOcc = ['everyday','hot_day_patio','cozy_winter','spicy_food_night','steak_night','seafood_sushi','pizza_pasta','celebration_toast','dessert_night','aperitif']
+    out.contextWeights = out.contextWeights
+      .map((c: any) => {
+        const raw = (c?.occasion || '').toString().toLowerCase().replace(/\s+/g,'_')
+        const match = allowedOcc.find(o => raw.includes(o))
+        return match ? { occasion: match, weights: c?.weights || {} } : null
+      })
+      .filter(Boolean)
+      .slice(0, 3)
+  }
+
+  return out
 }
 
 
