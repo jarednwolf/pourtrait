@@ -54,9 +54,48 @@ export async function mapFreeTextToProfile({
     throw lastErr || new Error('LLM mapping failed')
   }
 
-  const { content, usedModel } = await requestWithFallback()
-  const parsed: unknown = JSON.parse(extractFirstJsonObject(content) ?? content)
-  const profile: UserProfileInput = UserProfileSchema.parse(parsed)
+  let content: string | undefined
+  let usedModel: string = model
+  try {
+    const r = await requestWithFallback()
+    content = r.content
+    usedModel = r.usedModel
+  } catch (err: any) {
+    const message = err?.message || 'unknown error'
+    const status = err?.status || err?.code || err?.name
+    const detail = err?.response?.data?.error?.message || err?.error || ''
+    const enriched = `${message}${detail ? ` | ${detail}` : ''}`
+    const e = new Error(enriched)
+    ;(e as any).code = 'openai_request_failed'
+    ;(e as any).status = status
+    throw e
+  }
+
+  const jsonText = extractFirstJsonObject(content || '') ?? content
+  if (!jsonText) {
+    const e = new Error('Model returned no JSON content')
+    ;(e as any).code = 'invalid_model_output'
+    throw e
+  }
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(jsonText)
+  } catch (err: any) {
+    const e = new Error('Failed to parse JSON from model output')
+    ;(e as any).code = 'invalid_json'
+    ;(e as any).outputSample = (content || '').slice(0, 400)
+    throw e
+  }
+  let profile: UserProfileInput
+  try {
+    profile = UserProfileSchema.parse(parsed)
+  } catch (err: any) {
+    const e = new Error('Model output failed schema validation')
+    ;(e as any).code = 'schema_validation_failed'
+    ;(e as any).issues = err?.issues || undefined
+    ;(e as any).outputSample = (content || '').slice(0, 400)
+    throw e
+  }
   const summary = `Profile created from free-text. Experience: ${experience}.`
   return { profile, summary, usedModel }
 }

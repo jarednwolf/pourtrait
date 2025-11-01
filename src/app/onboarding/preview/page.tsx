@@ -76,12 +76,24 @@ export default function OnboardingPreviewPage() {
           body: JSON.stringify({ experience: exp, freeTextAnswers })
         })
         if (!res.ok) {
-          const errText = await res.text().catch(() => '')
-          track('preview_map_failed', { status: res.status, body: errText?.slice?.(0, 200) })
+          let errText = ''
+          try { errText = await res.text() } catch {}
+          track('preview_map_failed', { status: res.status, body: errText?.slice?.(0, 400) })
           if (res.status === 429) {
             setError('Please wait a few seconds and try again (temporary rate limit).')
           } else if (res.status === 500) {
-            setError('We could not contact the model. Check API key and model config, then retry.')
+            try {
+              const parsed = JSON.parse(errText)
+              if (parsed?.code === 'openai_request_failed') {
+                setError('Model request failed. Verify OPENAI_API_KEY and model access, then retry.')
+              } else if (parsed?.code === 'invalid_json' || parsed?.code === 'schema_validation_failed') {
+                setError('The model returned an invalid response. Try again in a moment or adjust the model setting.')
+              } else {
+                setError('We could not contact the model. Check API key and model config, then retry.')
+              }
+            } catch {
+              setError('We could not contact the model. Check API key and model config, then retry.')
+            }
           } else {
             setError('We could not generate your preview right now. Please retry.')
           }
