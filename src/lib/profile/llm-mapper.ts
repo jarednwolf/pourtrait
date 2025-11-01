@@ -17,55 +17,32 @@ export async function mapFreeTextToProfile({
   userId,
   experience,
   answers,
-  model = process.env.OPENAI_MODEL || 'gpt-5'
+  model = process.env.OPENAI_MODEL || 'gpt-4o-mini'
 }: {
   userId: string
   experience: Experience
   answers: FreeTextAnswers
   model?: string
 }): Promise<{ profile: UserProfileInput; summary: string; usedModel: string }> {
-  const hasApiKey = Boolean(process.env.OPENAI_API_KEY)
-  const openai = hasApiKey ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY is not set')
+  }
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   const messages = buildMappingMessages({ userId, experience, answers })
   
   async function requestWithFallback(): Promise<{ content: string; usedModel: string }> {
-    if (!hasApiKey) {
-      throw new Error('NO_OPENAI_KEY')
-    }
-    const candidates = [model, 'gpt-4o', 'gpt-4o-mini']
+    const candidates = [model, 'gpt-4o-mini', 'gpt-4o'].filter(Boolean)
     let lastErr: any
     for (const m of candidates) {
       try {
-        let content: string | undefined
-        if (m.startsWith('gpt-5')) {
-          // Prefer Responses API for GPT‑5 models
-          try {
-            const resp = await (openai as any).responses.create({
-              model: m,
-              input: messages as any, // pass messages directly for best adherence
-              max_output_tokens: 1500,
-              reasoning: { effort: 'low' } as any,
-              text: { format: { type: 'json_object' } } as any
-            } as any)
-            // Try to read output_text helper, then fall back to manual extraction
-            content = (resp as any).output_text || (resp as any).text || JSON.stringify(resp)
-            if (!content && (resp as any).output?.[0]?.content?.[0]?.text) {
-              content = (resp as any).output[0].content[0].text
-            }
-          } catch (err) {
-            lastErr = err
-            content = undefined
-          }
-        } else {
-          const r = await (openai as any).chat.completions.create({
-            model: m,
-            messages,
-            temperature: 0.15,
-            max_tokens: 900,
-            response_format: { type: 'json_object' }
-          })
-          content = r.choices[0]?.message?.content
-        }
+        const r = await openai.chat.completions.create({
+          model: m,
+          messages,
+          temperature: 0.15,
+          max_tokens: 900,
+          response_format: { type: 'json_object' }
+        })
+        const content = r.choices[0]?.message?.content
         if (content && content.trim().length > 0) {
           return { content, usedModel: m }
         }
@@ -77,18 +54,11 @@ export async function mapFreeTextToProfile({
     throw lastErr || new Error('LLM mapping failed')
   }
 
-  try {
-    const { content, usedModel } = await requestWithFallback()
-    const parsed: unknown = JSON.parse(extractFirstJsonObject(content) ?? content)
-    const profile: UserProfileInput = UserProfileSchema.parse(parsed)
-    const summary = `Profile created from free-text. Experience: ${experience}.`
-    return { profile, summary, usedModel }
-  } catch (err) {
-    // Fallback: generate a heuristic profile so preview never blocks
-    const profile = _heuristicProfileFromAnswers(userId, experience, answers)
-    const summary = `Preview generated without LLM (heuristic) based on your answers.`
-    return { profile, summary, usedModel: 'heuristic' }
-  }
+  const { content, usedModel } = await requestWithFallback()
+  const parsed: unknown = JSON.parse(extractFirstJsonObject(content) ?? content)
+  const profile: UserProfileInput = UserProfileSchema.parse(parsed)
+  const summary = `Profile created from free-text. Experience: ${experience}.`
+  return { profile, summary, usedModel }
 }
 
 function _heuristicProfileFromAnswers(userId: string, experience: Experience, answers: FreeTextAnswers): UserProfileInput {

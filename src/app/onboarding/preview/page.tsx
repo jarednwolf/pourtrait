@@ -78,7 +78,13 @@ export default function OnboardingPreviewPage() {
         if (!res.ok) {
           const errText = await res.text().catch(() => '')
           track('preview_map_failed', { status: res.status, body: errText?.slice?.(0, 200) })
-          setError('We could not generate your preview right now. Please retry.')
+          if (res.status === 429) {
+            setError('Please wait a few seconds and try again (temporary rate limit).')
+          } else if (res.status === 500) {
+            setError('We could not contact the model. Check API key and model config, then retry.')
+          } else {
+            setError('We could not generate your preview right now. Please retry.')
+          }
           return
         }
         const { data } = await res.json()
