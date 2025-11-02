@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { createBrowserSupabaseClient } from '@/lib/supabase/clients.browser'
 import { AuthService, type AuthUser } from '@/lib/auth'
 import type { Session, AuthChangeEvent } from '@supabase/supabase-js'
 
@@ -23,6 +23,7 @@ export type UseAuthReturn = AuthState & AuthActions
  * Internal hook for managing auth state (used by AuthProvider only).
  */
 export function useAuthInternal(initial?: { user?: AuthUser | null; session?: Session | null; initialized?: boolean }): UseAuthReturn {
+  const supabase = useMemo(() => createBrowserSupabaseClient(), [])
   const [state, setState] = useState<AuthState>({
     user: initial?.user ?? null,
     session: initial?.session ?? null,
