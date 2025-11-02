@@ -159,9 +159,9 @@ export function PublicOnlyRoute({
     }
 
     if (user) {
-      // If user needs onboarding, redirect there instead
+      // If user needs onboarding, send them to Account instead of gating them
       if (needsOnboarding(user)) {
-        router.push('/onboarding')
+        router.push('/settings')
       } else {
         router.push(redirectTo)
       }
@@ -186,7 +186,7 @@ export function PublicOnlyRoute({
             Already Signed In
           </h2>
           <p className="text-gray-600">
-            Redirecting to dashboard...
+            Redirecting to {needsOnboarding(auth.user) ? 'account' : 'dashboard'}...
           </p>
         </div>
       </div>
