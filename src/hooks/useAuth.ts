@@ -31,23 +31,19 @@ export function useAuth(): UseAuthReturn {
 
   const refreshUser = useCallback(async () => {
     try {
-      const user = await AuthService.getCurrentUser()
-      const session = await AuthService.getSession()
-      
-      setState(prev => ({
-        ...prev,
-        user,
-        session,
-        loading: false,
-      }))
+      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { user: raw } } = await supabase.auth.getUser()
+      let profileUser: AuthUser | null = raw as any
+      // Attach profile asynchronously
+      if (raw) {
+        AuthService.getUserProfile(raw.id).then(p => {
+          setState(prev => ({ ...prev, user: p ? { ...(raw as any), profile: p } : (raw as any) }))
+        }).catch(() => {})
+      }
+      setState(prev => ({ ...prev, user: profileUser, session: session || null, loading: false }))
     } catch (error) {
       console.error('Error refreshing user:', error)
-      setState(prev => ({
-        ...prev,
-        user: null,
-        session: null,
-        loading: false,
-      }))
+      setState(prev => ({ ...prev, user: null, session: null, loading: false }))
     }
   }, [])
 
@@ -81,26 +77,22 @@ export function useAuth(): UseAuthReturn {
     // Get initial session
     const initializeAuth = async () => {
       try {
-        const session = await AuthService.getSession()
-        const user = session ? await AuthService.getCurrentUser() : null
-
+        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { user: raw } } = await supabase.auth.getUser()
         if (mounted) {
-          setState({
-            user,
-            session,
-            loading: false,
-            initialized: true,
-          })
+          setState({ user: raw as any, session: session || null, loading: false, initialized: true })
+        }
+        if (raw) {
+          AuthService.getUserProfile(raw.id).then(p => {
+            if (mounted) {
+              setState(prev => ({ ...prev, user: p ? { ...(raw as any), profile: p } : (raw as any) }))
+            }
+          }).catch(() => {})
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
         if (mounted) {
-          setState({
-            user: null,
-            session: null,
-            loading: false,
-            initialized: true,
-          })
+          setState({ user: null, session: null, loading: false, initialized: true })
         }
       }
     }
@@ -117,33 +109,20 @@ export function useAuth(): UseAuthReturn {
         setState(prev => ({ ...prev, loading: true }))
 
         try {
-          let user: AuthUser | null = null
-
-          if (session?.user) {
-            // Handle different auth events
-            switch (event) {
-              case 'SIGNED_IN':
-              case 'TOKEN_REFRESHED':
-                user = await AuthService.getCurrentUser()
-                break
-              case 'SIGNED_OUT':
-                user = null
-                break
-              case 'USER_UPDATED':
-                user = await AuthService.getCurrentUser()
-                break
-              default:
-                user = session ? await AuthService.getCurrentUser() : null
-            }
-          }
+          let nextUser: AuthUser | null = session?.user as any
 
           if (mounted) {
-            setState({
-              user,
-              session,
-              loading: false,
-              initialized: true,
-            })
+            setState({ user: nextUser, session, loading: false, initialized: true })
+          }
+
+          // Attach/refresh profile in the background
+          if (session?.user) {
+            try {
+              const profile = await AuthService.getUserProfile(session.user.id)
+              if (mounted) {
+                setState(prev => ({ ...prev, user: profile ? { ...(session.user as any), profile } : (session.user as any) }))
+              }
+            } catch {}
           }
         } catch (error) {
           console.error('Auth state change error:', error)
