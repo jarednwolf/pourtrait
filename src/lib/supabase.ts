@@ -13,6 +13,8 @@ export const createSupabaseClient = () => {
       throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY')
     }
   }
+  // Use traditional supabase-js client for broad type support across services
+  // AuthProvider will hydrate auth state from the server to avoid flicker
   return createClient<Database>(supabaseUrl as string, supabaseAnonKey as string, {
     auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true },
   })

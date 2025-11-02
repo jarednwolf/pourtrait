@@ -76,6 +76,13 @@ export function useAuthInternal(initial?: { user?: AuthUser | null; session?: Se
 
     const initializeAuth = async () => {
       try {
+        if (initial?.initialized) {
+          // If server provided an initialized session, trust it and avoid overriding
+          if (mounted) {
+            setState(prev => ({ ...prev, loading: false, initialized: true }))
+          }
+          return
+        }
         const session = await AuthService.getSession()
         const user = session ? await AuthService.getCurrentUser() : null
         if (mounted) {

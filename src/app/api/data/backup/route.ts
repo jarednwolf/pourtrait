@@ -1,14 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/database.types'
 import { dataExportService } from '@/lib/services/data-export'
+function getSupabaseServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  return createClient<Database>(url, serviceKey)
+}
+
+async function getAuthenticatedUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader) { return { user: null } }
+  const token = authHeader.replace('Bearer ', '')
+  const supabase = getSupabaseServiceClient()
+  const { data: { user }, error } = await supabase.auth.getUser(token)
+  if (error || !user) { return { user: null } }
+  return { user }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
+    const { user } = await getAuthenticatedUser(request)
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -68,11 +81,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
+    const { user } = await getAuthenticatedUser(request)
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
