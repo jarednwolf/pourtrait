@@ -1,23 +1,25 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuthContext } from './AuthProvider'
 import { needsOnboarding } from '@/lib/auth'
 
 export function OnboardingRedirect() {
   const { user, initialized, loading } = useAuthContext()
+  const router = useRouter()
+  const redirectedRef = useRef(false)
 
   useEffect(() => {
-    if (!initialized || loading) {return}
-    if (!user) {return}
+    if (!initialized || loading) { return }
+    if (!user) { return }
+    if (redirectedRef.current) { return }
     if (needsOnboarding(user)) {
-      try {
-        const path = typeof window !== 'undefined' ? window.location.pathname : ''
-        // Avoid redirect loop when already on onboarding pages
-        if (!path.startsWith('/onboarding')) {
-          window.location.href = '/onboarding/step1'
-        }
-      } catch {}
+      const path = typeof window !== 'undefined' ? window.location.pathname : ''
+      if (!path.startsWith('/onboarding')) {
+        redirectedRef.current = true
+        router.push('/onboarding/step1')
+      }
     }
   }, [user, initialized, loading])
 

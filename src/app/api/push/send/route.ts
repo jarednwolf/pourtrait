@@ -6,8 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createSSRServerClient } from '@/lib/supabase/clients.server'
 import webpush from 'web-push'
 
 // Function to configure web-push with VAPID keys
@@ -58,7 +57,7 @@ export async function POST(request: NextRequest) {
     // Configure VAPID keys
     configureWebPush()
     
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createSSRServerClient()
     const body: SendNotificationRequest = await request.json()
 
     // Validate API key for server-to-server requests

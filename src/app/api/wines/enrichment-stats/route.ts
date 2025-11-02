@@ -5,8 +5,7 @@
  */
 
 import { NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createSSRServerClient } from '@/lib/supabase/clients.server'
 import { WineEnrichmentService } from '@/lib/services/wine-enrichment'
 import { ExternalWineDataService } from '@/lib/services/external-wine-data'
 
@@ -16,7 +15,7 @@ import { ExternalWineDataService } from '@/lib/services/external-wine-data'
 
 export async function GET() {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -50,7 +49,7 @@ export async function GET() {
 
 export async function DELETE() {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()

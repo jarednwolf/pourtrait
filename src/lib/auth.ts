@@ -115,16 +115,18 @@ export class AuthService {
       const result = calculateTasteProfile(responses)
 
       const { error } = await supabase
-        .from('taste_profiles')
+        .from('palate_profiles')
         .upsert({
           user_id: userId,
-          red_wine_preferences: result.redWinePreferences as any,
-          white_wine_preferences: result.whiteWinePreferences as any,
-          sparkling_preferences: result.sparklingPreferences as any,
+          flavor_maps: {
+            red: result.redWinePreferences,
+            white: result.whiteWinePreferences,
+            sparkling: result.sparklingPreferences,
+          } as any,
           general_preferences: result.generalPreferences as any,
           learning_history: responses as any,
           confidence_score: result.confidenceScore as any,
-          last_updated: new Date().toISOString() as any,
+          updated_at: new Date().toISOString() as any,
         }, { onConflict: 'user_id' } as any)
 
       if (error) { throw error }

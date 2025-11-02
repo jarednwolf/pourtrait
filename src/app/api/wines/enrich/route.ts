@@ -5,8 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createSSRServerClient } from '@/lib/supabase/clients.server'
 import { WineEnrichmentService, EnrichmentOptions } from '@/lib/services/wine-enrichment'
 import { WineKnowledgeBaseService } from '@/lib/services/wine-knowledge-base'
 import { WineService } from '@/lib/services/wine-service'
@@ -17,7 +16,7 @@ import { WineService } from '@/lib/services/wine-service'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -90,7 +89,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -163,7 +162,7 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()

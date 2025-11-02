@@ -102,6 +102,8 @@ export async function POST(request: NextRequest) {
         .eq('id', userId)
     } catch {}
 
+    // Legacy backfill removed after migration to palate_profiles readers
+
     return NextResponse.json({ success: true })
 
   } catch (error) {

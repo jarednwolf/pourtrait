@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { createSSRServerClient } from '@/lib/supabase/clients.server'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { OnboardingRedirect } from '@/components/providers/OnboardingRedirect'
@@ -50,11 +51,15 @@ export const viewport: Viewport = {
   ]
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const supabase = createSSRServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  const userData = session ? await supabase.auth.getUser() : null
+  const initialUser = userData?.data.user || null
   return (
     <html lang="en">
       <body className="bg-surface text-gray-900 dark:bg-dark-surface dark:text-gray-100">
@@ -88,7 +93,7 @@ export default function RootLayout({
             `,
           }}
         />
-        <AuthProvider>
+        <AuthProvider initialSession={session} initialUser={initialUser as any}>
           <a href="#main-content" className="skip-link">Skip to main content</a>
           <header className="border-b border-gray-200 bg-white text-gray-900 dark:bg-dark-surface dark:border-gray-800" role="banner">
             <div className="max-w-6xl mx-auto px-4 h-18 flex items-center justify-between">

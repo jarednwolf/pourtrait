@@ -145,6 +145,42 @@ describe('WineRepository', () => {
 
 ## Mocking Guidelines
 
+### Auth testing after SSR migration
+- Components and hooks that consume `useAuth()` are context-based. In tests, either:
+  - Wrap with `AuthProvider` and mock `useAuthInternal` to drive state, or
+  - Mock the hooks module directly:
+    ```ts
+    vi.mock('@/hooks/useAuth', () => ({
+      useAuth: () => ({ user: { id: 'u1' }, loading: false, initialized: true }),
+      useIsAuthenticated: () => true,
+      useUserProfile: () => ({ profile: { id: 'u1' }, loading: false, isAuthenticated: true }),
+      useAuthLoading: () => false,
+    }))
+    ```
+- Avoid importing Supabase directly in consumer tests. Auth state should be simulated via the context or hook mocks.
+
+### Palate profile mapping tests
+- The app reads taste data from `palate_profiles` and maps to the domain `TasteProfile` via `loadTasteProfileFromPalate`.
+- When mocking Supabase for these tests, provide `maybeSingle()` on `palate_profiles`:
+  ```ts
+  const supabase = {
+    from: (table: string) => table === 'palate_profiles'
+      ? { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { user_id: 'u1', flavor_maps: { red: { fruitRipeness: 0.6 } }, updated_at: new Date().toISOString() } }) }) }) }
+      : {}
+  }
+  ```
+
+### RLS-first API route tests
+- User-facing API routes use RLS with the request's Bearer token. Mock the helpers to avoid service-role usage:
+  ```ts
+  let supabaseMock: any
+  vi.mock('@/lib/supabase/api-auth', () => ({
+    getAccessTokenFromRequest: () => 'token',
+    createRlsClientFromRequest: () => supabaseMock,
+  }))
+  // Provide supabaseMock.auth.getUser(token) and any table calls needed
+  ```
+
 ### External Services
 ```typescript
 import { vi } from 'vitest'

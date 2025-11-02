@@ -31,7 +31,7 @@ The `AuthService` class provides a centralized interface for all authentication 
 
 React hooks provide reactive authentication state management:
 
-- `useAuth()`: Complete authentication state and actions
+- `useAuth()`: Context-backed authentication state and actions (single source of truth)
 - `useIsAuthenticated()`: Simple authentication status check
 - `useUserProfile()`: User profile data access
 - `useAuthLoading()`: Loading state management
@@ -46,21 +46,21 @@ The authentication state includes:
 
 ### 3. Authentication Context (`src/components/providers/AuthProvider.tsx`)
 
-The `AuthProvider` component provides authentication state to the entire application:
+The `AuthProvider` provides global auth state and consumes exactly one Supabase auth subscription internally. The root layout fetches the initial session server-side using `@supabase/ssr` and injects it into the provider for no-flicker hydration.
 
 - Wraps the app root to provide global auth state
-- Handles authentication state changes
-- Provides HOC for route protection
-- Manages loading states during initialization
+- Single subscription and debounced updates
+- Receives `initialSession`/`initialUser` from server layout
+- Provides HOC and primitives for route protection
+- Manages loading and timeout fallback
 
-### 4. Protected Routes (`src/components/auth/ProtectedRoute.tsx`)
+### 4. Protected Routes & Middleware
 
-Route protection components ensure proper access control:
+Centralized gating happens in Next.js `middleware.ts` using `@supabase/ssr` cookies to prevent UI spinner loops. Client-side `ProtectedRoute` provides a11y-friendly loading and a safety timeout fallback.
 
-- `ProtectedRoute`: Requires authentication and optional onboarding
+- `middleware.ts`: Redirects unauthenticated users to `/auth/signin`; redirects onboarding-incomplete users to `/onboarding/step1` (matchers configured)
+- `ProtectedRoute`: Client fallback UI and loading states
 - `PublicOnlyRoute`: Redirects authenticated users away from public pages
-- Automatic redirection based on authentication and onboarding status
-- Loading states during authentication checks
 
 ### 5. Authentication Forms
 

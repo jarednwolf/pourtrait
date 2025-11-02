@@ -6,6 +6,7 @@ import { logger } from '@/lib/utils/logger'
 import { AIRecommendationEngine } from '@/lib/ai/recommendation-engine'
 import { AIRecommendationRequest } from '@/lib/ai/types'
 import { createClient } from '@supabase/supabase-js'
+import { loadTasteProfileFromPalate } from '@/lib/profile/taste-mapper'
 
 // ============================================================================
 // Food Pairing Types
@@ -800,14 +801,7 @@ export class FoodPairingService {
   }
 
   private async getUserTasteProfile(userId: string): Promise<TasteProfile> {
-    const { data, error } = await this.supabase
-      .from('taste_profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single()
-
-    if (error) {throw error}
-    return data
+    return await loadTasteProfileFromPalate(this.supabase, userId)
   }
 
   private getRelevantFlavorProfile(wineType: string, tasteProfile: TasteProfile) {

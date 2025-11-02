@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthContext } from '@/components/providers/AuthProvider'
 import { needsOnboarding } from '@/lib/auth'
@@ -21,6 +21,7 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { user, loading, initialized } = useAuthContext()
   const router = useRouter()
+  const [timedOut, setTimedOut] = useState(false)
 
   useEffect(() => {
     if (!initialized || loading) {
@@ -52,8 +53,24 @@ export function ProtectedRoute({
     }
   }, [user, loading, initialized, requireOnboarding, redirectTo, router])
 
+  useEffect(() => {
+    if (initialized && !loading) { return }
+    const t = setTimeout(() => setTimedOut(true), 15000)
+    return () => clearTimeout(t)
+  }, [initialized, loading])
+
   // Show loading state
   if (!initialized || loading) {
+    if (timedOut) {
+      return (
+        <div className="flex min-h-screen items-center justify-center" role="alert" aria-live="assertive">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Taking longer than expected</h2>
+            <p className="text-gray-600">Please refresh the page or try signing in again.</p>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className="flex min-h-screen items-center justify-center" role="status" aria-live="polite">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>

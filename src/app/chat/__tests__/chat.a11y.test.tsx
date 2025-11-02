@@ -16,14 +16,13 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(''),
 }))
 
-// Mock AuthProvider usage inside ChatPage tree
-vi.mock('@/components/providers/AuthProvider', async (orig) => {
-  const actual = await (orig as any)()
-  return {
-    ...actual,
-    useAuth: () => ({ isAuthenticated: true, user: { id: 'test' }, loading: false }),
-  }
-})
+// Mock auth hooks used within ChatPage tree
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 'test' }, loading: false, initialized: true }),
+  useIsAuthenticated: () => true,
+  useUserProfile: () => ({ profile: { id: 'test' }, loading: false, isAuthenticated: true }),
+  useAuthLoading: () => false,
+}))
 
 describe('Accessibility: Chat Page', () => {
   it('should have no obvious a11y violations', async () => {

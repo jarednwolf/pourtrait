@@ -11,13 +11,13 @@ export function SommelierPreview() {
   const ref = useImpression({ onImpress })
   return (
     <Card className="h-full" ref={ref as any} role="region" aria-labelledby="sommelier-heading">
-      <CardHeader className="p-4">
-        <CardTitle id="sommelier-heading" className="flex items-center text-base">
+      <CardHeader className="p-5">
+        <CardTitle id="sommelier-heading" className="flex items-center text-heading-3">
           <Icon name="chat-bubble-left" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           Sommelier Chat
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-5 pt-0">
         <div className="text-sm text-gray-700">Ask what pairs with tonight’s dinner.</div>
         <div className="mt-3">
           <Button asChild size="sm"><a href="/chat?q=I%27m%20cooking%20salmon%20tonight%20%E2%80%94%20what%20pairs%20well%3F&send=1">Ask a question</a></Button>

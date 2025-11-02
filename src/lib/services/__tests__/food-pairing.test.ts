@@ -131,14 +131,23 @@ describe('FoodPairingService', () => {
 
     // Mock Supabase methods
     const mockSupabase = {
-      from: vi.fn(() => ({
-        select: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            single: vi.fn(() => Promise.resolve({ data: mockTasteProfile, error: null })),
-            order: vi.fn(() => Promise.resolve({ data: mockWines, error: null }))
-          }))
-        }))
-      }))
+      from: vi.fn((table: string) => {
+        if (table === 'palate_profiles') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            maybeSingle: vi.fn().mockResolvedValue({ data: { user_id: 'user-1', flavor_maps: { red: { fruitRipeness: 0.6, preferredRegions: ['Napa Valley'], preferredVarietals: ['Cabernet Sauvignon'] }, white: {}, sparkling: {} }, updated_at: new Date().toISOString() }, error: null })
+          } as any
+        }
+        if (table === 'wines') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            order: vi.fn().mockResolvedValue({ data: mockWines, error: null })
+          } as any
+        }
+        return { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: null, error: null }) } as any
+      })
     }
 
     // @ts-ignore
@@ -506,13 +515,12 @@ describe('FoodPairingService', () => {
     it('should handle missing user data gracefully', async () => {
       // Mock Supabase to return error
       const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(() => ({
-              single: vi.fn(() => Promise.resolve({ data: null, error: new Error('User not found') }))
-            }))
-          }))
-        }))
+        from: vi.fn((table: string) => {
+          if (table === 'palate_profiles') {
+            return { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), maybeSingle: vi.fn().mockResolvedValue({ data: null, error: new Error('User not found') }) } as any
+          }
+          return { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: null, error: new Error('User not found') }) } as any
+        })
       }
 
       // @ts-ignore

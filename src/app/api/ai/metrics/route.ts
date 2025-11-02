@@ -1,7 +1,7 @@
 // AI Metrics and Monitoring API Route
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createRlsClientFromRequest } from '@/lib/supabase/api-auth'
 
 export const runtime = 'edge'
 
@@ -25,11 +25,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Initialize Supabase
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    // Initialize Supabase (RLS-only; metrics are public per-user via RLS)
+    const supabase = createRlsClientFromRequest(request)
+    if (!supabase) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
 
     // Calculate time range
     const timeRanges = {
@@ -97,10 +97,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const supabase = createRlsClientFromRequest(request)
+    if (!supabase) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
 
     // Log custom metric
     const { error } = await supabase
@@ -219,10 +219,10 @@ export async function PUT(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const timeframe = searchParams.get('timeframe') || '30d'
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const supabase = createRlsClientFromRequest(request)
+    if (!supabase) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
 
     // Get cost data
     const timeRanges = {

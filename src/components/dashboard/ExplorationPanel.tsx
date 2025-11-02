@@ -16,13 +16,13 @@ export function ExplorationPanel() {
   ]
   return (
     <Card className="h-full" ref={ref as any} role="region" aria-labelledby="exploration-heading">
-      <CardHeader className="p-4">
-        <CardTitle id="exploration-heading" className="flex items-center text-base">
+      <CardHeader className="p-5">
+        <CardTitle id="exploration-heading" className="flex items-center text-heading-3">
           <Icon name="search" className="w-5 h-5 mr-2 text-primary" aria-hidden="true" />
           Exploration
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-5 pt-0">
         <div className="flex flex-wrap gap-2">
           {chips.map((c, i) => (
             <Button key={i} asChild size="sm" variant="outline" onClick={() => track('exploration_chip_clicked', { label: c.label })}>

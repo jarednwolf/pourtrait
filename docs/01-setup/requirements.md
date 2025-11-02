@@ -47,7 +47,7 @@ Complete technical requirements and dependencies for Pourtrait.
 ```json
 {
   "@supabase/supabase-js": "^2.38.5",
-  "@supabase/auth-helpers-nextjs": "^0.8.7"
+  "@supabase/ssr": "^0.4.0"
 }
 ```
 

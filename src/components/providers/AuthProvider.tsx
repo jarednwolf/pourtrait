@@ -1,7 +1,10 @@
 'use client'
 
 import React, { createContext, useContext, ReactNode, useEffect } from 'react'
-import { useAuth, type UseAuthReturn } from '@/hooks/useAuth'
+import { useAuthInternal, type UseAuthReturn } from '@/hooks/useAuthInternal'
+import type { Session } from '@supabase/supabase-js'
+import type { AuthUser } from '@/lib/auth'
+import { track } from '@/lib/utils/track'
 import { consumePostAuthIntent, navigateForIntent } from '@/lib/auth/intent'
 import { events } from '@/lib/utils/track'
 
@@ -9,14 +12,16 @@ const AuthContext = createContext<UseAuthReturn | undefined>(undefined)
 
 interface AuthProviderProps {
   children: ReactNode
+  initialSession?: Session | null
+  initialUser?: AuthUser | null
 }
 
 /**
  * Authentication context provider
  * Provides authentication state and actions to the entire app
  */
-export function AuthProvider({ children }: AuthProviderProps) {
-  const auth = useAuth()
+export function AuthProvider({ children, initialSession = null, initialUser = null }: AuthProviderProps) {
+  const auth = useAuthInternal({ user: initialUser, session: initialSession, initialized: Boolean(initialSession) })
 
   // Consume any stored post-auth intent once the user becomes authenticated
   useEffect(() => {
@@ -28,6 +33,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       navigateForIntent(intent)
     }
   }, [auth.initialized, auth.loading, auth.user])
+
+  // Basic observability for auth readiness
+  useEffect(() => {
+    if (!auth.initialized) { return }
+    try {
+      track('auth_ready')
+    } catch {}
+  }, [auth.initialized])
 
   return (
     <AuthContext.Provider value={auth}>
