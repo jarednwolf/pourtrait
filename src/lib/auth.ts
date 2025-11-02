@@ -276,7 +276,17 @@ export class AuthService {
       }
 
       // Fetch user profile
-      const profile = await this.getUserProfile(user.id)
+      let profile = await this.getUserProfile(user.id)
+      // If no profile exists yet, create a minimal one
+      if (!profile) {
+        try {
+          await this.createUserProfile(user.id, {
+            name: (user.user_metadata as any)?.name || user.email?.split('@')[0] || 'User',
+            experienceLevel: 'beginner',
+          })
+          profile = await this.getUserProfile(user.id)
+        } catch {}
+      }
       
       return {
         ...user,
@@ -449,7 +459,9 @@ export const getAuthErrorMessage = (error: AuthError | Error): string => {
  * Check if user needs to complete onboarding
  */
 export const needsOnboarding = (user: AuthUser | null): boolean => {
-  return user?.profile?.onboarding_completed === false
+  // If there's no profile, or onboarding_completed is false, user needs onboarding
+  if (!user || !user.profile) { return true }
+  return user.profile.onboarding_completed === false
 }
 
 /**
