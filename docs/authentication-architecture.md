@@ -62,6 +62,25 @@ Centralized gating happens in Next.js `middleware.ts` using `@supabase/ssr` cook
 - `ProtectedRoute`: Client fallback UI and loading states
 - `PublicOnlyRoute`: Redirects authenticated users away from public pages
 
+#### Current UX highlights (SSR + RLS-first)
+
+- Server hydrates the client with the current session in `app/layout.tsx` via `@supabase/ssr`.
+- Middleware protects `/dashboard`, `/inventory`, `/chat`, `/profile`, `/settings` and skips onboarding gating on `/settings`.
+- If a user completes onboarding from the preview page, the app upserts their profile (`palate_profiles` + `user_profiles.onboarding_completed`) and immediately redirects to `/dashboard`.
+- If the user is unauthenticated on preview, the primary CTA routes to `/auth/signin?next=/dashboard` (not signup).
+- Public-only routes (signin/signup) render quickly; if auth init is slow they render after a short grace period to avoid a perceived hang.
+
+#### Email confirmation & health
+
+- Signup uses `AuthService.signUp` which sets `emailRedirectTo` to `${origin}/auth/callback?next=%2Fdashboard`.
+- A resend confirmation helper is available from the signup success screen with a small rate‑limit guard and user messaging.
+- A lightweight health endpoint is available at `/api/health/auth` which returns the derived `emailRedirectTo` and presence of supabase credentials to aid debugging deployments.
+
+#### Onboarding completion
+
+- The profile save endpoint upserts into `user_profiles` to ensure a missing row does not block `onboarding_completed`.
+- Client refreshes the profile after save to update the UI and redirect logic immediately.
+
 ### 5. Authentication Forms
 
 Pre-built form components for common authentication flows:

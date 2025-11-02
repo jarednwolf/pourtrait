@@ -15,11 +15,10 @@ vi.mock('@/lib/auth', () => ({
   getAuthErrorMessage: vi.fn((error) => error.message),
 }))
 
-// Mock Next.js router
+// Mock Next.js navigation
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-  }),
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => ({ get: (_k: string) => null }),
 }))
 
 describe('SignUpForm', () => {
