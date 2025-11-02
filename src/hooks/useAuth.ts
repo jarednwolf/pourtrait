@@ -33,7 +33,7 @@ export function useAuth(): UseAuthReturn {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       const { data: { user: raw } } = await supabase.auth.getUser()
-      let profileUser: AuthUser | null = raw as any
+      const profileUser: AuthUser | null = raw as any
       // Attach profile asynchronously
       if (raw) {
         AuthService.getUserProfile(raw.id).then(p => {
@@ -109,7 +109,7 @@ export function useAuth(): UseAuthReturn {
         setState(prev => ({ ...prev, loading: true }))
 
         try {
-          let nextUser: AuthUser | null = session?.user as any
+          const nextUser: AuthUser | null = session?.user as any
 
           if (mounted) {
             setState({ user: nextUser, session, loading: false, initialized: true })
