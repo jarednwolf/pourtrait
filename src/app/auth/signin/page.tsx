@@ -3,7 +3,6 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { SignInForm } from '@/components/auth/SignInForm'
 import { PublicOnlyRoute } from '@/components/auth/ProtectedRoute'
-import { track } from '@/lib/utils/track'
 
 function SignInContent() {
   const search = useSearchParams()

@@ -3,7 +3,6 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { SignUpForm } from '@/components/auth/SignUpForm'
 import { PublicOnlyRoute } from '@/components/auth/ProtectedRoute'
-import { track } from '@/lib/utils/track'
 
 function SignUpContent() {
   const search = useSearchParams()
