@@ -21,7 +21,8 @@ export function OnboardingRedirect() {
     const isProtected = protectedPrefixes.some((p) => current.startsWith(p))
     if (isProtected) {
       redirectedRef.current = true
-      router.push('/onboarding/step1')
+      // Send users to Account (settings) instead of a hard jump into step1
+      router.push('/settings')
     }
   }, [user, initialized, loading, pathname])
 
