@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/database.types'
 import { dataExportService, ExportOptions } from '@/lib/services/data-export'
 import { pdfExportService } from '@/lib/services/pdf-export'
+import { DataExportService } from '@/lib/services/data-export'
 
 export const runtime = 'nodejs'
 
@@ -12,19 +13,27 @@ function getSupabaseServiceClient() {
   return createClient<Database>(url, serviceKey)
 }
 
+function getSupabaseRLSClientFromToken(token: string) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  return createClient<Database>(url, anonKey, {
+    global: { headers: { Authorization: `Bearer ${token}` } }
+  })
+}
+
 async function getAuthenticatedUser(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
-  if (!authHeader) { return { user: null } }
+  if (!authHeader) { return { user: null as any, token: null as any } }
   const token = authHeader.replace('Bearer ', '')
   const supabase = getSupabaseServiceClient()
   const { data: { user }, error } = await supabase.auth.getUser(token)
-  if (error || !user) { return { user: null } }
-  return { user }
+  if (error || !user) { return { user: null as any, token: null as any } }
+  return { user, token }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { user } = await getAuthenticatedUser(request)
+    const { user, token } = await getAuthenticatedUser(request)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -35,8 +44,12 @@ export async function POST(request: NextRequest) {
       options: ExportOptions
     }
 
+    // Use an RLS-enabled client scoped to the bearer token
+    const rlsClient = token ? getSupabaseRLSClientFromToken(token) : undefined
+    const svc = rlsClient ? new DataExportService(rlsClient) : dataExportService
+
     // Export user data
-    const exportData = await dataExportService.exportUserData(user.id, {
+    const exportData = await svc.exportUserData(user.id, {
       ...options,
       format
     })
@@ -92,13 +105,19 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { user } = await getAuthenticatedUser(request)
+    const { user, token } = await getAuthenticatedUser(request)
     if (!user) { return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
 
-    // Get export statistics
-    const stats = await dataExportService.getExportStats(user.id)
+    // Get export statistics using RLS-enabled client
+    const rlsClient = token ? getSupabaseRLSClientFromToken(token) : undefined
+    const svc = rlsClient ? new DataExportService(rlsClient) : dataExportService
+    const stats = await svc.getExportStats(user.id)
 
-    return NextResponse.json(stats)
+    // Fallback to auth user's created_at if profile row is missing
+    return NextResponse.json({
+      ...stats,
+      accountCreated: stats.accountCreated || (user as any).created_at || ''
+    })
 
   } catch (error) {
     console.error('Export stats error:', error)
