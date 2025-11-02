@@ -140,6 +140,7 @@ export function PublicOnlyRoute({
   const auth = useAuthContext()
   const { user, loading, initialized } = auth
   const router = useRouter()
+  const [fallbackReady, setFallbackReady] = useState(false)
 
   // Watchdog: if auth remains loading for too long on public routes, refresh
   useEffect(() => {
@@ -170,11 +171,18 @@ export function PublicOnlyRoute({
 
   // Show loading state
   if (!initialized || loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    )
+    // After a short grace period, render children even if auth hasn't resolved.
+    // This prevents auth pages from appearing to hang on slow or blocked storage environments.
+    if (!fallbackReady) {
+      // Start a one-time timer to allow render-through
+      setTimeout(() => setFallbackReady(true), 1200)
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      )
+    }
+    return <>{children}</>
   }
 
   // Already authenticated
