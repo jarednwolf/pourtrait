@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/database.types'
 import { dataExportService, DataExportService } from '@/lib/services/data-export'
-import { createRlsClientFromRequest, getAccessTokenFromRequest } from '@/lib/supabase/api-auth'
+import { createRlsClientFromRequest } from '@/lib/supabase/api-auth'
 function getSupabaseServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
