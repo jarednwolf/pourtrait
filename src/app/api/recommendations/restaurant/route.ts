@@ -6,7 +6,7 @@ import { ExtractedWineListItem, RecommendationContext } from '@/types'
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {

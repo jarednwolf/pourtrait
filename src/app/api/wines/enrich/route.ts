@@ -16,7 +16,7 @@ import { WineService } from '@/lib/services/wine-service'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -162,7 +162,7 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()

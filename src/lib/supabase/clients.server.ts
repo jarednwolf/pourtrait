@@ -6,8 +6,8 @@ import type { Database } from '@/lib/database.types'
  * Server Components / Route Handlers: SSR-aware Supabase client.
  * Persists auth via Next.js cookies.
  */
-export function createSSRServerClient() {
-  const cookieStore = cookies()
+export async function createSSRServerClient() {
+  const cookieStore = await cookies()
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -20,13 +20,17 @@ export function createSSRServerClient() {
   return createServerClient<Database>(supabaseUrl as string, supabaseAnonKey as string, {
     cookies: {
       get(name: string) {
-        return cookieStore.get(name)?.value
+        return (cookieStore as any).get?.(name)?.value
       },
       set(name: string, value: string, options: any) {
-        cookieStore.set({ name, value, ...options })
+        if (typeof (cookieStore as any).set === 'function') {
+          ;(cookieStore as any).set({ name, value, ...options })
+        }
       },
       remove(name: string, options: any) {
-        cookieStore.set({ name, value: '', ...options })
+        if (typeof (cookieStore as any).set === 'function') {
+          ;(cookieStore as any).set({ name, value: '', ...options })
+        }
       },
     },
   })

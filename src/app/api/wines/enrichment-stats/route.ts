@@ -15,7 +15,7 @@ import { ExternalWineDataService } from '@/lib/services/external-wine-data'
 
 export async function GET() {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -49,7 +49,7 @@ export async function GET() {
 
 export async function DELETE() {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()

@@ -56,7 +56,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createSSRServerClient()
+  const supabase = await createSSRServerClient()
   const { data: { session } } = await supabase.auth.getSession()
   const userData = session ? await supabase.auth.getUser() : null
   const initialUser = userData?.data.user || null

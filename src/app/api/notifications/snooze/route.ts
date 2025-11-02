@@ -15,7 +15,7 @@ interface SnoozeRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

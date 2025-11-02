@@ -7,7 +7,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

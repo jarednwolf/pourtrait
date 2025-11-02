@@ -10,7 +10,7 @@ import { createSSRServerClient } from '@/lib/supabase/clients.server'
 // GET - Retrieve user notification history
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
 // DELETE - Clear notification history (with optional filters)
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

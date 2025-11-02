@@ -29,7 +29,7 @@ interface NotificationPreferences {
 // GET - Retrieve user notification preferences
 export async function GET() {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -93,7 +93,7 @@ export async function GET() {
 // PUT - Update user notification preferences
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -150,7 +150,7 @@ export async function PUT(request: NextRequest) {
 // PATCH - Update specific preference
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

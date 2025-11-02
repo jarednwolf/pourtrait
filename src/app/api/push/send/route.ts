@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     // Configure VAPID keys
     configureWebPush()
     
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     const body: SendNotificationRequest = await request.json()
 
     // Validate API key for server-to-server requests

@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const next = requestUrl.searchParams.get('next') ?? '/dashboard'
 
   if (code) {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     try {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)

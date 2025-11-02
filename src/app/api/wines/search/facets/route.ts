@@ -5,7 +5,7 @@ import type { SearchFilters } from '@/types'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSSRServerClient()
+    const supabase = await createSSRServerClient()
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
