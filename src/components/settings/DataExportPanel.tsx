@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useDataExport } from '@/hooks/useDataExport'
+import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -17,6 +18,7 @@ interface ExportStats {
 }
 
 export function DataExportPanel() {
+  const { initialized } = useAuth()
   const {
     exportData,
     createBackup,
@@ -41,8 +43,9 @@ export function DataExportPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    if (!initialized) { return }
     loadStats()
-  }, [])
+  }, [initialized])
 
   const loadStats = async () => {
     try {

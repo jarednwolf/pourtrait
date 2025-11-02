@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { createBrowserSupabaseClient } from '@/lib/supabase/clients.browser'
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
 import { AuthService, type AuthUser } from '@/lib/auth'
 import type { Session, AuthChangeEvent } from '@supabase/supabase-js'
 
@@ -23,7 +23,6 @@ export type UseAuthReturn = AuthState & AuthActions
  * Internal hook for managing auth state (used by AuthProvider only).
  */
 export function useAuthInternal(initial?: { user?: AuthUser | null; session?: Session | null; initialized?: boolean }): UseAuthReturn {
-  const supabase = useMemo(() => createBrowserSupabaseClient(), [])
   const [state, setState] = useState<AuthState>({
     user: initial?.user ?? null,
     session: initial?.session ?? null,
@@ -77,12 +76,14 @@ export function useAuthInternal(initial?: { user?: AuthUser | null; session?: Se
 
     const initializeAuth = async () => {
       try {
-        if (initial?.initialized) {
-          // If server provided an initialized session, trust it and avoid overriding
-          if (mounted) {
-            setState(prev => ({ ...prev, loading: false, initialized: true }))
-          }
-          return
+        // If server provided a session, persist it into supabase-js so tokens are available to the client
+        if (initial?.session) {
+          try {
+            await supabase.auth.setSession({
+              access_token: initial.session.access_token,
+              refresh_token: initial.session.refresh_token,
+            })
+          } catch {}
         }
         const session = await AuthService.getSession()
         const user = session ? await AuthService.getCurrentUser() : null
