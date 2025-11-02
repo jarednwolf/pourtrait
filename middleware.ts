@@ -18,7 +18,8 @@ export async function middleware(req: NextRequest) {
 
   // Onboarding gating: if profile incomplete, redirect to onboarding (except when already there)
   const pathname = req.nextUrl.pathname
-  if (!pathname.startsWith('/onboarding')) {
+  const skipOnboardingGate = pathname.startsWith('/onboarding') || pathname.startsWith('/settings')
+  if (!skipOnboardingGate) {
     try {
       // Prefer explicit flag; fall back to presence of palate profile
       const { data: profile } = await supabase
