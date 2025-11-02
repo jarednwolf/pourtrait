@@ -20,8 +20,22 @@ export function ProtectedRoute({
   redirectTo = '/auth/signin'
 }: ProtectedRouteProps) {
   const { user, loading, initialized } = useAuthContext()
+  const auth = useAuthContext()
   const router = useRouter()
   const [timedOut, setTimedOut] = useState(false)
+
+  useEffect(() => {
+    // Watchdog: if auth is stuck loading for too long, try a manual refresh
+    const timeout = setTimeout(() => {
+      try {
+        if (!initialized || loading) {
+          auth.refreshUser?.()
+        }
+      } catch {}
+    }, 2500)
+
+    return () => clearTimeout(timeout)
+  }, [initialized, loading, auth])
 
   useEffect(() => {
     if (!initialized || loading) {
@@ -123,8 +137,21 @@ export function PublicOnlyRoute({
   children: ReactNode
   redirectTo?: string 
 }) {
-  const { user, loading, initialized } = useAuthContext()
+  const auth = useAuthContext()
+  const { user, loading, initialized } = auth
   const router = useRouter()
+
+  // Watchdog: if auth remains loading for too long on public routes, refresh
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      try {
+        if (!initialized || loading) {
+          auth.refreshUser?.()
+        }
+      } catch {}
+    }, 2500)
+    return () => clearTimeout(timeout)
+  }, [initialized, loading, auth])
 
   useEffect(() => {
     if (!initialized || loading) {

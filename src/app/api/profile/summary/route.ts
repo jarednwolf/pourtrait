@@ -68,8 +68,11 @@ export async function POST(request: NextRequest) {
       supabase.from('food_profiles').select('*').eq('user_id', user.id).single()
     ])
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
-    const model = process.env.OPENAI_MODEL || 'gpt-5'
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'OPENAI_API_KEY not set' }, { status: 500 })
+    }
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    const candidates = [process.env.OPENAI_MODEL, 'gpt-4o-mini', 'gpt-4o'].filter(Boolean) as string[]
 
     const input = {
       palette: profile || {},
@@ -84,17 +87,29 @@ export async function POST(request: NextRequest) {
       'Mention notable highs and any explicit dislikes. No emojis. Keep it friendly and clear.',
     ].join('\n')
 
-    const completion = await openai.chat.completions.create({
-      model,
-      temperature: 0.2,
-      max_tokens: 200,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: JSON.stringify(input) }
-      ]
-    })
-
-    const summary = completion.choices?.[0]?.message?.content || ''
+    let summary = ''
+    let lastErr: any = null
+    for (const m of candidates) {
+      try {
+        const completion = await openai.chat.completions.create({
+          model: m,
+          temperature: 0.2,
+          max_tokens: 200,
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: JSON.stringify(input) }
+          ]
+        })
+        summary = completion.choices?.[0]?.message?.content || ''
+        if (summary) break
+      } catch (err) {
+        lastErr = err
+      }
+    }
+    if (!summary) {
+      console.error('profile_summary_model_failed', { error: lastErr?.message || lastErr })
+      return NextResponse.json({ error: 'model_error' }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true, data: { summary } })
 

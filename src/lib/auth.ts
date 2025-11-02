@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import type { User, AuthError } from '@supabase/supabase-js'
 import type { UserProfile } from './supabase'
-import { calculateTasteProfile } from '@/lib/onboarding/quiz-calculator'
+import { calculateStructuredUserProfile } from '@/lib/onboarding/quiz-calculator'
 import type { QuizResponse } from '@/lib/onboarding/quiz-data'
 
 export interface AuthUser extends User {
@@ -111,25 +111,18 @@ export class AuthService {
         timestamp: new Date(r.timestamp || Date.now())
       }))
 
-      // Compute a full taste profile from quiz responses
-      const result = calculateTasteProfile(responses)
+      // Compute the structured user profile used by palate_profiles schema
+      const structured = calculateStructuredUserProfile(userId, responses)
 
-      const { error } = await supabase
-        .from('palate_profiles')
-        .upsert({
-          user_id: userId,
-          flavor_maps: {
-            red: result.redWinePreferences,
-            white: result.whiteWinePreferences,
-            sparkling: result.sparklingPreferences,
-          } as any,
-          general_preferences: result.generalPreferences as any,
-          learning_history: responses as any,
-          confidence_score: result.confidenceScore as any,
-          updated_at: new Date().toISOString() as any,
-        }, { onConflict: 'user_id' } as any)
-
-      if (error) { throw error }
+      // Use the authenticated API route to persist to palate_profiles and related tables
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) { return }
+      await fetch('/api/profile/upsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(structured)
+      })
     } catch (error) {
       console.error('Upsert taste profile from quiz error:', error)
     }
@@ -283,7 +276,17 @@ export class AuthService {
       }
 
       // Fetch user profile
-      const profile = await this.getUserProfile(user.id)
+      let profile = await this.getUserProfile(user.id)
+      // If no profile exists yet, create a minimal one
+      if (!profile) {
+        try {
+          await this.createUserProfile(user.id, {
+            name: (user.user_metadata as any)?.name || user.email?.split('@')[0] || 'User',
+            experienceLevel: 'beginner',
+          })
+          profile = await this.getUserProfile(user.id)
+        } catch {}
+      }
       
       return {
         ...user,
@@ -456,7 +459,9 @@ export const getAuthErrorMessage = (error: AuthError | Error): string => {
  * Check if user needs to complete onboarding
  */
 export const needsOnboarding = (user: AuthUser | null): boolean => {
-  return user?.profile?.onboarding_completed === false
+  // If there's no profile, or onboarding_completed is false, user needs onboarding
+  if (!user || !user.profile) { return true }
+  return user.profile.onboarding_completed === false
 }
 
 /**

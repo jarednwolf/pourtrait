@@ -13,6 +13,7 @@ export default function ProfileInsightsPage() {
   const [dbProfile, setDbProfile] = React.useState<any | null>(null)
   const [aiSummary, setAiSummary] = React.useState<string>('')
   const [loading, setLoading] = React.useState<boolean>(true)
+  const [attemptedSave, setAttemptedSave] = React.useState(false)
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -44,6 +45,30 @@ export default function ProfileInsightsPage() {
     run()
     return () => { cancelled = true }
   }, [getAccessToken])
+
+  // If we have no saved DB profile yet, but a preview exists locally, save it now
+  React.useEffect(() => {
+    const maybeSave = async () => {
+      if (attemptedSave) { return }
+      if (dbProfile) { return }
+      try {
+        const raw = typeof window !== 'undefined' ? window.localStorage.getItem('pourtrait_profile_preview_v1') : null
+        if (!raw) { return }
+        const parsed = JSON.parse(raw)
+        const prof = parsed?.profile
+        if (!prof) { return }
+        const token = await getAccessToken()
+        if (!token) { return }
+        await fetch('/api/profile/upsert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(prof)
+        })
+        setAttemptedSave(true)
+      } catch {}
+    }
+    maybeSave()
+  }, [dbProfile, attemptedSave, getAccessToken])
 
   return (
     <ProtectedRoute>

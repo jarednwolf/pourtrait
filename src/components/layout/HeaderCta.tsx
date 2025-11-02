@@ -1,10 +1,10 @@
 "use client"
 import React from 'react'
 import { Button } from '@/components/ui/Button'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuthContext } from '@/components/providers/AuthProvider'
 
 export function HeaderCta() {
-  const { user } = useAuth()
+  const { user } = useAuthContext()
   const href = user ? '/settings' : '/auth/signin'
   const label = user ? 'Account' : 'Sign in'
 
