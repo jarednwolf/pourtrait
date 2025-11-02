@@ -120,8 +120,21 @@ export function PublicOnlyRoute({
   children: ReactNode
   redirectTo?: string 
 }) {
-  const { user, loading, initialized } = useAuthContext()
+  const auth = useAuthContext()
+  const { user, loading, initialized } = auth
   const router = useRouter()
+
+  // Watchdog: if auth remains loading for too long on public routes, refresh
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      try {
+        if (!initialized || loading) {
+          auth.refreshUser?.()
+        }
+      } catch {}
+    }, 2500)
+    return () => clearTimeout(timeout)
+  }, [initialized, loading, auth])
 
   useEffect(() => {
     if (!initialized || loading) {
