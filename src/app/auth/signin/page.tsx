@@ -1,10 +1,13 @@
 'use client'
 import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { SignInForm } from '@/components/auth/SignInForm'
 import { PublicOnlyRoute } from '@/components/auth/ProtectedRoute'
 import { track } from '@/lib/utils/track'
 
 function SignInContent() {
+  const search = useSearchParams()
+  const next = search?.get('next') || '/dashboard'
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -19,13 +22,8 @@ function SignInContent() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <SignInForm />
         <div className="mt-4 text-center" aria-label="Get started options">
-          <a
-            href="/onboarding"
-            className="text-purple-700 underline"
-            aria-label="Start your palate profile"
-            onClick={() => track('onboarding_started', { source: 'auth_signin' })}
-          >
-            Start your palate profile
+          <a href={`/auth/signup?next=${encodeURIComponent(next)}`} className="text-blue-700 underline" aria-label="Create account">
+            Create an account
           </a>
         </div>
       </div>

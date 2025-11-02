@@ -125,6 +125,8 @@ export default function OnboardingPreviewPage() {
                 })
                 // Refresh local profile so gating logic updates immediately
                 await refreshProfile().catch(() => {})
+                // Move the user forward automatically
+                router.push('/dashboard?show=recs=1')
               }
             } catch {}
           }
@@ -201,7 +203,7 @@ export default function OnboardingPreviewPage() {
                     </Button>
                   ) : (
                     <Button asChild onClick={() => track('preview_signup_clicked')}>
-                      <a href="/auth/signup?next=/dashboard" aria-label="Create account to save your profile">Save my profile</a>
+                      <a href="/auth/signin?next=/dashboard" aria-label="Sign in to save your profile">Save my profile</a>
                     </Button>
                   )}
                   <Button asChild variant="outline">
