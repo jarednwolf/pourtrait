@@ -42,10 +42,28 @@ export function DataExportPanel() {
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Kick off a stats load immediately on mount to avoid indefinite spinner on client navigations
+  useEffect(() => {
+    loadStats()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Re-run once auth is initialized to fetch with a valid token
   useEffect(() => {
     if (!initialized) { return }
     loadStats()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialized])
+
+  // If we loaded zeros due to a pre-auth 401, retry once after a short delay when auth is ready
+  useEffect(() => {
+    if (!initialized) { return }
+    if (!stats) { return }
+    if (stats.totalWines !== 0 || stats.totalConsumptionRecords !== 0 || stats.accountCreated) { return }
+    const id = setTimeout(() => { loadStats() }, 1200)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialized, stats?.totalWines, stats?.totalConsumptionRecords, stats?.accountCreated])
 
   const loadStats = async () => {
     try {

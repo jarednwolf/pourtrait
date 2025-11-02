@@ -225,14 +225,24 @@ export function useDataExport(): UseDataExportReturn {
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to get export stats')
+        // Swallow 401s quietly (can occur before client auth hydrates). Return zeros and allow caller to retry later.
+        if (response.status === 401) {
+          return {
+            totalWines: 0,
+            totalConsumptionRecords: 0,
+            hasTasteProfile: false,
+            accountCreated: '',
+            lastActivity: ''
+          }
+        }
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error((errorData as any).error || 'Failed to get export stats')
       }
 
       return await response.json()
 
     } catch (err) {
-      // Return zeros if stats fail, and set lightweight message
+      // Return zeros if stats fail; keep error lightweight
       setError(err instanceof Error ? err.message : 'Failed to get export stats')
       return {
         totalWines: 0,
