@@ -32,7 +32,7 @@ function mapProfileToDisplay(profile: UserProfileInput) {
 
 export default function OnboardingPreviewPage() {
   const router = useRouter()
-  const { user, getAccessToken } = useAuth()
+  const { user, getAccessToken, refreshProfile } = useAuth()
   const [loading, setLoading] = React.useState(true)
   const [summary, setSummary] = React.useState<string>('')
   const [commentary, setCommentary] = React.useState<string>('')
@@ -123,6 +123,8 @@ export default function OnboardingPreviewPage() {
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                   body: JSON.stringify(prof)
                 })
+                // Refresh local profile so gating logic updates immediately
+                await refreshProfile().catch(() => {})
               }
             } catch {}
           }
