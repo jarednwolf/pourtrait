@@ -11,7 +11,7 @@ import { track } from '@/lib/utils/track'
 type SettingsTab = 'profile' | 'notifications' | 'data' | 'privacy'
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>('data')
+  const [activeTab, setActiveTab] = useState<SettingsTab>('profile')
 
   useEffect(() => {
     if (typeof window === 'undefined') {return}

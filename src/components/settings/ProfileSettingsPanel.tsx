@@ -6,14 +6,16 @@ import { Button } from '@/components/ui/Button'
 import { Alert } from '@/components/ui/Alert'
 import { useAuth } from '@/hooks/useAuth'
 import { AuthService } from '@/lib/auth'
+import { useRouter } from 'next/navigation'
 
 export function ProfileSettingsPanel() {
-  const { user, refreshProfile } = useAuth()
+  const { user, refreshProfile, signOut } = useAuth()
   const [name, setName] = React.useState<string>('')
   const [experience, setExperience] = React.useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
   const [saving, setSaving] = React.useState(false)
   const [message, setMessage] = React.useState<string | null>(null)
   const [error, setError] = React.useState<string | null>(null)
+  const router = useRouter()
 
   // Initialize from current profile
   React.useEffect(() => {
@@ -44,6 +46,27 @@ export function ProfileSettingsPanel() {
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-4">Profile Settings</h2>
+      <div className="mb-5 flex items-center justify-between">
+        <div className="text-sm text-gray-700">
+          {user ? (
+            <span>Signed in as <span className="font-medium">{user.email}</span></span>
+          ) : (
+            <span>Not signed in</span>
+          )}
+        </div>
+        {user ? (
+          <Button
+            variant="outline"
+            onClick={async () => { try { await signOut(); router.push('/auth/signin') } catch {} }}
+          >
+            Sign out
+          </Button>
+        ) : (
+          <Button asChild>
+            <a href="/auth/signin">Sign in</a>
+          </Button>
+        )}
+      </div>
       {error && <Alert variant="error">{error}</Alert>}
       {message && <Alert variant="success">{message}</Alert>}
 
