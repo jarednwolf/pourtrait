@@ -96,3 +96,5 @@ storybook-static
 
 # Ignore Cursor metadata
 .cursor/
+
+.npm-cache/
