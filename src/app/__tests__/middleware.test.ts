@@ -21,12 +21,13 @@ describe('middleware auth routing', () => {
     vi.restoreAllMocks()
   })
 
-  it('redirects guest from /dashboard to sign-in with returnTo', async () => {
+  it('redirects guest from /dashboard to sign-in with next', async () => {
     const req = makeReq('https://example.com/dashboard')
     const res = await middleware(req)
     // NextResponse.redirect returns an object with headers/location
     // We check the url by stringifying
-    expect((res as NextResponse).headers.get('Location')).toContain('/auth/signin?returnTo=%2Fdashboard')
+    const loc = (res as NextResponse).headers.get('Location') || ''
+    expect(loc).toContain('/auth/signin?next=%2Fdashboard')
   })
 
   it('redirects authed user from / to /dashboard', async () => {

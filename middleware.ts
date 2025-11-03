@@ -13,7 +13,8 @@ export async function middleware(req: NextRequest) {
   if (!session) {
     const now = new URL(req.url)
     const signinUrl = new URL('/auth/signin', req.url)
-    signinUrl.searchParams.set('returnTo', now.pathname + now.search)
+    const ret = now.pathname + now.search
+    signinUrl.searchParams.set('next', ret)
     return NextResponse.redirect(signinUrl)
   }
 
