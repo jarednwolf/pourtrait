@@ -9,7 +9,7 @@ import { AuthService } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 
 export function ProfileSettingsPanel() {
-  const { user, refreshProfile, signOut } = useAuth()
+  const { user, refreshProfile, signOut, initialized, loading } = useAuth()
   const [name, setName] = React.useState<string>('')
   const [experience, setExperience] = React.useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
   const [saving, setSaving] = React.useState(false)
@@ -48,13 +48,19 @@ export function ProfileSettingsPanel() {
       <h2 className="text-xl font-semibold mb-4">Profile Settings</h2>
       <div className="mb-5 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          {user ? (
+          {!initialized || loading ? (
+            <span className="text-gray-500">Checking session…</span>
+          ) : user ? (
             <span>Signed in as <span className="font-medium">{user.email}</span></span>
           ) : (
             <span>Not signed in</span>
           )}
         </div>
-        {user ? (
+        {!initialized || loading ? (
+          <Button variant="outline" disabled>
+            …
+          </Button>
+        ) : user ? (
           <Button
             variant="outline"
             onClick={async () => { try { await signOut(); router.push('/auth/signin') } catch {} }}
