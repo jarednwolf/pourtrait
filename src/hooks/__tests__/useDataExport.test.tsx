@@ -2,6 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useDataExport } from '../useDataExport'
 
+// Mock auth hook to avoid requiring AuthProvider in hook tests
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    getAccessToken: vi.fn().mockResolvedValue('test-token')
+  })
+}))
+
 // Mock fetch
 global.fetch = vi.fn()
 
@@ -53,16 +60,17 @@ describe('useDataExport', () => {
         await result.current.exportData('csv', { includePersonalNotes: true })
       })
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/data/export', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          format: 'csv',
-          options: { includePersonalNotes: true }
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/data/export',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            format: 'csv',
+            options: { includePersonalNotes: true }
+          })
         })
-      })
+      )
 
       expect(result.current.isExporting).toBe(false)
       expect(result.current.error).toBe(null)
@@ -137,9 +145,10 @@ describe('useDataExport', () => {
         await result.current.createBackup()
       })
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/data/backup?action=create', {
-        method: 'POST'
-      })
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/data/backup?action=create',
+        expect.objectContaining({ method: 'POST' })
+      )
 
       expect(result.current.error).toBe(null)
     })
@@ -164,15 +173,14 @@ describe('useDataExport', () => {
         await result.current.restoreBackup(mockFile)
       })
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/data/backup?action=restore', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          backupData: { wines: [] }
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/data/backup?action=restore',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ backupData: { wines: [] } })
         })
-      })
+      )
 
       expect(result.current.isRestoring).toBe(false)
       expect(result.current.error).toBe(null)
@@ -212,15 +220,14 @@ describe('useDataExport', () => {
         await result.current.deleteAllData('DELETE_ALL_DATA')
       })
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/data/backup', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          confirmDelete: 'DELETE_ALL_DATA'
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/data/backup',
+        expect.objectContaining({
+          method: 'DELETE',
+          headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ confirmDelete: 'DELETE_ALL_DATA' })
         })
-      })
+      )
 
       expect(result.current.isDeleting).toBe(false)
       expect(result.current.error).toBe(null)
@@ -252,7 +259,9 @@ describe('useDataExport', () => {
       })
 
       expect(stats).toEqual(mockStats)
-      expect(global.fetch).toHaveBeenCalledWith('/api/data/export')
+      // First arg should be the endpoint; headers presence is allowed
+      const call = (global.fetch as any).mock.calls.find((c: any[]) => c[0] === '/api/data/export')
+      expect(call).toBeTruthy()
     })
 
     it('should handle stats fetch errors', async () => {

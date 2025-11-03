@@ -31,7 +31,7 @@ The `AuthService` class provides a centralized interface for all authentication 
 
 React hooks provide reactive authentication state management:
 
-- `useAuth()`: Complete authentication state and actions
+- `useAuth()`: Context-backed authentication state and actions (single source of truth)
 - `useIsAuthenticated()`: Simple authentication status check
 - `useUserProfile()`: User profile data access
 - `useAuthLoading()`: Loading state management
@@ -46,21 +46,40 @@ The authentication state includes:
 
 ### 3. Authentication Context (`src/components/providers/AuthProvider.tsx`)
 
-The `AuthProvider` component provides authentication state to the entire application:
+The `AuthProvider` provides global auth state and consumes exactly one Supabase auth subscription internally. The root layout fetches the initial session server-side using `@supabase/ssr` and injects it into the provider for no-flicker hydration.
 
 - Wraps the app root to provide global auth state
-- Handles authentication state changes
-- Provides HOC for route protection
-- Manages loading states during initialization
+- Single subscription and debounced updates
+- Receives `initialSession`/`initialUser` from server layout
+- Provides HOC and primitives for route protection
+- Manages loading and timeout fallback
 
-### 4. Protected Routes (`src/components/auth/ProtectedRoute.tsx`)
+### 4. Protected Routes & Middleware
 
-Route protection components ensure proper access control:
+Centralized gating happens in Next.js `middleware.ts` using `@supabase/ssr` cookies to prevent UI spinner loops. Client-side `ProtectedRoute` provides a11y-friendly loading and a safety timeout fallback.
 
-- `ProtectedRoute`: Requires authentication and optional onboarding
+- `middleware.ts`: Redirects unauthenticated users to `/auth/signin`; redirects onboarding-incomplete users to `/onboarding/step1` (matchers configured)
+- `ProtectedRoute`: Client fallback UI and loading states
 - `PublicOnlyRoute`: Redirects authenticated users away from public pages
-- Automatic redirection based on authentication and onboarding status
-- Loading states during authentication checks
+
+#### Current UX highlights (SSR + RLS-first)
+
+- Server hydrates the client with the current session in `app/layout.tsx` via `@supabase/ssr`.
+- Middleware protects `/dashboard`, `/inventory`, `/chat`, `/profile`, `/settings` and skips onboarding gating on `/settings`.
+- If a user completes onboarding from the preview page, the app upserts their profile (`palate_profiles` + `user_profiles.onboarding_completed`) and immediately redirects to `/dashboard`.
+- If the user is unauthenticated on preview, the primary CTA routes to `/auth/signin?next=/dashboard` (not signup).
+- Public-only routes (signin/signup) render quickly; if auth init is slow they render after a short grace period to avoid a perceived hang.
+
+#### Email confirmation & health
+
+- Signup uses `AuthService.signUp` which sets `emailRedirectTo` to `${origin}/auth/callback?next=%2Fdashboard`.
+- A resend confirmation helper is available from the signup success screen with a small rate‑limit guard and user messaging.
+- A lightweight health endpoint is available at `/api/health/auth` which returns the derived `emailRedirectTo` and presence of supabase credentials to aid debugging deployments.
+
+#### Onboarding completion
+
+- The profile save endpoint upserts into `user_profiles` to ensure a missing row does not block `onboarding_completed`.
+- Client refreshes the profile after save to update the UI and redirect logic immediately.
 
 ### 5. Authentication Forms
 
@@ -361,3 +380,36 @@ Monitor authentication errors:
 - Data retention policies
 - User consent management
 - Right to deletion implementation
+
+## 2025-11 Auth Lifecycle Updates
+
+### Route Protection Policy
+- Public: `/`, `/onboarding/**`, `/auth/**`, marketing pages, `/test`.
+- Auth-only: `/dashboard`, `/inventory`, `/chat`, `/settings`, `/profile`.
+- Default landing for authenticated users: `/dashboard`.
+
+### Middleware Guard
+- File: `middleware.ts`
+- Behavior:
+  - If authenticated and path is `/` → redirect to `/dashboard`.
+  - If guest and path in auth-only set → redirect to `/auth/signin?returnTo=<current>`.
+- Matcher: `/`, `/dashboard`, `/inventory`, `/chat`, `/settings`, `/profile`.
+
+### Server & Client Session Helpers
+- Server (RSC/route handlers): `src/lib/supabase-server.ts`
+  - `getServerSession()`, `getServerUser()` for SSR decisions.
+- Client post-auth hook: `src/hooks/useAuthSessionRedirect.ts`
+  - Subscribes to `onAuthStateChange`; on `SIGNED_IN` redirects to `returnTo || next || /dashboard`.
+
+### Return-To Preservation
+- Forms read `returnTo`/`next` from query and sessionStorage; OAuth `redirectTo` carries `next` to `/auth/callback`.
+- Finish step (`/auth/callback/finish`) redirects to the `next` param (defaults to `/dashboard`).
+
+### Navigation IA (Authenticated)
+- Header Account menu entries: Dashboard, Cellar/Inventory, Chat Sommelier, Settings, Sign out.
+
+### Analytics Signals
+- `auth_to_dashboard` on post-auth redirect.
+- `dashboard_viewed` on dashboard.
+- `chat_opened_auth` / `chat_opened_guest` on chat open.
+- `inventory_opened_auth` / `inventory_opened_guest` on inventory open.

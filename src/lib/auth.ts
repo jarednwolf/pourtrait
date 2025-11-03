@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import type { User, AuthError } from '@supabase/supabase-js'
 import type { UserProfile } from './supabase'
-import { calculateTasteProfile } from '@/lib/onboarding/quiz-calculator'
+import { calculateStructuredUserProfile } from '@/lib/onboarding/quiz-calculator'
 import type { QuizResponse } from '@/lib/onboarding/quiz-data'
 
 export interface AuthUser extends User {
@@ -39,6 +39,13 @@ export interface UpdateProfileData {
  * Authentication service class for managing user authentication
  */
 export class AuthService {
+  // Normalize potentially pasted emails: trim, lowercase, remove zero‑width/invisible spaces
+  private static normalizeEmail(rawEmail: string): string {
+    return (rawEmail || '')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')
+      .trim()
+      .toLowerCase()
+  }
   /**
    * Sign up a new user with email and password
    */
@@ -48,8 +55,9 @@ export class AuthService {
         ? `${window.location.origin}/auth/callback?next=%2Fdashboard`
         : undefined
 
+      const normalizedEmail = this.normalizeEmail(data.email)
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
+        email: normalizedEmail,
         password: data.password,
         options: {
           data: {
@@ -111,23 +119,18 @@ export class AuthService {
         timestamp: new Date(r.timestamp || Date.now())
       }))
 
-      // Compute a full taste profile from quiz responses
-      const result = calculateTasteProfile(responses)
+      // Compute the structured user profile used by palate_profiles schema
+      const structured = calculateStructuredUserProfile(userId, responses)
 
-      const { error } = await supabase
-        .from('taste_profiles')
-        .upsert({
-          user_id: userId,
-          red_wine_preferences: result.redWinePreferences as any,
-          white_wine_preferences: result.whiteWinePreferences as any,
-          sparkling_preferences: result.sparklingPreferences as any,
-          general_preferences: result.generalPreferences as any,
-          learning_history: responses as any,
-          confidence_score: result.confidenceScore as any,
-          last_updated: new Date().toISOString() as any,
-        }, { onConflict: 'user_id' } as any)
-
-      if (error) { throw error }
+      // Use the authenticated API route to persist to palate_profiles and related tables
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) { return }
+      await fetch('/api/profile/upsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(structured)
+      })
     } catch (error) {
       console.error('Upsert taste profile from quiz error:', error)
     }
@@ -138,8 +141,9 @@ export class AuthService {
    */
   static async signIn(data: SignInData) {
     try {
+      const normalizedEmail = this.normalizeEmail(data.email)
       const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
+        email: normalizedEmail,
         password: data.password,
       })
 
@@ -157,13 +161,17 @@ export class AuthService {
   /**
    * Sign in with OAuth provider
    */
-  static async signInWithProvider(provider: 'google' | 'github' | 'apple') {
+  static async signInWithProvider(provider: 'google' | 'github' | 'apple', nextPath?: string) {
     try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : ''
+      const search = typeof window !== 'undefined' ? window.location.search : ''
+      const urlParams = new URLSearchParams(search)
+      const candidate = nextPath || urlParams.get('returnTo') || urlParams.get('next') || '/dashboard'
+      const next = typeof candidate === 'string' && candidate.startsWith('/') ? candidate : '/dashboard'
+      const redirectTo = origin ? `${origin}/auth/callback?next=${encodeURIComponent(next)}` : undefined
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+        options: { redirectTo },
       })
 
       if (error) {
@@ -197,7 +205,8 @@ export class AuthService {
    */
   static async resetPassword(data: ResetPasswordData) {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+      const normalizedEmail = this.normalizeEmail(data.email)
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       })
 
@@ -236,9 +245,10 @@ export class AuthService {
       const emailRedirectTo = typeof window !== 'undefined'
         ? `${window.location.origin}/auth/callback?next=%2Fdashboard`
         : undefined
+      const normalizedEmail = this.normalizeEmail(email)
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email,
+        email: normalizedEmail,
         options: { emailRedirectTo }
       } as any)
 
@@ -281,7 +291,17 @@ export class AuthService {
       }
 
       // Fetch user profile
-      const profile = await this.getUserProfile(user.id)
+      let profile = await this.getUserProfile(user.id)
+      // If no profile exists yet, create a minimal one
+      if (!profile) {
+        try {
+          await this.createUserProfile(user.id, {
+            name: (user.user_metadata as any)?.name || user.email?.split('@')[0] || 'User',
+            experienceLevel: 'beginner',
+          })
+          profile = await this.getUserProfile(user.id)
+        } catch {}
+      }
       
       return {
         ...user,
@@ -335,11 +355,11 @@ export class AuthService {
         .from('user_profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // No profile found
+        // For safety, treat not found as null without surfacing 406s
+        if ((error as any).code === 'PGRST116' || (error as any).status === 406) {
           return null
         }
         throw error
@@ -430,7 +450,15 @@ export class AuthService {
  */
 export const getAuthErrorMessage = (error: AuthError | Error): string => {
   if ('message' in error) {
-    switch (error.message) {
+    const msg = String(error.message || '')
+    // Friendlier copy for common, opaque GoTrue responses
+    if (msg.includes('Email address') && msg.includes('is invalid')) {
+      return 'That email looks invalid or uses a blocked test/disposable domain. Please enter a real email (Gmail, Outlook, iCloud, etc.). Tip: use an alias like name+demo@gmail.com to create a test account.'
+    }
+    if (msg.includes('is not allowed')) {
+      return 'This email domain is restricted on this project. Please use a personal or work email address.'
+    }
+    switch (msg) {
       case 'Invalid login credentials':
         return 'Invalid email or password. Please check your credentials and try again.'
       case 'Email not confirmed':
@@ -444,7 +472,7 @@ export const getAuthErrorMessage = (error: AuthError | Error): string => {
       case 'Signup is disabled':
         return 'New account registration is currently disabled.'
       default:
-        return error.message
+        return msg
     }
   }
   return 'An unexpected error occurred. Please try again.'
@@ -454,7 +482,9 @@ export const getAuthErrorMessage = (error: AuthError | Error): string => {
  * Check if user needs to complete onboarding
  */
 export const needsOnboarding = (user: AuthUser | null): boolean => {
-  return user?.profile?.onboarding_completed === false
+  // If there's no profile, or onboarding_completed is false, user needs onboarding
+  if (!user || !user.profile) { return true }
+  return user.profile.onboarding_completed === false
 }
 
 /**

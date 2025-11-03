@@ -3,6 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { AuthGate } from '@/components/auth/AuthGate'
 
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: null, loading: false, initialized: true })
+}))
+
 vi.stubGlobal('window', Object.assign(window, { dispatchEvent: vi.fn() }))
 
 describe('AuthGate', () => {

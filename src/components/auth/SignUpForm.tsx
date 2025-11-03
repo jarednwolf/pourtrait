@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { AuthService, getAuthErrorMessage, type SignUpData } from '@/lib/auth'
 
 interface SignUpFormProps {
@@ -21,7 +22,11 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [resentAt, setResentAt] = useState<number | null>(null)
+  const [resendMsg, setResendMsg] = useState<string | null>(null)
   const router = useRouter()
+  const search = useSearchParams()
+  const nextParam = search?.get('next') || '/dashboard'
 
   // Prefill experience level from saved onboarding responses (if present)
   useEffect(() => {
@@ -81,7 +86,15 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
         if (onSuccess) {
           onSuccess()
         } else {
-          router.push(redirectTo)
+          // Preserve returnTo/next when present
+          try {
+            const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+            const rt = params.get('returnTo') || params.get('next') || redirectTo
+            const dest = rt && rt.startsWith('/') ? rt : redirectTo
+            router.push(dest)
+          } catch {
+            router.push(redirectTo)
+          }
         }
       }
     } catch (err: any) {
@@ -94,6 +107,11 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
   const handleOAuthSignIn = async (provider: 'google' | 'github' | 'apple') => {
     try {
       setError(null)
+      // Pass through returnTo/next for callback round-trip
+      const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+      const rt = params.get('returnTo') || params.get('next') || redirectTo
+      const dest = rt && rt.startsWith('/') ? rt : redirectTo
+      try { sessionStorage.setItem('returnTo', dest) } catch {}
       await AuthService.signInWithProvider(provider)
     } catch (err: any) {
       setError(getAuthErrorMessage(err))
@@ -117,12 +135,25 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
             <p className="text-sm text-gray-500 mb-6">
               Please check your email and click the confirmation link to activate your account.
             </p>
-            <button
-              onClick={() => AuthService.resendConfirmation(formData.email)}
-              className="text-blue-600 hover:text-blue-500 text-sm"
-            >
-              Resend confirmation email
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={async () => {
+                  if (resentAt && Date.now() - resentAt < 30_000) { return }
+                  try {
+                    await AuthService.resendConfirmation(formData.email)
+                    setResentAt(Date.now())
+                    setResendMsg('Email sent. Check your inbox and spam folder.')
+                  } catch {
+                    setResendMsg('Could not resend right now. Please try again in a moment.')
+                  }
+                }}
+                disabled={!!resentAt && Date.now() - resentAt < 30_000}
+                className="text-blue-600 hover:text-blue-500 text-sm disabled:opacity-50"
+              >
+                Resend confirmation email
+              </button>
+              {resendMsg && <div className="text-xs text-gray-500" role="status">{resendMsg}</div>}
+            </div>
           </div>
         </div>
       </div>
@@ -291,7 +322,7 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
         <div className="mt-6 text-center">
           <div className="text-sm text-gray-600">
             Already have an account?{' '}
-            <Link href="/auth/signin" className="text-blue-600 hover:text-blue-500">
+            <Link href={`/auth/signin?next=${encodeURIComponent(nextParam)}`} className="text-blue-600 hover:text-blue-500">
               Sign in
             </Link>
           </div>

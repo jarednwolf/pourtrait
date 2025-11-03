@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthContext } from '@/components/providers/AuthProvider'
 import { needsOnboarding } from '@/lib/auth'
@@ -20,7 +20,22 @@ export function ProtectedRoute({
   redirectTo = '/auth/signin'
 }: ProtectedRouteProps) {
   const { user, loading, initialized } = useAuthContext()
+  const auth = useAuthContext()
   const router = useRouter()
+  const [timedOut, setTimedOut] = useState(false)
+
+  useEffect(() => {
+    // Watchdog: if auth is stuck loading for too long, try a manual refresh
+    const timeout = setTimeout(() => {
+      try {
+        if (!initialized || loading) {
+          auth.refreshUser?.()
+        }
+      } catch {}
+    }, 2500)
+
+    return () => clearTimeout(timeout)
+  }, [initialized, loading, auth])
 
   useEffect(() => {
     if (!initialized || loading) {
@@ -52,8 +67,24 @@ export function ProtectedRoute({
     }
   }, [user, loading, initialized, requireOnboarding, redirectTo, router])
 
+  useEffect(() => {
+    if (initialized && !loading) { return }
+    const t = setTimeout(() => setTimedOut(true), 15000)
+    return () => clearTimeout(t)
+  }, [initialized, loading])
+
   // Show loading state
   if (!initialized || loading) {
+    if (timedOut) {
+      return (
+        <div className="flex min-h-screen items-center justify-center" role="alert" aria-live="assertive">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Taking longer than expected</h2>
+            <p className="text-gray-600">Please refresh the page or try signing in again.</p>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className="flex min-h-screen items-center justify-center" role="status" aria-live="polite">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -106,8 +137,22 @@ export function PublicOnlyRoute({
   children: ReactNode
   redirectTo?: string 
 }) {
-  const { user, loading, initialized } = useAuthContext()
+  const auth = useAuthContext()
+  const { user, loading, initialized } = auth
   const router = useRouter()
+  const [fallbackReady, setFallbackReady] = useState(false)
+
+  // Watchdog: if auth remains loading for too long on public routes, refresh
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      try {
+        if (!initialized || loading) {
+          auth.refreshUser?.()
+        }
+      } catch {}
+    }, 2500)
+    return () => clearTimeout(timeout)
+  }, [initialized, loading, auth])
 
   useEffect(() => {
     if (!initialized || loading) {
@@ -115,9 +160,9 @@ export function PublicOnlyRoute({
     }
 
     if (user) {
-      // If user needs onboarding, redirect there instead
+      // If user needs onboarding, send them to Account instead of gating them
       if (needsOnboarding(user)) {
-        router.push('/onboarding')
+        router.push('/settings')
       } else {
         router.push(redirectTo)
       }
@@ -126,11 +171,18 @@ export function PublicOnlyRoute({
 
   // Show loading state
   if (!initialized || loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    )
+    // After a short grace period, render children even if auth hasn't resolved.
+    // This prevents auth pages from appearing to hang on slow or blocked storage environments.
+    if (!fallbackReady) {
+      // Start a one-time timer to allow render-through
+      setTimeout(() => setFallbackReady(true), 1200)
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      )
+    }
+    return <>{children}</>
   }
 
   // Already authenticated
@@ -142,7 +194,7 @@ export function PublicOnlyRoute({
             Already Signed In
           </h2>
           <p className="text-gray-600">
-            Redirecting to dashboard...
+            Redirecting to {needsOnboarding(auth.user) ? 'account' : 'dashboard'}...
           </p>
         </div>
       </div>

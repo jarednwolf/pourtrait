@@ -2,6 +2,13 @@ import React from 'react'
 import { render, waitFor } from '@testing-library/react'
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import OnboardingPreviewPage from '@/app/onboarding/preview/page'
+// Mock auth hooks to avoid needing AuthProvider in this isolated render
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 'test' }, loading: false, initialized: true }),
+  useIsAuthenticated: () => true,
+  useUserProfile: () => ({ profile: { id: 'test' }, loading: false, isAuthenticated: true }),
+  useAuthLoading: () => false,
+}))
 
 let axe: any
 try {

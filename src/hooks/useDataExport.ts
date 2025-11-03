@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAuth } from '@/hooks/useAuth'
 import { ExportOptions } from '@/lib/services/data-export'
 
 interface ExportStats {
@@ -22,6 +23,7 @@ interface UseDataExportReturn {
 }
 
 export function useDataExport(): UseDataExportReturn {
+  const { getAccessToken } = useAuth()
   const [isExporting, setIsExporting] = useState(false)
   const [isRestoring, setIsRestoring] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -32,10 +34,12 @@ export function useDataExport(): UseDataExportReturn {
     setError(null)
 
     try {
+      const token = await getAccessToken().catch(() => null)
       const response = await fetch('/api/data/export', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ format, options })
       })
@@ -76,8 +80,12 @@ export function useDataExport(): UseDataExportReturn {
     setError(null)
 
     try {
+      const token = await getAccessToken().catch(() => null)
       const response = await fetch('/api/data/backup?action=create', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
       })
 
       if (!response.ok) {
@@ -148,10 +156,12 @@ export function useDataExport(): UseDataExportReturn {
         throw new Error('Backup restore failed')
       }
 
+      const token = await getAccessToken().catch(() => null)
       const response = await fetch('/api/data/backup?action=restore', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ backupData })
       })
@@ -177,10 +187,12 @@ export function useDataExport(): UseDataExportReturn {
     setError(null)
 
     try {
+      const token = await getAccessToken().catch(() => null)
       const response = await fetch('/api/data/backup', {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ confirmDelete: confirmation })
       })
@@ -205,17 +217,32 @@ export function useDataExport(): UseDataExportReturn {
     setError(null)
 
     try {
-      const response = await fetch('/api/data/export')
+      const token = await getAccessToken().catch(() => null)
+      const response = await fetch('/api/data/export', {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to get export stats')
+        // Swallow 401s quietly (can occur before client auth hydrates). Return zeros and allow caller to retry later.
+        if (response.status === 401) {
+          return {
+            totalWines: 0,
+            totalConsumptionRecords: 0,
+            hasTasteProfile: false,
+            accountCreated: '',
+            lastActivity: ''
+          }
+        }
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error((errorData as any).error || 'Failed to get export stats')
       }
 
       return await response.json()
 
     } catch (err) {
-      // Return zeros if stats fail, and set lightweight message
+      // Return zeros if stats fail; keep error lightweight
       setError(err instanceof Error ? err.message : 'Failed to get export stats')
       return {
         totalWines: 0,

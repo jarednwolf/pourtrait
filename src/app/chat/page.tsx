@@ -27,8 +27,8 @@ function ChatContent() {
   const { user } = useAuth()
 
   useEffect(() => {
-    track('chat_opened')
-  }, [])
+    track(user ? 'chat_opened_auth' : 'chat_opened_guest')
+  }, [user])
 
   useEffect(() => {
     if (initialMessage) {

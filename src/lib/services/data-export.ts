@@ -1,5 +1,6 @@
 import { Wine, User, TasteProfile, ConsumptionRecord } from '@/types'
 import { supabase, createClient } from '@/lib/supabase'
+import { loadTasteProfileFromPalate } from '@/lib/profile/taste-mapper'
 import { logger } from '@/lib/utils/logger'
 
 export interface ExportOptions {
@@ -102,24 +103,7 @@ export class DataExportService {
 
       // Include taste profile if requested
       if (options.includeTasteProfile) {
-        const { data: tasteProfile } = await client
-          .from('taste_profiles')
-          .select('*')
-          .eq('user_id', userId)
-          .single()
-        
-        if (tasteProfile) {
-          exportData.tasteProfile = {
-            userId: tasteProfile.user_id,
-            redWinePreferences: tasteProfile.red_wine_preferences as unknown as TasteProfile['redWinePreferences'],
-            whiteWinePreferences: tasteProfile.white_wine_preferences as unknown as TasteProfile['whiteWinePreferences'],
-            sparklingPreferences: tasteProfile.sparkling_preferences as unknown as TasteProfile['sparklingPreferences'],
-            generalPreferences: tasteProfile.general_preferences as unknown as TasteProfile['generalPreferences'],
-            learningHistory: tasteProfile.learning_history as unknown as TasteProfile['learningHistory'],
-            confidenceScore: tasteProfile.confidence_score ?? 0,
-            lastUpdated: new Date(tasteProfile.last_updated || new Date().toISOString())
-          }
-        }
+        exportData.tasteProfile = await loadTasteProfileFromPalate(client, userId)
       }
 
       // Include consumption history if requested
@@ -269,13 +253,21 @@ export class DataExportService {
         }
       }
 
-      // Restore taste profile if included
+      // Restore taste profile if included (palate_profiles)
       if (backupData.tasteProfile) {
         const { error: upsertProfileError } = await client
-          .from('taste_profiles')
+          .from('palate_profiles')
           .upsert({
-            ...backupData.tasteProfile,
-            user_id: userId
+            user_id: userId,
+            flavor_maps: {
+              red: backupData.tasteProfile.redWinePreferences,
+              white: backupData.tasteProfile.whiteWinePreferences,
+              sparkling: backupData.tasteProfile.sparklingPreferences
+            } as any,
+            general_preferences: backupData.tasteProfile.generalPreferences as any,
+            learning_history: backupData.tasteProfile.learningHistory as any,
+            confidence_score: backupData.tasteProfile.confidenceScore as any,
+            updated_at: new Date().toISOString() as any
           })
 
         if (upsertProfileError) {
@@ -327,6 +319,7 @@ export class DataExportService {
       'consumption_history',
       'recommendations',
       'notifications',
+      'palate_profiles',
       'taste_profiles',
       'wines'
     ] as const
@@ -422,7 +415,7 @@ export class DataExportService {
     // Respect mock call ordering by running sequentially in the same order as the test config
     const totalWines = await listCount('wines')
     const totalConsumptionRecords = await listCount('consumption_history')
-    const profileRow = await getSingle('taste_profiles', 'id')
+    const profileRow = await getSingle('palate_profiles', 'user_id')
     const userRow = await getSingle('user_profiles', 'created_at, updated_at')
 
     return {

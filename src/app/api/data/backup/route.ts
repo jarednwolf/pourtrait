@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { dataExportService } from '@/lib/services/data-export'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/database.types'
+import { dataExportService, DataExportService } from '@/lib/services/data-export'
+import { createRlsClientFromRequest } from '@/lib/supabase/api-auth'
+function getSupabaseServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  return createClient<Database>(url, serviceKey)
+}
+
+async function getAuthenticatedUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader) { return { user: null as any, token: null as any } }
+  const token = authHeader.replace('Bearer ', '')
+  const supabase = getSupabaseServiceClient()
+  const { data: { user }, error } = await supabase.auth.getUser(token)
+  if (error || !user) { return { user: null as any, token: null as any } }
+  return { user, token }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
+    const { user, token } = await getAuthenticatedUser(request)
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -20,7 +34,10 @@ export async function POST(request: NextRequest) {
 
     if (action === 'create') {
       // Create backup
-      const backupData = await dataExportService.createBackup(user.id)
+      // Use RLS-enabled client bound to the bearer token
+      const rlsClient = token ? createRlsClientFromRequest(request) : null
+      const svc = rlsClient ? new DataExportService(rlsClient as any) : dataExportService
+      const backupData = await svc.createBackup(user.id)
       
       return new NextResponse(JSON.stringify(backupData, null, 2), {
         status: 200,
@@ -43,8 +60,9 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-
-      await dataExportService.restoreFromBackup(user.id, backupData)
+      const rlsClient = token ? createRlsClientFromRequest(request) : null
+      const svc = rlsClient ? new DataExportService(rlsClient as any) : dataExportService
+      await svc.restoreFromBackup(user.id, backupData)
 
       return NextResponse.json({
         success: true,
@@ -68,11 +86,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
+    const { user } = await getAuthenticatedUser(request)
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -89,8 +104,9 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Delete all user data
-    await dataExportService.deleteAllUserData(user.id)
+    // Delete all user data (requires service-role for auth.admin.deleteUser)
+    const svc = new DataExportService(getSupabaseServiceClient() as any)
+    await svc.deleteAllUserData(user.id)
 
     return NextResponse.json({
       success: true,

@@ -60,14 +60,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user profile and preferences
-    const { data: profile } = await supabase
-      .from('taste_profiles')
-      .select('*')
-      .eq('user_id', user.id)
+    // Get user experience level from user profile
+    const { data: userProfile } = await supabase
+      .from('user_profiles')
+      .select('experience_level')
+      .eq('id', user.id)
       .single()
 
-    const experienceLevel = profile?.experience_level || 'intermediate'
+    const experienceLevel = userProfile?.experience_level || 'intermediate'
 
     // Get conversation history and context
     const conversationHistory = body.conversationHistory || []
@@ -219,11 +219,11 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 })
     }
 
-    // Get user profile and context
+    // Get user experience level
     const { data: profile } = await supabase
-      .from('taste_profiles')
-      .select('*')
-      .eq('user_id', user.id)
+      .from('user_profiles')
+      .select('experience_level')
+      .eq('id', user.id)
       .single()
 
     const experienceLevel = profile?.experience_level || 'intermediate'

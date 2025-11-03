@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { imageProcessingService } from '@/lib/services/image-processing'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createSSRServerClient } from '@/lib/supabase/clients.server'
 
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = await createSSRServerClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {

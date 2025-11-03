@@ -209,7 +209,8 @@ async function markNotificationAsRead(notificationId) {
   
   try {
     await fetch(`/api/notifications/${notificationId}/read`, {
-      method: 'POST'
+      method: 'POST',
+      credentials: 'include'
     })
   } catch (error) {
     console.error('Error marking notification as read:', error)
@@ -224,6 +225,7 @@ async function snoozeNotification(data) {
       headers: {
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({
         notificationId: data.notificationId,
         snoozeMinutes: 60 // Snooze for 1 hour
@@ -254,7 +256,8 @@ async function syncPendingNotifications() {
   try {
     // Fetch any pending notifications that need to be delivered
     const response = await fetch('/api/notifications/sync', {
-      method: 'POST'
+      method: 'POST',
+      credentials: 'include'
     })
     
     if (response.ok) {

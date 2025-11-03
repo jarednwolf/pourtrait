@@ -37,3 +37,14 @@ vi.mock('next/link', () => ({
 // Mock environment variables for tests
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
+
+// Polyfill IntersectionObserver for jsdom environment
+if (!(globalThis as any).IntersectionObserver) {
+  ;(globalThis as any).IntersectionObserver = class {
+    constructor(_cb: any, _options?: any) {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() { return [] }
+  }
+}

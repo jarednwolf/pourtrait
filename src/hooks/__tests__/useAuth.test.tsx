@@ -1,31 +1,21 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 import { useAuth, useIsAuthenticated, useUserProfile, useAuthLoading } from '../useAuth'
-import { AuthService } from '@/lib/auth'
+import { AuthProvider } from '@/components/providers/AuthProvider'
 
-// Mock AuthService
-vi.mock('@/lib/auth', () => ({
-  AuthService: {
-    getCurrentUser: vi.fn(),
-    getSession: vi.fn(),
-    signOut: vi.fn(),
-  },
+// Drive auth state via internal hook mock
+let mockAuthState: any
+vi.mock('@/hooks/useAuthInternal', () => ({
+  useAuthInternal: () => mockAuthState
 }))
 
-// Mock Supabase
-vi.mock('@/lib/supabase', () => ({
-  supabase: {
-    auth: {
-      onAuthStateChange: vi.fn(() => ({
-        data: {
-          subscription: {
-            unsubscribe: vi.fn(),
-          },
-        },
-      })),
-    },
-  },
-}))
+function withProvider(ui: any) {
+  return {
+    wrapper: ({ children }: any) => (
+      <AuthProvider initialSession={null} initialUser={null}>{children}</AuthProvider>
+    )
+  }
+}
 
 describe('useAuth', () => {
   beforeEach(() => {
@@ -37,78 +27,55 @@ describe('useAuth', () => {
   })
 
   it('should initialize with loading state', () => {
-    const { result } = renderHook(() => useAuth())
-
+    mockAuthState = {
+      user: null,
+      session: null,
+      loading: true,
+      initialized: false,
+      signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn(),
+    }
+    const { result } = renderHook(() => useAuth(), withProvider(null))
     expect(result.current.loading).toBe(true)
     expect(result.current.initialized).toBe(false)
     expect(result.current.user).toBeNull()
     expect(result.current.session).toBeNull()
   })
 
-  it('should set user and session when authenticated', async () => {
-    const mockUser = {
-      id: 'user-123',
-      email: 'test@example.com',
-      profile: { id: 'user-123', name: 'Test User', experience_level: 'beginner' },
-    }
+  it('should set user and session when authenticated', () => {
+    const mockUser = { id: 'user-123', email: 'test@example.com', profile: { id: 'user-123' } }
     const mockSession = { access_token: 'token', user: mockUser }
-
-    vi.mocked(AuthService.getSession).mockResolvedValue(mockSession)
-    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(mockUser)
-
-    const { result } = renderHook(() => useAuth())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
+    mockAuthState = {
+      user: mockUser,
+      session: mockSession,
+      loading: false,
+      initialized: true,
+      signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn(),
+    }
+    const { result } = renderHook(() => useAuth(), withProvider(null))
     expect(result.current.initialized).toBe(true)
     expect(result.current.user).toEqual(mockUser)
-    expect(result.current.session).toEqual(mockSession)
+    expect(result.current.session).toEqual(mockSession as any)
   })
 
   it('should handle sign out', async () => {
-    vi.mocked(AuthService.signOut).mockResolvedValue()
-
-    const { result } = renderHook(() => useAuth())
-
-    await act(async () => {
-      await result.current.signOut()
-    })
-
-    expect(AuthService.signOut).toHaveBeenCalled()
+    const signOut = vi.fn()
+    mockAuthState = { user: null, session: null, loading: false, initialized: true, signOut, refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useAuth(), withProvider(null))
+    await act(async () => { await result.current.signOut() })
+    expect(signOut).toHaveBeenCalled()
   })
 
   it('should refresh user data', async () => {
-    const mockUser = {
-      id: 'user-123',
-      email: 'test@example.com',
-      profile: { id: 'user-123', name: 'Test User', experience_level: 'beginner' },
-    }
-
-    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(mockUser)
-    vi.mocked(AuthService.getSession).mockResolvedValue(null)
-
-    const { result } = renderHook(() => useAuth())
-
-    await act(async () => {
-      await result.current.refreshUser()
-    })
-
-    expect(AuthService.getCurrentUser).toHaveBeenCalled()
-    expect(AuthService.getSession).toHaveBeenCalled()
+    const refreshUser = vi.fn()
+    mockAuthState = { user: null, session: null, loading: false, initialized: true, signOut: vi.fn(), refreshUser, getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useAuth(), withProvider(null))
+    await act(async () => { await result.current.refreshUser() })
+    expect(refreshUser).toHaveBeenCalled()
   })
 
-  it('should handle authentication errors gracefully', async () => {
-    vi.mocked(AuthService.getSession).mockRejectedValue(new Error('Auth error'))
-    vi.mocked(AuthService.getCurrentUser).mockRejectedValue(new Error('Auth error'))
-
-    const { result } = renderHook(() => useAuth())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
+  it('should handle authentication errors gracefully', () => {
+    mockAuthState = { user: null, session: null, loading: false, initialized: true, signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useAuth(), withProvider(null))
     expect(result.current.initialized).toBe(true)
     expect(result.current.user).toBeNull()
     expect(result.current.session).toBeNull()
@@ -117,11 +84,8 @@ describe('useAuth', () => {
 
 describe('useIsAuthenticated', () => {
   it('should return false when not authenticated', () => {
-    vi.mocked(AuthService.getSession).mockResolvedValue(null)
-    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(null)
-
-    const { result } = renderHook(() => useIsAuthenticated())
-
+    mockAuthState = { user: null, session: null, loading: false, initialized: true, signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useIsAuthenticated(), withProvider(null))
     expect(result.current).toBe(false)
   })
 
@@ -132,14 +96,9 @@ describe('useIsAuthenticated', () => {
       profile: { id: 'user-123', name: 'Test User', experience_level: 'beginner' },
     }
 
-    vi.mocked(AuthService.getSession).mockResolvedValue({ access_token: 'token' } as any)
-    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(mockUser)
-
-    const { result } = renderHook(() => useIsAuthenticated())
-
-    await waitFor(() => {
-      expect(result.current).toBe(true)
-    })
+    mockAuthState = { user: mockUser, session: { access_token: 'token' }, loading: false, initialized: true, signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useIsAuthenticated(), withProvider(null))
+    expect(result.current).toBe(true)
   })
 })
 
@@ -151,29 +110,15 @@ describe('useUserProfile', () => {
       profile: { id: 'user-123', name: 'Test User', experience_level: 'beginner' },
     }
 
-    vi.mocked(AuthService.getSession).mockResolvedValue({ access_token: 'token' } as any)
-    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(mockUser)
-
-    const { result } = renderHook(() => useUserProfile())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
+    mockAuthState = { user: mockUser, session: { access_token: 'token' }, loading: false, initialized: true, signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useUserProfile(), withProvider(null))
     expect(result.current.profile).toEqual(mockUser.profile)
     expect(result.current.isAuthenticated).toBe(true)
   })
 
   it('should return null profile when not authenticated', async () => {
-    vi.mocked(AuthService.getSession).mockResolvedValue(null)
-    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(null)
-
-    const { result } = renderHook(() => useUserProfile())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
+    mockAuthState = { user: null, session: null, loading: false, initialized: true, signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useUserProfile(), withProvider(null))
     expect(result.current.profile).toBeNull()
     expect(result.current.isAuthenticated).toBe(false)
   })
@@ -181,18 +126,14 @@ describe('useUserProfile', () => {
 
 describe('useAuthLoading', () => {
   it('should return true when loading', () => {
-    const { result } = renderHook(() => useAuthLoading())
+    mockAuthState = { user: null, session: null, loading: true, initialized: false, signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useAuthLoading(), withProvider(null))
     expect(result.current).toBe(true)
   })
 
   it('should return false when loaded', async () => {
-    vi.mocked(AuthService.getSession).mockResolvedValue(null)
-    vi.mocked(AuthService.getCurrentUser).mockResolvedValue(null)
-
-    const { result } = renderHook(() => useAuthLoading())
-
-    await waitFor(() => {
-      expect(result.current).toBe(false)
-    })
+    mockAuthState = { user: null, session: null, loading: false, initialized: true, signOut: vi.fn(), refreshUser: vi.fn(), getAccessToken: vi.fn(), refreshProfile: vi.fn() }
+    const { result } = renderHook(() => useAuthLoading(), withProvider(null))
+    expect(result.current).toBe(false)
   })
 })

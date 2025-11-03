@@ -6,7 +6,7 @@ Delivers immediate personalization before signup. After the quiz, we show a load
 ## UX Flow
 - Guest completes the quiz → routed to `/onboarding/preview`.
 - Loader starts; once mapping completes, the page renders the personalized preview (bars + summary) using `ProfileSummary`.
-- CTA “Save my profile” sends the user to signup; after auth, the finish callback upserts the preview to DB and redirects to `/onboarding/summary`.
+- CTA “Save my profile” sends the user to signup; after auth, the finish callback upserts the preview to DB and redirects to `next` (defaults to `/dashboard`).
 
 ## Storage
 - Local-only for v1 (cross-device can be added later).
@@ -23,7 +23,7 @@ Delivers immediate personalization before signup. After the quiz, we show a load
 ## Conversion (Post‑Auth)
 - `src/app/auth/callback/finish/page.tsx` checks `pourtrait_profile_preview_v1` first.
 - If present: upsert via `POST /api/profile/upsert`, then emits `profile_created` through `POST /api/interactions/track` with `{ reasons: ['profile_created'], context: { source: 'preview', used_llm: true } }`.
-- Clears both local keys and redirects to `/onboarding/summary`.
+- Clears both local keys and redirects to the `next` param (defaults to `/dashboard`).
 - If absent: falls back to mapping from saved quiz answers.
 
 ## Data Model Touchpoints

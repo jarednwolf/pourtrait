@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { DataExportPanel } from '@/components/settings/DataExportPanel'
 import { Card } from '@/components/ui/Card'
+import { ProfileSettingsPanel } from '@/components/settings/ProfileSettingsPanel'
 import { Button } from '@/components/ui/Button'
 import { usePushNotifications, useNotificationPreferences } from '@/hooks/usePushNotifications'
 import { track } from '@/lib/utils/track'
@@ -10,7 +11,7 @@ import { track } from '@/lib/utils/track'
 type SettingsTab = 'profile' | 'notifications' | 'data' | 'privacy'
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>('data')
+  const [activeTab, setActiveTab] = useState<SettingsTab>('profile')
 
   useEffect(() => {
     if (typeof window === 'undefined') {return}
@@ -61,12 +62,7 @@ export default function SettingsPage() {
 
           {/* Main Content */}
           <div className="flex-1">
-            {activeTab === 'profile' && (
-              <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Profile Settings</h2>
-                <p className="text-gray-600">Profile management features coming soon.</p>
-              </Card>
-            )}
+            {activeTab === 'profile' && <ProfileSettingsPanel />}
 
             {activeTab === 'notifications' && (
               <Card className="p-6">

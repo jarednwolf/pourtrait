@@ -279,7 +279,7 @@ describe('PublicOnlyRoute', () => {
     })
   })
 
-  it('should redirect to onboarding when authenticated but not onboarded', async () => {
+  it('should redirect to settings when authenticated but not onboarded', async () => {
     const mockUser = {
       id: 'user-123',
       email: 'test@example.com',
@@ -307,7 +307,7 @@ describe('PublicOnlyRoute', () => {
     )
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/onboarding')
+      expect(mockPush).toHaveBeenCalledWith('/settings')
     })
   })
 

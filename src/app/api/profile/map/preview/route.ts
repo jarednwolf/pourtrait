@@ -27,8 +27,8 @@ export async function POST(request: NextRequest) {
     const cookies = parseCookies(request.headers.get('cookie'))
     const lastTs = Number(cookies['pp_preview_ts'] || '0')
     const now = Date.now()
-    if (!isNaN(lastTs) && now - lastTs < 10_000) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    if (!isNaN(lastTs) && now - lastTs < 4_000) {
+      return NextResponse.json({ error: 'Too many requests', retryAfterMs: 4000 - (now - lastTs) }, { status: 429 })
     }
 
     const startedAt = Date.now()
@@ -73,8 +73,15 @@ export async function POST(request: NextRequest) {
     res.cookies.set('pp_preview_ts', String(now), { httpOnly: false, sameSite: 'lax', maxAge: 60 * 5 })
     return res
   } catch (error) {
-    console.error('preview_map_failed', { error: (error as any)?.message || String(error) })
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const err: any = error
+    const payload = {
+      error: 'preview_map_failed',
+      code: err?.code || err?.status || err?.name || 'unknown',
+      message: err?.message || 'Unknown error',
+      outputSample: err?.outputSample,
+    }
+    console.error('preview_map_failed', payload)
+    return NextResponse.json(payload, { status: 500 })
   }
 }
 

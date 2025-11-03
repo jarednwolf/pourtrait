@@ -5,6 +5,7 @@ import {
   Wine
 } from '@/types'
 import { createClient } from '@supabase/supabase-js'
+import { loadTasteProfileFromPalate } from '@/lib/profile/taste-mapper'
 
 /**
  * Restaurant Wine Analysis Service
@@ -799,14 +800,8 @@ export class RestaurantWineAnalysisService {
    */
   private async getUserTasteProfile(userId: string): Promise<TasteProfile | null> {
     try {
-      const { data, error } = await this.getSupabase()
-        .from('taste_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single()
-
-      if (error || !data) {return null}
-      return data as TasteProfile
+      const supabase = this.getSupabase()
+      return await loadTasteProfileFromPalate(supabase, userId)
     } catch (error) {
       console.error('Failed to fetch taste profile:', error)
       return null

@@ -5,6 +5,7 @@ import { Wine, TasteProfile, RecommendationContext, Recommendation, ConsumptionR
 import { AIRecommendationEngine } from '@/lib/ai/recommendation-engine'
 import { AIRecommendationRequest } from '@/lib/ai/types'
 import { createClient } from '@supabase/supabase-js'
+import { loadTasteProfileFromPalate } from '@/lib/profile/taste-mapper'
 
 // ============================================================================
 // Core Recommendation Service
@@ -291,14 +292,7 @@ export class PersonalizedRecommendationService {
   }
 
   private async getUserTasteProfile(userId: string): Promise<TasteProfile> {
-    const { data, error } = await this.supabase
-      .from('taste_profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single()
-
-    if (error) {throw error}
-    return data
+    return await loadTasteProfileFromPalate(this.supabase, userId)
   }
 
   private async getUserConsumptionHistory(userId: string): Promise<ConsumptionRecord[]> {

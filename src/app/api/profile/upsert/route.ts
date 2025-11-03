@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Mark onboarding as completed and sync experience level on user profile
+    // Mark onboarding as completed and ensure user profile row exists
     try {
       const mappedExperience = profile.wineKnowledge === 'novice'
         ? 'beginner'
@@ -98,9 +98,10 @@ export async function POST(request: NextRequest) {
           : profile.wineKnowledge
       await supabase
         .from('user_profiles')
-        .update({ onboarding_completed: true, experience_level: mappedExperience })
-        .eq('id', userId)
+        .upsert({ id: userId, onboarding_completed: true, experience_level: mappedExperience })
     } catch {}
+
+    // Legacy backfill removed after migration to palate_profiles readers
 
     return NextResponse.json({ success: true })
 

@@ -32,12 +32,13 @@ function mapProfileToDisplay(profile: UserProfileInput) {
 
 export default function OnboardingPreviewPage() {
   const router = useRouter()
-  const { user, getAccessToken } = useAuth()
+  const { user, getAccessToken, refreshProfile } = useAuth()
   const [loading, setLoading] = React.useState(true)
   const [summary, setSummary] = React.useState<string>('')
   const [commentary, setCommentary] = React.useState<string>('')
   const [confidence, setConfidence] = React.useState<number | undefined>(undefined)
   const [display, setDisplay] = React.useState<any | null>(null)
+  const [error, setError] = React.useState<string | null>(null)
   const headingRef = React.useRef<HTMLHeadingElement | null>(null)
 
   React.useEffect(() => {
@@ -47,9 +48,13 @@ export default function OnboardingPreviewPage() {
     setTimeout(() => headingRef.current?.focus(), 0)
   }, [])
 
+  const hasRequestedRef = React.useRef(false)
+
   React.useEffect(() => {
     let cancelled = false
     const run = async () => {
+      if (hasRequestedRef.current) { return }
+      hasRequestedRef.current = true
       try {
         const raw = typeof window !== 'undefined' ? window.localStorage.getItem(QUIZ_KEY) : null
         if (!raw) {
@@ -75,9 +80,35 @@ export default function OnboardingPreviewPage() {
           body: JSON.stringify({ experience: exp, freeTextAnswers })
         })
         if (!res.ok) {
-          const errText = await res.text().catch(() => '')
-          track('preview_map_failed', { status: res.status, body: errText?.slice?.(0, 200) })
-          throw new Error('preview mapping failed')
+          let errText = ''
+          try { errText = await res.text() } catch {}
+          track('preview_map_failed', { status: res.status, body: errText?.slice?.(0, 400) })
+          if (res.status === 429) {
+            // Auto retry once after a short delay to smooth over double-invokes
+            await new Promise(resolve => setTimeout(resolve, 1500))
+            if (!cancelled) {
+              hasRequestedRef.current = false
+              setError(null)
+              run()
+              return
+            }
+          } else if (res.status === 500) {
+            try {
+              const parsed = JSON.parse(errText)
+              if (parsed?.code === 'openai_request_failed') {
+                setError('Model request failed. Verify OPENAI_API_KEY and model access, then retry.')
+              } else if (parsed?.code === 'invalid_json' || parsed?.code === 'schema_validation_failed') {
+                setError('The model returned an invalid response. Try again in a moment or adjust the model setting.')
+              } else {
+                setError('We could not contact the model. Check API key and model config, then retry.')
+              }
+            } catch {
+              setError('We could not contact the model. Check API key and model config, then retry.')
+            }
+          } else {
+            setError('We could not generate your preview right now. Please retry.')
+          }
+          return
         }
         const { data } = await res.json()
         const prof: UserProfileInput | null = data?.profile || null
@@ -90,12 +121,10 @@ export default function OnboardingPreviewPage() {
           setSummary(sum)
           setCommentary(comm)
           setConfidence(conf)
-          try {
-            window.localStorage.setItem(PREVIEW_KEY, JSON.stringify({ profile: prof, summary: sum }))
-          } catch {}
+          try { window.localStorage.setItem(PREVIEW_KEY, JSON.stringify({ profile: prof, summary: sum })) } catch {}
           track('preview_map_completed')
 
-          // If the user is already authenticated, upsert immediately
+          // If already authenticated, upsert immediately
           if (user) {
             try {
               const token = await getAccessToken()
@@ -105,11 +134,10 @@ export default function OnboardingPreviewPage() {
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                   body: JSON.stringify(prof)
                 })
-                await fetch('/api/interactions/track', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                  body: JSON.stringify({ reasons: ['profile_created'], context: { source: 'preview_authed', used_llm: true } })
-                }).catch(() => {})
+                // Refresh local profile so gating logic updates immediately
+                await refreshProfile().catch(() => {})
+                // Move the user forward automatically
+                router.push('/dashboard?show=recs=1')
               }
             } catch {}
           }
@@ -121,6 +149,29 @@ export default function OnboardingPreviewPage() {
     run()
     return () => { cancelled = true }
   }, [router])
+
+  // Secondary guard: if user becomes available later, persist the preview we stored
+  React.useEffect(() => {
+    const saveIfPending = async () => {
+      if (!user) { return }
+      try {
+        const raw = typeof window !== 'undefined' ? window.localStorage.getItem(PREVIEW_KEY) : null
+        if (!raw) { return }
+        const parsed = JSON.parse(raw)
+        const prof = parsed?.profile
+        if (!prof) { return }
+        const token = await getAccessToken()
+        if (token) {
+          await fetch('/api/profile/upsert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(prof)
+          })
+        }
+      } catch {}
+    }
+    saveIfPending()
+  }, [user, getAccessToken])
 
   return (
     <div className="min-h-screen bg-gray-50" aria-busy={loading || undefined}>
@@ -140,6 +191,18 @@ export default function OnboardingPreviewPage() {
         <div className="mt-8">
           {loading ? (
             <Card className="p-6">Analyzing your preferences…</Card>
+          ) : error ? (
+            <Card className="p-6">
+              <div className="text-gray-800">{error}</div>
+              <div className="mt-4 flex gap-3">
+                <Button asChild>
+                  <a href="/onboarding/preview">Retry</a>
+                </Button>
+                <Button asChild variant="outline">
+                  <a href="/onboarding/step1">Refine answers</a>
+                </Button>
+              </div>
+            </Card>
           ) : (
             display ? (
               <>
@@ -151,7 +214,7 @@ export default function OnboardingPreviewPage() {
                     </Button>
                   ) : (
                     <Button asChild onClick={() => track('preview_signup_clicked')}>
-                      <a href="/auth/signup?next=/dashboard" aria-label="Create account to save your profile">Save my profile</a>
+                      <a href="/auth/signin?next=/dashboard" aria-label="Sign in to save your profile">Save my profile</a>
                     </Button>
                   )}
                   <Button asChild variant="outline">

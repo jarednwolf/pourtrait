@@ -3,7 +3,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AIRecommendationEngine } from '@/lib/ai/recommendation-engine'
 import { AIRecommendationRequest } from '@/lib/ai/types'
-import { createClient } from '@supabase/supabase-js'
+import { createRlsClientFromRequest, getAccessTokenFromRequest } from '@/lib/supabase/api-auth'
+import { loadTasteProfileFromPalate } from '@/lib/profile/taste-mapper'
 
 // Configure as Edge Runtime for optimal performance
 export const runtime = 'edge'
@@ -26,25 +27,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user authentication
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+    // Authentication handled via token extraction below
+
+    // Initialize Supabase client (RLS with user's bearer token)
+    const token = getAccessTokenFromRequest(request)
+    const supabase = token ? createRlsClientFromRequest(request)! : null
+    if (!supabase) {
+      return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 })
     }
 
-    // Initialize Supabase client
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-
     // Verify user and get profile
-    const { data: { user }, error: authError } = await supabase.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    )
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token!)
 
     if (authError || !user) {
       return NextResponse.json(
@@ -53,19 +46,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user's taste profile
-    const { data: tasteProfile, error: profileError } = await supabase
-      .from('taste_profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .single()
-
-    if (profileError || !tasteProfile) {
-      return NextResponse.json(
-        { error: 'User taste profile not found' },
-        { status: 404 }
-      )
-    }
+    // Get user's taste profile from palate tables
+    const tasteProfile = await loadTasteProfileFromPalate(supabase, user.id)
 
     // Get user's wine inventory if requested
     let inventory = undefined
@@ -87,7 +69,7 @@ export async function POST(request: NextRequest) {
       context: body.context || {},
       userProfile: tasteProfile,
       inventory,
-      experienceLevel: body.experienceLevel || tasteProfile.experience_level || 'intermediate'
+      experienceLevel: body.experienceLevel || 'intermediate'
     }
 
     // Generate recommendations using AI engine

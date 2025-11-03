@@ -6,15 +6,17 @@ export { createClient }
 
 // Function to create client-side Supabase client
 export const createSupabaseClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://example.supabase.co'
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key'
-
-  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-    },
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY')
+    }
+  }
+  // Use traditional supabase-js client for broad type support across services
+  // AuthProvider will hydrate auth state from the server to avoid flicker
+  return createClient<Database>(supabaseUrl as string, supabaseAnonKey as string, {
+    auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true },
   })
 }
 
@@ -23,14 +25,15 @@ export const supabase = createSupabaseClient()
 
 // Server-side client for admin operations
 export const createServerClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://example.supabase.co'
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'service-role-key'
-
-  return createClient<Database>(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !serviceRoleKey) {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
+    }
+  }
+  return createClient<Database>(supabaseUrl as string, serviceRoleKey as string, {
+    auth: { autoRefreshToken: false, persistSession: false },
   })
 }
 

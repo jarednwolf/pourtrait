@@ -16,18 +16,18 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
       className={`relative bg-white dark:bg-transparent ${className}`}
       aria-labelledby="home-hero-heading"
     >
-      <div className="relative mx-auto max-w-6xl px-4 pt-8 pb-6 sm:pt-10 sm:pb-8 lg:pt-12 lg:pb-8">
+      <div className="relative mx-auto max-w-6xl px-4 pt-10 pb-8 sm:pt-12 sm:pb-10 lg:pt-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Copy side */}
           <div className="lg:col-span-7">
             <h1
               id="home-hero-heading"
-              className="font-serif font-bold tracking-tight text-brand-gradient text-display-2 sm:text-display-1"
+              className="font-serif font-bold tracking-tight text-gray-900 lg:text-brand-gradient text-heading-1"
             >
               Every bottle a brushstroke
             </h1>
-            <p className="mt-4 text-lg sm:text-xl text-gray-700 dark:text-gray-300 max-w-2xl">
-              Get a personalized wine pick in 60 seconds. Start your taste profile now and see tonight’s recommendation.
+            <p className="mt-5 text-body-lg text-gray-700 dark:text-gray-300 max-w-2xl">
+              Build your palate profile and cellar over time. Pourtrait learns your preferences, guides your wine journey with personalized recommendations, and alerts you when bottles are at their best.
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -40,29 +40,20 @@ export function HomeHero({ className = '' }: HomeHeroProps) {
               {/* Secondary CTA removed for focus */}
             </div>
 
-            <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-700">
-              <div className="flex items-center gap-2">
-                <Icon name="zap" className="w-4 h-4 text-primary" aria-hidden="true" />
-                <div>
-                  <dt className="sr-only">Speed</dt>
-                  <dd>Under 60s to value</dd>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Icon name="users" className="w-4 h-4 text-primary" aria-hidden="true" />
-                <div>
-                  <dt className="sr-only">Ease</dt>
-                  <dd>Beginner friendly</dd>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Icon name="shield-check" className="w-4 h-4 text-primary" aria-hidden="true" />
-                <div>
-                  <dt className="sr-only">Privacy</dt>
-                  <dd>Private by design</dd>
-                </div>
-              </div>
-            </dl>
+            <ul className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-700" role="list">
+              <li className="flex items-center gap-3">
+                <Icon name="sparkles" className="w-5 h-5 text-primary" aria-hidden="true" />
+                <span>Learns your taste over time</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Icon name="clock" className="w-5 h-5 text-primary" aria-hidden="true" />
+                <span>Drink‑window alerts</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Icon name="shield-check" className="w-5 h-5 text-primary" aria-hidden="true" />
+                <span>Private by design</span>
+              </li>
+            </ul>
           </div>
 
           {/* Visual side (hero image with gradient overlay) */}

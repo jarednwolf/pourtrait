@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
  */
 export const buttonVariants = cva(
   // Base styles applied to all buttons
-  'btn inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_a]:no-underline',
+  'btn inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 whitespace-nowrap [&_a]:no-underline',
   {
     variants: {
       variant: {
@@ -36,7 +36,7 @@ export const buttonVariants = cva(
  * Card component variants for consistent container styling
  */
 export const cardVariants = cva(
-  'rounded-lg bg-white shadow-sm ring-1 ring-gray-200 dark:bg-dark-surface dark:ring-gray-800',
+  'rounded-lg bg-white shadow-sm ring-1 ring-gray-200 transition-shadow hover:shadow-md hover:ring-gray-300 dark:bg-dark-surface dark:ring-gray-800',
   {
     variants: {
       padding: {

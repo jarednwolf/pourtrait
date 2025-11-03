@@ -373,7 +373,7 @@ export class WineService {
       .from('user_wine_stats')
       .select('*')
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
 
     if (error) {
       throw new Error(`Failed to fetch inventory stats: ${error.message}`)

@@ -14,13 +14,12 @@ try {
 // Mock router and auth used by InventoryPage
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }))
 
-vi.mock('@/components/providers/AuthProvider', async (orig) => {
-  const actual = await (orig as any)()
-  return {
-    ...actual,
-    useAuth: () => ({ isAuthenticated: true, user: { id: 'u1' }, loading: false }),
-  }
-})
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 'u1' }, loading: false, initialized: true }),
+  useIsAuthenticated: () => true,
+  useUserProfile: () => ({ profile: { id: 'u1' }, loading: false, isAuthenticated: true }),
+  useAuthLoading: () => false,
+}))
 
 // Mock enhanced service hook and WineService methods to avoid network
 vi.mock('@/lib/services/wine-service-enhanced', () => ({
