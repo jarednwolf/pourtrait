@@ -39,6 +39,13 @@ export interface UpdateProfileData {
  * Authentication service class for managing user authentication
  */
 export class AuthService {
+  // Normalize potentially pasted emails: trim, lowercase, remove zero‑width/invisible spaces
+  private static normalizeEmail(rawEmail: string): string {
+    return (rawEmail || '')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')
+      .trim()
+      .toLowerCase()
+  }
   /**
    * Sign up a new user with email and password
    */
@@ -48,8 +55,9 @@ export class AuthService {
         ? `${window.location.origin}/auth/callback?next=%2Fdashboard`
         : undefined
 
+      const normalizedEmail = this.normalizeEmail(data.email)
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
+        email: normalizedEmail,
         password: data.password,
         options: {
           data: {
@@ -133,8 +141,9 @@ export class AuthService {
    */
   static async signIn(data: SignInData) {
     try {
+      const normalizedEmail = this.normalizeEmail(data.email)
       const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
+        email: normalizedEmail,
         password: data.password,
       })
 
@@ -192,7 +201,8 @@ export class AuthService {
    */
   static async resetPassword(data: ResetPasswordData) {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+      const normalizedEmail = this.normalizeEmail(data.email)
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       })
 
@@ -231,9 +241,10 @@ export class AuthService {
       const emailRedirectTo = typeof window !== 'undefined'
         ? `${window.location.origin}/auth/callback?next=%2Fdashboard`
         : undefined
+      const normalizedEmail = this.normalizeEmail(email)
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email,
+        email: normalizedEmail,
         options: { emailRedirectTo }
       } as any)
 
