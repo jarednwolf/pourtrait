@@ -351,11 +351,11 @@ export class AuthService {
         .from('user_profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // No profile found
+        // For safety, treat not found as null without surfacing 406s
+        if ((error as any).code === 'PGRST116' || (error as any).status === 406) {
           return null
         }
         throw error
