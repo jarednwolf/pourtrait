@@ -446,7 +446,15 @@ export class AuthService {
  */
 export const getAuthErrorMessage = (error: AuthError | Error): string => {
   if ('message' in error) {
-    switch (error.message) {
+    const msg = String(error.message || '')
+    // Friendlier copy for common, opaque GoTrue responses
+    if (msg.includes('Email address') && msg.includes('is invalid')) {
+      return 'That email looks invalid or uses a blocked test/disposable domain. Please enter a real email (Gmail, Outlook, iCloud, etc.). Tip: use an alias like name+demo@gmail.com to create a test account.'
+    }
+    if (msg.includes('is not allowed')) {
+      return 'This email domain is restricted on this project. Please use a personal or work email address.'
+    }
+    switch (msg) {
       case 'Invalid login credentials':
         return 'Invalid email or password. Please check your credentials and try again.'
       case 'Email not confirmed':
@@ -460,7 +468,7 @@ export const getAuthErrorMessage = (error: AuthError | Error): string => {
       case 'Signup is disabled':
         return 'New account registration is currently disabled.'
       default:
-        return error.message
+        return msg
     }
   }
   return 'An unexpected error occurred. Please try again.'
