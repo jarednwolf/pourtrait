@@ -13,7 +13,7 @@ export function HeaderCta() {
 
   return (
     <Button asChild size="sm" variant="outline">
-      <a href={href} aria-label={label}>{label}</a>
+      <a href="/auth/signin" aria-label="Sign in">Sign in</a>
     </Button>
   )
 }

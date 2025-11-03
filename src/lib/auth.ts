@@ -161,13 +161,17 @@ export class AuthService {
   /**
    * Sign in with OAuth provider
    */
-  static async signInWithProvider(provider: 'google' | 'github' | 'apple') {
+  static async signInWithProvider(provider: 'google' | 'github' | 'apple', nextPath?: string) {
     try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : ''
+      const search = typeof window !== 'undefined' ? window.location.search : ''
+      const urlParams = new URLSearchParams(search)
+      const candidate = nextPath || urlParams.get('returnTo') || urlParams.get('next') || '/dashboard'
+      const next = typeof candidate === 'string' && candidate.startsWith('/') ? candidate : '/dashboard'
+      const redirectTo = origin ? `${origin}/auth/callback?next=${encodeURIComponent(next)}` : undefined
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+        options: { redirectTo },
       })
 
       if (error) {

@@ -86,7 +86,15 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
         if (onSuccess) {
           onSuccess()
         } else {
-          router.push(redirectTo)
+          // Preserve returnTo/next when present
+          try {
+            const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+            const rt = params.get('returnTo') || params.get('next') || redirectTo
+            const dest = rt && rt.startsWith('/') ? rt : redirectTo
+            router.push(dest)
+          } catch {
+            router.push(redirectTo)
+          }
         }
       }
     } catch (err: any) {
@@ -99,6 +107,11 @@ export function SignUpForm({ redirectTo = '/onboarding', onSuccess }: SignUpForm
   const handleOAuthSignIn = async (provider: 'google' | 'github' | 'apple') => {
     try {
       setError(null)
+      // Pass through returnTo/next for callback round-trip
+      const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+      const rt = params.get('returnTo') || params.get('next') || redirectTo
+      const dest = rt && rt.startsWith('/') ? rt : redirectTo
+      try { sessionStorage.setItem('returnTo', dest) } catch {}
       await AuthService.signInWithProvider(provider)
     } catch (err: any) {
       setError(getAuthErrorMessage(err))

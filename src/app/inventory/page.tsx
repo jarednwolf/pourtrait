@@ -164,10 +164,17 @@ export default function InventoryPage() {
   // Load initial data
   useEffect(() => {
     if (user) {
-      track('inventory_opened')
+      track('inventory_opened_auth')
       loadInventoryData()
     }
   }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Track guest inventory opens
+  useEffect(() => {
+    if (!user) {
+      track('inventory_opened_guest')
+    }
+  }, [user])
 
   const loadInventoryData = async () => {
     if (!user) {return}
