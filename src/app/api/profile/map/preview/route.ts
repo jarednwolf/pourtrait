@@ -27,8 +27,8 @@ export async function POST(request: NextRequest) {
     const cookies = parseCookies(request.headers.get('cookie'))
     const lastTs = Number(cookies['pp_preview_ts'] || '0')
     const now = Date.now()
-    if (!isNaN(lastTs) && now - lastTs < 10_000) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    if (!isNaN(lastTs) && now - lastTs < 4_000) {
+      return NextResponse.json({ error: 'Too many requests', retryAfterMs: 4000 - (now - lastTs) }, { status: 429 })
     }
 
     const startedAt = Date.now()

@@ -48,9 +48,13 @@ export default function OnboardingPreviewPage() {
     setTimeout(() => headingRef.current?.focus(), 0)
   }, [])
 
+  const hasRequestedRef = React.useRef(false)
+
   React.useEffect(() => {
     let cancelled = false
     const run = async () => {
+      if (hasRequestedRef.current) { return }
+      hasRequestedRef.current = true
       try {
         const raw = typeof window !== 'undefined' ? window.localStorage.getItem(QUIZ_KEY) : null
         if (!raw) {
@@ -80,7 +84,14 @@ export default function OnboardingPreviewPage() {
           try { errText = await res.text() } catch {}
           track('preview_map_failed', { status: res.status, body: errText?.slice?.(0, 400) })
           if (res.status === 429) {
-            setError('Please wait a few seconds and try again (temporary rate limit).')
+            // Auto retry once after a short delay to smooth over double-invokes
+            await new Promise(resolve => setTimeout(resolve, 1500))
+            if (!cancelled) {
+              hasRequestedRef.current = false
+              setError(null)
+              run()
+              return
+            }
           } else if (res.status === 500) {
             try {
               const parsed = JSON.parse(errText)
@@ -137,7 +148,7 @@ export default function OnboardingPreviewPage() {
     }
     run()
     return () => { cancelled = true }
-  }, [router, user, getAccessToken])
+  }, [router])
 
   // Secondary guard: if user becomes available later, persist the preview we stored
   React.useEffect(() => {
