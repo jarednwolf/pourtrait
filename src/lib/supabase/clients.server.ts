@@ -1,39 +1,14 @@
 import { cookies } from 'next/headers'
-import { createServerClient } from '@supabase/ssr'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import type { Database } from '@/lib/database.types'
 
 /**
  * Server Components / Route Handlers: SSR-aware Supabase client.
  * Persists auth via Next.js cookies.
  */
-export async function createSSRServerClient() {
-  const cookieStore = await cookies()
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    if (process.env.NODE_ENV !== 'test') {
-      throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY')
-    }
-  }
-
-  return createServerClient<Database>(supabaseUrl as string, supabaseAnonKey as string, {
-    cookies: {
-      get(name: string) {
-        return (cookieStore as any).get?.(name)?.value
-      },
-      set(name: string, value: string, options: any) {
-        if (typeof (cookieStore as any).set === 'function') {
-          ;(cookieStore as any).set({ name, value, ...options })
-        }
-      },
-      remove(name: string, options: any) {
-        if (typeof (cookieStore as any).set === 'function') {
-          ;(cookieStore as any).set({ name, value: '', ...options })
-        }
-      },
-    },
-  })
+export function createSSRServerClient() {
+  const cookieStore = cookies()
+  return createServerComponentClient<Database>({ cookies: () => cookieStore })
 }
 
 
