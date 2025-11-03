@@ -361,3 +361,36 @@ Monitor authentication errors:
 - Data retention policies
 - User consent management
 - Right to deletion implementation
+
+## 2025-11 Auth Lifecycle Updates
+
+### Route Protection Policy
+- Public: `/`, `/onboarding/**`, `/auth/**`, marketing pages, `/test`.
+- Auth-only: `/dashboard`, `/inventory`, `/chat`, `/settings`, `/profile`.
+- Default landing for authenticated users: `/dashboard`.
+
+### Middleware Guard
+- File: `middleware.ts`
+- Behavior:
+  - If authenticated and path is `/` → redirect to `/dashboard`.
+  - If guest and path in auth-only set → redirect to `/auth/signin?returnTo=<current>`.
+- Matcher: `/`, `/dashboard`, `/inventory`, `/chat`, `/settings`, `/profile`.
+
+### Server & Client Session Helpers
+- Server (RSC/route handlers): `src/lib/supabase-server.ts`
+  - `getServerSession()`, `getServerUser()` for SSR decisions.
+- Client post-auth hook: `src/hooks/useAuthSessionRedirect.ts`
+  - Subscribes to `onAuthStateChange`; on `SIGNED_IN` redirects to `returnTo || next || /dashboard`.
+
+### Return-To Preservation
+- Forms read `returnTo`/`next` from query and sessionStorage; OAuth `redirectTo` carries `next` to `/auth/callback`.
+- Finish step (`/auth/callback/finish`) redirects to the `next` param (defaults to `/dashboard`).
+
+### Navigation IA (Authenticated)
+- Header Account menu entries: Dashboard, Cellar/Inventory, Chat Sommelier, Settings, Sign out.
+
+### Analytics Signals
+- `auth_to_dashboard` on post-auth redirect.
+- `dashboard_viewed` on dashboard.
+- `chat_opened_auth` / `chat_opened_guest` on chat open.
+- `inventory_opened_auth` / `inventory_opened_guest` on inventory open.

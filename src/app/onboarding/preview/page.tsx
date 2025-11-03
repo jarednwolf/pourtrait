@@ -38,6 +38,7 @@ export default function OnboardingPreviewPage() {
   const [commentary, setCommentary] = React.useState<string>('')
   const [confidence, setConfidence] = React.useState<number | undefined>(undefined)
   const [display, setDisplay] = React.useState<any | null>(null)
+  const [error, setError] = React.useState<string | null>(null)
   const headingRef = React.useRef<HTMLHeadingElement | null>(null)
 
   React.useEffect(() => {
@@ -77,7 +78,8 @@ export default function OnboardingPreviewPage() {
         if (!res.ok) {
           const errText = await res.text().catch(() => '')
           track('preview_map_failed', { status: res.status, body: errText?.slice?.(0, 200) })
-          throw new Error('preview mapping failed')
+          setError('We could not generate your preview right now. Please retry.')
+          return
         }
         const { data } = await res.json()
         const prof: UserProfileInput | null = data?.profile || null
@@ -140,6 +142,18 @@ export default function OnboardingPreviewPage() {
         <div className="mt-8">
           {loading ? (
             <Card className="p-6">Analyzing your preferences…</Card>
+          ) : error ? (
+            <Card className="p-6">
+              <div className="text-gray-800">{error}</div>
+              <div className="mt-4 flex gap-3">
+                <Button asChild>
+                  <a href="/onboarding/preview">Retry</a>
+                </Button>
+                <Button asChild variant="outline">
+                  <a href="/onboarding/step1">Refine answers</a>
+                </Button>
+              </div>
+            </Card>
           ) : (
             display ? (
               <>

@@ -272,6 +272,11 @@ it('should handle error')
 - Don't mock the code you're testing
 - Use realistic mock data
 
+## Auth Routing & Middleware Tests (2025-11)
+
+- OAuth next propagation: `src/app/__tests__/auth-service.oauth.test.ts` asserts `redirectTo` includes `next`.
+- Middleware routing: `src/app/__tests__/middleware.test.ts` covers root → dashboard (authed) and guard → signin with returnTo (guest).
+
 ## AI Response Testing
 
 ### Professional Tone Validation

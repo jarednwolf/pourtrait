@@ -3,8 +3,10 @@ import { Suspense } from 'react'
 import { SignUpForm } from '@/components/auth/SignUpForm'
 import { PublicOnlyRoute } from '@/components/auth/ProtectedRoute'
 import { track } from '@/lib/utils/track'
+import { useAuthSessionRedirect } from '@/hooks/useAuthSessionRedirect'
 
 function SignUpContent() {
+  useAuthSessionRedirect()
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">

@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 export function BottomNav() {
   const pathname = usePathname()
   const items = [
-    { href: '/(auth)/dashboard', label: 'Dashboard', icon: 'home' },
+    { href: '/dashboard', label: 'Dashboard', icon: 'home' },
     { href: '/inventory', label: 'Cellar', icon: 'grid' },
     { href: '/chat', label: 'Sommelier', icon: 'sparkles' },
     { href: '/restaurant-scanner', label: 'Scan', icon: 'camera' },
