@@ -355,15 +355,9 @@ export class AuthService {
         .from('user_profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle()
+        .single()
 
-      if (error) {
-        // For safety, treat not found as null without surfacing 406s
-        if ((error as any).code === 'PGRST116' || (error as any).status === 406) {
-          return null
-        }
-        throw error
-      }
+      if (error) { throw error }
 
       return data
     } catch (error) {

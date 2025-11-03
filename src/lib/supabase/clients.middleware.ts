@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { createMiddlewareClient as createHelpersMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import type { Database } from '@/lib/database.types'
 
 /**
@@ -16,7 +16,7 @@ export function createMiddlewareClient(req: NextRequest, res: NextResponse) {
     }
   }
 
-  return createServerClient<Database>(supabaseUrl as string, supabaseAnonKey as string, {
+  return createHelpersMiddlewareClient<Database>(supabaseUrl as string, supabaseAnonKey as string, {
     cookies: {
       get(name: string) {
         return req.cookies.get(name)?.value

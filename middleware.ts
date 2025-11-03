@@ -11,13 +11,20 @@ export async function middleware(req: NextRequest) {
 
   // If not authenticated, send to sign in with return path
   if (!session) {
+    const now = new URL(req.url)
     const signinUrl = new URL('/auth/signin', req.url)
-    signinUrl.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search)
+    signinUrl.searchParams.set('returnTo', now.pathname + now.search)
     return NextResponse.redirect(signinUrl)
   }
 
   // Onboarding gating: if profile incomplete, redirect to onboarding (except when already there)
-  const pathname = req.nextUrl.pathname
+  const current = new URL(req.url)
+  const pathname = current.pathname
+  // Redirect authed user from root to dashboard
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
   const skipOnboardingGate = pathname.startsWith('/onboarding') || pathname.startsWith('/settings')
   if (!skipOnboardingGate) {
     try {
@@ -39,9 +46,9 @@ export async function middleware(req: NextRequest) {
       }
 
       if (needsOnboarding) {
-        const url = new URL('/onboarding/step1', req.url)
-        url.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search)
-        return NextResponse.redirect(url)
+        const nextUrl = new URL('/onboarding/step1', req.url)
+        nextUrl.searchParams.set('next', current.pathname + current.search)
+        return NextResponse.redirect(nextUrl)
       }
     } catch {
       // On any error, do not block navigation; allow through
@@ -53,6 +60,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
+    '/',
     '/dashboard/:path*',
     '/inventory/:path*',
     '/chat/:path*',
